@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "me.itzisonn_.meazy_addon"
-version = "1.0"
+version = "2.6"
 
 dependencies {
     implementation("com.github.ItzIsonn:Meazy:f1327886fb")
