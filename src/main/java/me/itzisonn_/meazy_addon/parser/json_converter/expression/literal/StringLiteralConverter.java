@@ -1,15 +1,15 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.expression.literal;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.StringLiteral;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class StringLiteralConverter extends Converter<StringLiteral> {
     public StringLiteralConverter() {
-        super(RegistryIdentifier.ofDefault("string_literal"));
+        super(AddonMain.getIdentifier("string_literal"));
     }
 
     @Override

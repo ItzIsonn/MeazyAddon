@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.Expression;
@@ -40,10 +39,10 @@ public class ClassDeclarationStatement extends ModifierStatement implements Stat
         if (!body.isEmpty() || !enumIds.isEmpty()) {
             StringBuilder bodyBuilder = new StringBuilder();
             for (Statement statement : body) {
-                bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+                bodyBuilder.append(Statement.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
             }
 
-            bodyString = " {\n" + enumToString(offset) + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+            bodyString = " {\n" + enumToString(offset) + bodyBuilder + Statement.getOffset(offset - 1) + "}";
         }
         else bodyString = "";
 
@@ -56,7 +55,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Stat
 
         for (int i = 0; i < enumIds.size(); i++) {
             String enumId = keySet.get(i);
-            enumIdsBuilder.append(Utils.getOffset(offset)).append(enumId);
+            enumIdsBuilder.append(Statement.getOffset(offset)).append(enumId);
 
             StringBuilder argsBuilder = new StringBuilder();
             List<Expression> args = enumIds.get(enumId);

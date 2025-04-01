@@ -2,7 +2,7 @@ package me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections
 
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -32,7 +32,7 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Any", false),
                 new InnerMapValue(new HashMap<>(map)),
                 false,
-                Set.of(Modifiers.PRIVATE()),
+                Set.of(AddonModifiers.PRIVATE()),
                 false));
 
 

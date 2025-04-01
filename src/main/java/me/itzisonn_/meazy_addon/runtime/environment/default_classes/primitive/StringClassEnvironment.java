@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes.primitive;
 
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.Registries;
@@ -34,11 +34,11 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Any", false),
                 new InnerStringValue(value),
                 false,
-                Set.of(Modifiers.PRIVATE()),
+                Set.of(AddonModifiers.PRIVATE()),
                 false));
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
@@ -46,7 +46,7 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("valueOf", List.of(
                 new CallArgExpression("object", new DataType("Any", false), true)),
-                new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("String", false), this, Set.of(AddonModifiers.SHARED())) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(functionArgs.getFirst().getFinalValue().toString());

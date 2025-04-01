@@ -1,15 +1,15 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.expression.identifier;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class ClassIdentifierConverter extends Converter<ClassIdentifier> {
     public ClassIdentifierConverter() {
-        super(RegistryIdentifier.ofDefault("class_identifier"));
+        super(AddonMain.getIdentifier("class_identifier"));
     }
 
     @Override

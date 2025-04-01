@@ -2,11 +2,11 @@ package me.itzisonn_.meazy_addon.parser.json_converter.statement;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ForeachStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class ForeachStatementConverter extends Converter<ForeachStatement> {
     public ForeachStatementConverter() {
-        super(RegistryIdentifier.ofDefault("foreach_statement"));
+        super(AddonMain.getIdentifier("foreach_statement"));
     }
 
     @Override

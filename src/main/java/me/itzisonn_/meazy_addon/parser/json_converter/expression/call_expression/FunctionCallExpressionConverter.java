@@ -2,10 +2,10 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression.call_expressio
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class FunctionCallExpressionConverter extends Converter<FunctionCallExpression> {
     public FunctionCallExpressionConverter() {
-        super(RegistryIdentifier.ofDefault("function_call_expression"));
+        super(AddonMain.getIdentifier("function_call_expression"));
     }
 
     @Override

@@ -3,92 +3,92 @@ package me.itzisonn_.meazy_addon.parser;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.StringValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
+import me.itzisonn_.registry.RegistryEntry;
 
 /**
  * All basic Operators
  *
  * @see Registries#OPERATORS
  */
-public final class Operators {
+public final class AddonOperators {
     private static boolean isInit = false;
 
-    private Operators() {}
+    private AddonOperators() {}
 
 
 
     public static Operator PLUS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("plus")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("plus")).getValue();
     }
 
     public static Operator MINUS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("minus")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("minus")).getValue();
     }
 
     public static Operator MULTIPLY() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("multiply")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("multiply")).getValue();
     }
 
     public static Operator DIVIDE() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("divide")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("divide")).getValue();
     }
 
     public static Operator PERCENT() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("percent")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("percent")).getValue();
     }
 
     public static Operator POWER() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("power")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("power")).getValue();
     }
 
     public static Operator NEGATION() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("negation")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("negation")).getValue();
     }
 
 
 
     public static Operator AND() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("and")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("and")).getValue();
     }
 
     public static Operator OR() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("or")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("or")).getValue();
     }
 
     public static Operator INVERSION() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("inversion")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("inversion")).getValue();
     }
 
     public static Operator EQUALS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("equals")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("equals")).getValue();
     }
 
     public static Operator NOT_EQUALS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("not_equals")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("not_equals")).getValue();
     }
 
     public static Operator GREATER() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("greater")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("greater")).getValue();
     }
 
     public static Operator GREATER_OR_EQUALS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("greater_or_equals")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("greater_or_equals")).getValue();
     }
 
     public static Operator LESS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("less")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("less")).getValue();
     }
 
     public static Operator LESS_OR_EQUALS() {
-        return Registries.OPERATORS.getEntry(RegistryIdentifier.ofDefault("less_or_equals")).getValue();
+        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("less_or_equals")).getValue();
     }
 
 
@@ -110,16 +110,6 @@ public final class Operators {
     }
 
     /**
-     * Finds registered Operator with given symbol and any type
-     *
-     * @param symbol Operator's symbol
-     * @return Operator with given symbol or null
-     */
-    public static Operator parse(String symbol) {
-        return parse(symbol, null);
-    }
-
-    /**
      * Finds registered Operator with given id
      *
      * @param id Operator's id
@@ -136,7 +126,7 @@ public final class Operators {
 
 
     private static void register(String id, Operator operator) {
-        Registries.OPERATORS.register(RegistryIdentifier.ofDefault(id), operator);
+        Registries.OPERATORS.register(AddonMain.getIdentifier(id), operator);
     }
 
     /**

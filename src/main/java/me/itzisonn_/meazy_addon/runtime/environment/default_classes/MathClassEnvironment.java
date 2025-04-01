@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes;
 
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
@@ -28,7 +28,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Float", false),
                 new DoubleValue(Math.PI),
                 true,
-                Set.of(Modifiers.SHARED()),
+                Set.of(AddonModifiers.SHARED()),
                 false));
 
         declareVariable(new VariableValue(
@@ -36,11 +36,11 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Float", false),
                 new DoubleValue(Math.E),
                 true,
-                Set.of(Modifiers.SHARED()),
+                Set.of(AddonModifiers.SHARED()),
                 false));
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
@@ -48,7 +48,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("round", List.of(
                 new CallArgExpression("value", new DataType("Float", false), true)),
-                new DataType("Int", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Int", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
                 return new IntValue((int) Math.round(numberValue.getValue().doubleValue()));
@@ -57,7 +57,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("floor", List.of(
                 new CallArgExpression("value", new DataType("Float", false), true)),
-                new DataType("Int", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Int", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
                 return new IntValue((int) Math.floor(numberValue.getValue().doubleValue()));
@@ -66,7 +66,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("ceil", List.of(
                 new CallArgExpression("value", new DataType("Float", false), true)),
-                new DataType("Int", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Int", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
                 return new IntValue((int) Math.ceil(numberValue.getValue().doubleValue()));
@@ -75,7 +75,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("pow", List.of(
                 new CallArgExpression("number", new DataType("Float", false), true), new CallArgExpression("degree", new DataType("Float", false), true)),
-                new DataType("Float", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Float", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue &&
                         functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> degreeValue)) throw new InvalidSyntaxException("Can't get power non-number values");
@@ -85,7 +85,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("abs", List.of(
                 new CallArgExpression("value", new DataType("Float", false), true)),
-                new DataType("Float", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Float", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> number)) throw new InvalidSyntaxException("Can't get abs value of non-number value");
                 return new DoubleValue(Math.abs(number.getValue().doubleValue()));
@@ -94,7 +94,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("min", List.of(
                 new CallArgExpression("value", new DataType("Float", false), true), new CallArgExpression("degree", new DataType("Float", false), true)),
-                new DataType("Float", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Float", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> firstValue &&
                         functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> secondValue)) throw new InvalidSyntaxException("Can't get min of non-number values");
@@ -104,7 +104,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("max", List.of(
                 new CallArgExpression("value", new DataType("Float", false), true), new CallArgExpression("degree", new DataType("Float", false), true)),
-                new DataType("Float", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Float", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> firstValue &&
                         functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> secondValue)) throw new InvalidSyntaxException("Can't get max of non-number values");
@@ -114,7 +114,7 @@ public class MathClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("factorial", List.of(
                 new CallArgExpression("value", new DataType("Int", false), true)),
-                new DataType("Int", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Int", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue numberValue)) throw new InvalidSyntaxException("Can't get factorial of non-int value");
                 int result = 1;

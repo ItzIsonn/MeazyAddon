@@ -2,15 +2,15 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.NullCheckExpression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class NullCheckExpressionConverter extends Converter<NullCheckExpression> {
     public NullCheckExpressionConverter() {
-        super(RegistryIdentifier.ofDefault("null_check_expression"));
+        super(AddonMain.getIdentifier("null_check_expression"));
     }
 
     @Override

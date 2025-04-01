@@ -1,16 +1,16 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.expression.literal;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class NumberLiteralConverter extends Converter<NumberLiteral> {
     public NumberLiteralConverter() {
-        super(RegistryIdentifier.ofDefault("number_literal"));
+        super(AddonMain.getIdentifier("number_literal"));
     }
 
     @Override

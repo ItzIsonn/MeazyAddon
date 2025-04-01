@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections;
 
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.AddonUtils;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
@@ -34,7 +34,7 @@ public class SetClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Any", false),
                 new InnerSetValue(new HashSet<>(set)),
                 false,
-                Set.of(Modifiers.PRIVATE()),
+                Set.of(AddonModifiers.PRIVATE()),
                 false));
 
 
@@ -124,7 +124,7 @@ public class SetClassEnvironment extends ClassEnvironmentImpl {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't convert non-set value to string");
 
-                return new StringValue(Utils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
+                return new StringValue(AddonUtils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
             }
         });
     }

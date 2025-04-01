@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes.primitive;
 
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -15,7 +15,7 @@ public class AnyClassEnvironment extends ClassEnvironmentImpl {
         super(parent, true, "Any");
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });

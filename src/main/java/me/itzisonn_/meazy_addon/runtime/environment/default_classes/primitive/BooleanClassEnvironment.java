@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes.primitive;
 
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
@@ -20,7 +20,7 @@ public class BooleanClassEnvironment extends ClassEnvironmentImpl {
         super(parent, true, "Boolean");
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
@@ -28,7 +28,7 @@ public class BooleanClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("valueOf", List.of(
                 new CallArgExpression("object", new DataType("Any", false), true)),
-                new DataType("Boolean", true), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Boolean", true), this, Set.of(AddonModifiers.SHARED())) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 String value = functionArgs.getFirst().getFinalValue().toString();

@@ -1,13 +1,12 @@
 package me.itzisonn_.meazy_addon.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 
 import java.util.List;
 import java.util.Set;
@@ -46,12 +45,12 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
         String returnDataTypeString = returnDataType == null ? "" : ":" + returnDataType;
 
         String bodyString;
-        if (!modifiers.contains(Modifiers.ABSTRACT())) {
+        if (!modifiers.contains(AddonModifiers.ABSTRACT())) {
             StringBuilder bodyBuilder = new StringBuilder();
             for (Statement statement : body) {
-                bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+                bodyBuilder.append(Statement.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
             }
-            bodyString = " {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+            bodyString = " {\n" + bodyBuilder + Statement.getOffset(offset - 1) + "}";
         }
         else bodyString = "";
 

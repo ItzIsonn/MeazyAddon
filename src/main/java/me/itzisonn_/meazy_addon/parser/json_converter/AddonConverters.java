@@ -23,10 +23,10 @@ import java.lang.reflect.ParameterizedType;
  *
  * @see Registries#CONVERTERS
  */
-public final class Converters {
+public final class AddonConverters {
     private static boolean isInit = false;
 
-    private Converters() {}
+    private AddonConverters() {}
 
 
 
@@ -49,7 +49,6 @@ public final class Converters {
         if (isInit) throw new IllegalStateException("Converters have already been initialized!");
         isInit = true;
 
-        register(new ProgramConverter());
         register(new ClassDeclarationStatementConverter());
         register(new FunctionDeclarationStatementConverter());
         register(new VariableDeclarationConverter());
@@ -72,7 +71,6 @@ public final class Converters {
         register(new ClassCallExpressionConverter());
         register(new MemberExpressionConverter());
         register(new FunctionCallExpressionConverter());
-        register(new CallArgExpressionConverter());
         register(new ClassIdentifierConverter());
         register(new FunctionIdentifierConverter());
         register(new VariableIdentifierConverter());

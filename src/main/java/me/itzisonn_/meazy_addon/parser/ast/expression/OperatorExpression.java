@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.ParenthesisExpression;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy_addon.parser.Operators;
+import me.itzisonn_.meazy_addon.parser.AddonOperators;
 
 @Getter
 public class OperatorExpression implements Expression, ParenthesisExpression {
@@ -22,7 +22,7 @@ public class OperatorExpression implements Expression, ParenthesisExpression {
     }
 
     public OperatorExpression(Expression left, Expression right, String operator, OperatorType operatorType) {
-        this(left, right, Operators.parse(operator, operatorType));
+        this(left, right, AddonOperators.parse(operator, operatorType));
     }
 
     public OperatorType getType() {

@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy.parser.ast.Expression;
@@ -30,9 +29,9 @@ public class ForStatement implements Statement {
 
         StringBuilder bodyBuilder = new StringBuilder();
         for (Statement statement : body) {
-            bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+            bodyBuilder.append(Statement.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
         }
 
-        return "for (" + variableDeclarationString + ";" + conditionString + ";" + assignmentExpressionString + ") {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+        return "for (" + variableDeclarationString + ";" + conditionString + ";" + assignmentExpressionString + ") {\n" + bodyBuilder + Statement.getOffset(offset - 1) + "}";
     }
 }

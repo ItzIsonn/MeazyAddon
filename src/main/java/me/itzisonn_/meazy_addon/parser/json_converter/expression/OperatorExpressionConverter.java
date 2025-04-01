@@ -2,19 +2,20 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.OperatorExpression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
+import me.itzisonn_.registry.RegistryEntry;
+import me.itzisonn_.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class OperatorExpressionConverter extends Converter<OperatorExpression> {
     public OperatorExpressionConverter() {
-        super(RegistryIdentifier.ofDefault("operator_expression"));
+        super(AddonMain.getIdentifier("operator_expression"));
     }
 
     @Override

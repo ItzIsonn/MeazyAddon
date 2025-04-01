@@ -1,15 +1,15 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.statement.BreakStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class BreakStatementConverter extends Converter<BreakStatement> {
     public BreakStatementConverter() {
-        super(RegistryIdentifier.ofDefault("break_statement"));
+        super(AddonMain.getIdentifier("break_statement"));
     }
 
     @Override

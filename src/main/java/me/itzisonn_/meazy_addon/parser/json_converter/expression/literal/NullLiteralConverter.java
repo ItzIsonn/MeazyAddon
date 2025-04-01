@@ -1,15 +1,15 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.expression.literal;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.NullLiteral;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class NullLiteralConverter extends Converter<NullLiteral> {
     public NullLiteralConverter() {
-        super(RegistryIdentifier.ofDefault("null_literal"));
+        super(AddonMain.getIdentifier("null_literal"));
     }
 
     @Override

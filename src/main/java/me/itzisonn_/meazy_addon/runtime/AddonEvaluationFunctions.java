@@ -5,13 +5,14 @@ import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.interpreter.*;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.*;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCreationExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.MapCreationExpression;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
@@ -21,10 +22,8 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy_addon.parser.Operators;
+import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.CollectionClassEnvironment;
 import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.ListClassEnvironment;
@@ -45,6 +44,7 @@ import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ContinueInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
+import me.itzisonn_.registry.RegistryEntry;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -55,11 +55,11 @@ import java.util.stream.Collectors;
  *
  * @see Registries#EVALUATION_FUNCTIONS
  */
-public final class EvaluationFunctions {
+public final class AddonEvaluationFunctions {
     private static boolean isInit = false;
     private static final List<FunctionDeclarationStatement> extensionFunctions = new ArrayList<>();
 
-    private EvaluationFunctions() {}
+    private AddonEvaluationFunctions() {}
 
 
 
@@ -112,7 +112,7 @@ public final class EvaluationFunctions {
                         new DataType(classDeclarationStatement.getId(), false),
                         null,
                         true,
-                        Set.of(Modifiers.SHARED()),
+                        Set.of(AddonModifiers.SHARED()),
                         false
                 ));
             }
@@ -152,8 +152,8 @@ public final class EvaluationFunctions {
                 enumValues.add(enumValue);
             }
 
-            if (classDeclarationStatement.getModifiers().contains(Modifiers.ENUM())) {
-                classEnvironment.declareFunction(new DefaultFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(Modifiers.SHARED())) {
+            if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
+                classEnvironment.declareFunction(new DefaultFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                         return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), new ArrayList<>(enumValues)));
@@ -170,7 +170,7 @@ public final class EvaluationFunctions {
             if (functionDeclarationStatement.getClassId() != null) {
                 ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(functionDeclarationStatement.getClassId());
                 if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + functionDeclarationStatement.getClassId());
-                if (classValue.getModifiers().contains(Modifiers.FINAL())) throw new InvalidIdentifierException("Can't extend final class with id " + functionDeclarationStatement.getClassId());
+                if (classValue.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidIdentifierException("Can't extend final class with id " + functionDeclarationStatement.getClassId());
                 if (!extensionFunctions.contains(functionDeclarationStatement)) extensionFunctions.add(functionDeclarationStatement);
                 return null;
             }
@@ -191,12 +191,12 @@ public final class EvaluationFunctions {
                     functionDeclarationEnvironment,
                     functionDeclarationStatement.getModifiers());
 
-            if (functionDeclarationStatement.getModifiers().contains(Modifiers.OPERATOR())) {
+            if (functionDeclarationStatement.getModifiers().contains(AddonModifiers.OPERATOR())) {
                 if (!(environment instanceof ClassEnvironment classEnvironment)) {
                     throw new InvalidSyntaxException("Can't declare operator function not inside a class");
                 }
 
-                Operator operator = Operators.parseById(runtimeFunctionValue.getId());
+                Operator operator = AddonOperators.parseById(runtimeFunctionValue.getId());
                 if (operator == null) {
                     throw new InvalidSyntaxException("Can't declare operator function because operator " + runtimeFunctionValue.getId() + " doesn't exist");
                 }
@@ -222,13 +222,13 @@ public final class EvaluationFunctions {
             }
 
             Set<Modifier> modifiers = new HashSet<>(variableDeclarationStatement.getModifiers());
-            if (!(environment instanceof ClassEnvironment) && environment.isShared() && !variableDeclarationStatement.getModifiers().contains(Modifiers.SHARED())) modifiers.add(Modifiers.SHARED());
+            if (!(environment instanceof ClassEnvironment) && environment.isShared() && !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED())) modifiers.add(AddonModifiers.SHARED());
 
             variableDeclarationStatement.getDeclarationInfos().forEach(variableDeclarationInfo -> {
                 RuntimeValue<?> value;
                 if (variableDeclarationInfo.getValue() == null) value = null;
                 else if (environment instanceof ClassEnvironment && environment.isShared() &&
-                        !variableDeclarationStatement.getModifiers().contains(Modifiers.SHARED())) value = null;
+                        !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED())) value = null;
                 else value = Interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
 
                 environment.declareVariable(new VariableValue(
@@ -621,8 +621,8 @@ public final class EvaluationFunctions {
             RuntimeValue<?> rawClass = Interpreter.evaluate(classCallExpression.getCaller(), environment);
 
             if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException("Can't call " + rawClass.getClass().getName() + " because it's not a class");
-            if (classValue.getModifiers().contains(Modifiers.ABSTRACT())) throw new InvalidCallException("Can't create instance of an abstract class " + classValue.getId());
-            if (classValue.getModifiers().contains(Modifiers.ENUM())) throw new InvalidCallException("Can't create instance of an enum class " + classValue.getId());
+            if (classValue.getModifiers().contains(AddonModifiers.ABSTRACT())) throw new InvalidCallException("Can't create instance of an abstract class " + classValue.getId());
+            if (classValue.getModifiers().contains(AddonModifiers.ENUM())) throw new InvalidCallException("Can't create instance of an enum class " + classValue.getId());
 
             ClassEnvironment classEnvironment = initClassEnvironment(classValue, extraEnvironment, args);
             if (classValue instanceof RuntimeClassValue runtimeClassValue) return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
@@ -676,11 +676,11 @@ public final class EvaluationFunctions {
                     VariableValue variableValue = variableDeclarationEnvironment.getVariable(identifier.getId());
                     if (variableValue == null) throw new InvalidIdentifierException("Variable with id " + identifier.getId() + " doesn't exist");
 
-                    if (variableValue.getModifiers().contains(Modifiers.PRIVATE()) && requestEnvironment != variableDeclarationEnvironment &&
+                    if (variableValue.getModifiers().contains(AddonModifiers.PRIVATE()) && requestEnvironment != variableDeclarationEnvironment &&
                             !requestEnvironment.hasParent(variableDeclarationEnvironment))
                         throw new InvalidAccessException("Can't access private variable with id " + identifier.getId());
 
-                    if (variableValue.getModifiers().contains(Modifiers.PROTECTED()) && requestEnvironment != variableDeclarationEnvironment &&
+                    if (variableValue.getModifiers().contains(AddonModifiers.PROTECTED()) && requestEnvironment != variableDeclarationEnvironment &&
                             !requestEnvironment.hasParent(variableDeclarationEnvironment) && !requestEnvironment.hasParent(parentEnv -> {
                                 if (parentEnv instanceof ClassEnvironment classEnvironment) {
                                     ClassEnvironment declarationEnvironment = (ClassEnvironment) variableDeclarationEnvironment.getParent(env -> env instanceof ClassEnvironment);
@@ -698,7 +698,7 @@ public final class EvaluationFunctions {
                         throw new InvalidAccessException("Can't access protected variable with id " + identifier.getId());
                     }
 
-                    if (!variableValue.getModifiers().contains(Modifiers.SHARED()) && environment.isShared() && !variableValue.isArgument())
+                    if (!variableValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() && !variableValue.isArgument())
                         throw new InvalidAccessException("Can't access not-shared variable with id " + identifier.getId() + " from shared environment");
 
                     return variableValue;
@@ -718,11 +718,11 @@ public final class EvaluationFunctions {
                     FunctionValue functionValue = functionDeclarationEnvironment.getFunction(identifier.getId(), args);
                     if (functionValue == null) throw new InvalidIdentifierException("Function with id " + identifier.getId() + " doesn't exist");
 
-                    if (functionValue.getModifiers().contains(Modifiers.PRIVATE()) && requestEnvironment != functionDeclarationEnvironment &&
+                    if (functionValue.getModifiers().contains(AddonModifiers.PRIVATE()) && requestEnvironment != functionDeclarationEnvironment &&
                             !requestEnvironment.hasParent(functionDeclarationEnvironment))
                         throw new InvalidAccessException("Can't access private function with id " + identifier.getId());
 
-                    if (functionValue.getModifiers().contains(Modifiers.PROTECTED()) && requestEnvironment != functionDeclarationEnvironment &&
+                    if (functionValue.getModifiers().contains(AddonModifiers.PROTECTED()) && requestEnvironment != functionDeclarationEnvironment &&
                             !requestEnvironment.hasParent(functionDeclarationEnvironment) && !requestEnvironment.hasParent(parentEnv -> {
                         if (parentEnv instanceof ClassEnvironment classEnvironment) {
                             ClassEnvironment declarationEnvironment;
@@ -743,7 +743,7 @@ public final class EvaluationFunctions {
                         throw new InvalidAccessException("Can't access protected function with id " + identifier.getId());
                     }
 
-                    if (!functionValue.getModifiers().contains(Modifiers.SHARED()) && environment.isShared())
+                    if (!functionValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared())
                         throw new InvalidAccessException("Can't access not-shared function with id " + identifier.getId() + " from shared environment");
 
                     return functionValue;
@@ -860,7 +860,7 @@ public final class EvaluationFunctions {
             if (classValue == null) {
                 throw new InvalidIdentifierException("Class with id " + baseClass + " doesn't exist");
             }
-            if (classValue.getModifiers().contains(Modifiers.FINAL())) throw new InvalidAccessException("Can't inherit final class with id " + baseClass);
+            if (classValue.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidAccessException("Can't inherit final class with id " + baseClass);
 
             boolean check = hasRepeatedBaseClasses(classValue.getBaseClasses(), baseClasses);
             if (check) return true;
@@ -877,7 +877,7 @@ public final class EvaluationFunctions {
             }
 
             for (VariableValue variableValue : classValue.getEnvironment().getVariables()) {
-                if (variableValue.getModifiers().contains(Modifiers.PRIVATE())) continue;
+                if (variableValue.getModifiers().contains(AddonModifiers.PRIVATE())) continue;
                 if (variables.contains(variableValue.getId())) {
                     return true;
                 }
@@ -894,9 +894,9 @@ public final class EvaluationFunctions {
     private static boolean hasRepeatedFunctions(Set<ClassEnvironment> baseClassesList, List<FunctionValue> functions) {
         for (ClassEnvironment classEnvironment : baseClassesList) {
             for (FunctionValue functionValue : getFinalFunctions(classEnvironment)) {
-                if (functionValue.getModifiers().contains(Modifiers.PRIVATE())) continue;
-                if (functionValue.getModifiers().contains(Modifiers.ABSTRACT())) {
-                    if (functions.stream().anyMatch(function -> function.isLike(functionValue) && !function.getModifiers().contains(Modifiers.ABSTRACT()))) {
+                if (functionValue.getModifiers().contains(AddonModifiers.PRIVATE())) continue;
+                if (functionValue.getModifiers().contains(AddonModifiers.ABSTRACT())) {
+                    if (functions.stream().anyMatch(function -> function.isLike(functionValue) && !function.getModifiers().contains(AddonModifiers.ABSTRACT()))) {
                         return true;
                     }
                 }
@@ -964,7 +964,7 @@ public final class EvaluationFunctions {
                 if (rawConstructor == null) throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
 
                 if (rawConstructor instanceof RuntimeConstructorValue runtimeConstructorValue) {
-                    if (runtimeConstructorValue.getModifiers().contains(Modifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
+                    if (runtimeConstructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
                         if (env instanceof ClassEnvironment classEnv) {
                             return classEnv.getId().equals(classValue.getId());
                         }
@@ -973,7 +973,7 @@ public final class EvaluationFunctions {
                         throw new InvalidCallException("Requested constructor has private access");
                     }
 
-                    if (runtimeConstructorValue.getModifiers().contains(Modifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
+                    if (runtimeConstructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
                         if (env instanceof ClassEnvironment classEnv) {
                             if (classEnv.getId().equals(classValue.getId())) return true;
 
@@ -1032,7 +1032,7 @@ public final class EvaluationFunctions {
                 if (rawConstructor == null) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
 
                 if (rawConstructor instanceof DefaultConstructorValue defaultConstructorValue) {
-                    if (defaultConstructorValue.getModifiers().contains(Modifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
+                    if (defaultConstructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
                         if (env instanceof ClassEnvironment classEnv) {
                             return classEnv.getId().equals(defaultClassValue.getId());
                         }
@@ -1041,7 +1041,7 @@ public final class EvaluationFunctions {
                         throw new InvalidCallException("Requested constructor has private access");
                     }
 
-                    if (defaultConstructorValue.getModifiers().contains(Modifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
+                    if (defaultConstructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
                         if (env instanceof ClassEnvironment classEnv) {
                             if (classEnv.getId().equals(classValue.getId())) return true;
 
@@ -1078,8 +1078,8 @@ public final class EvaluationFunctions {
         for (FunctionValue value : classEnvironment.getFunctions()) {
             for (ClassEnvironment baseClass : classEnvironment.getDeepBaseClasses()) {
                 for (FunctionValue baseClassFunction : baseClass.getFunctions()) {
-                    if (baseClassFunction.isLike(value) && !baseClassFunction.getModifiers().contains(Modifiers.PRIVATE())) {
-                        if (baseClassFunction.getModifiers().contains(Modifiers.FINAL())) throw new InvalidAccessException("Can't override final function with id " + baseClassFunction.getId());
+                    if (baseClassFunction.isLike(value) && !baseClassFunction.getModifiers().contains(AddonModifiers.PRIVATE())) {
+                        if (baseClassFunction.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidAccessException("Can't override final function with id " + baseClassFunction.getId());
                         baseClassFunction.setOverridden();
                     }
                 }
@@ -1090,10 +1090,10 @@ public final class EvaluationFunctions {
             throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " has repeated functions");
         }
 
-        if (!classEnvironment.getModifiers().contains(Modifiers.ABSTRACT())) {
+        if (!classEnvironment.getModifiers().contains(AddonModifiers.ABSTRACT())) {
             for (ClassEnvironment baseClass : classEnvironment.getBaseClasses()) {
                 for (FunctionValue functionValue : getFinalFunctions(baseClass)) {
-                    if (functionValue.getModifiers().contains(Modifiers.ABSTRACT())) {
+                    if (functionValue.getModifiers().contains(AddonModifiers.ABSTRACT())) {
                         throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " in class with id " + classEnvironment.getId() + " hasn't been initialized");
                     }
                 }
@@ -1112,7 +1112,7 @@ public final class EvaluationFunctions {
             FunctionEnvironment functionEnvironment;
             try {
                 functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
-                        .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(Modifiers.SHARED()));
+                        .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(AddonModifiers.SHARED()));
             }
             catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
@@ -1134,7 +1134,7 @@ public final class EvaluationFunctions {
             FunctionEnvironment functionEnvironment;
             try {
                 functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
-                        .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(Modifiers.SHARED()));
+                        .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(AddonModifiers.SHARED()));
             }
             catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
@@ -1196,6 +1196,6 @@ public final class EvaluationFunctions {
 
 
     private static <T extends Statement> void register(String id, Class<T> cls, EvaluationFunction<T> evaluationFunction) {
-        Registries.EVALUATION_FUNCTIONS.register(RegistryIdentifier.ofDefault(id), cls, evaluationFunction);
+        Registries.EVALUATION_FUNCTIONS.register(AddonMain.getIdentifier(id), cls, evaluationFunction);
     }
 }

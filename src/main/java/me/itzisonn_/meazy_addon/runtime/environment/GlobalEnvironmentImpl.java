@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.BooleanLiteral;
@@ -152,7 +152,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
 
         declareFunction(new DefaultFunctionValue("print", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, Set.of(Modifiers.SHARED())) {
+                null, this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
                 Interpreter.OUTPUT.append(value);
@@ -163,7 +163,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
 
         declareFunction(new DefaultFunctionValue("println", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, Set.of(Modifiers.SHARED())) {
+                null, this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
                 Interpreter.OUTPUT.append(value).append("\n");

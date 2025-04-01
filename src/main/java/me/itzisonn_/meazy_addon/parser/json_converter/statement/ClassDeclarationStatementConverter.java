@@ -3,12 +3,12 @@ package me.itzisonn_.meazy_addon.parser.json_converter.statement;
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.AddonMain;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ClassDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ClassDeclarationStatementConverter extends Converter<ClassDeclarationStatement> {
     public ClassDeclarationStatementConverter() {
-        super(RegistryIdentifier.ofDefault("class_declaration_statement"));
+        super(AddonMain.getIdentifier("class_declaration_statement"));
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
         checkType(object);
 
         Set<Modifier> modifiers = getElement(object, "modifiers").getAsJsonArray().asList().stream().map(element -> {
-            Modifier modifier = Modifiers.parse(element.getAsString());
+            Modifier modifier = AddonModifiers.parse(element.getAsString());
             if (modifier == null) {
                 throw new InvalidCompiledFileException("Unknown Modifier with id " + element.getAsString());
             }

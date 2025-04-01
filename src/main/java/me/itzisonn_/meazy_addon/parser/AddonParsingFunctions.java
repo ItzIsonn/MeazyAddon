@@ -1,14 +1,16 @@
 package me.itzisonn_.meazy_addon.parser;
 
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
+import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy_addon.lexer.TokenTypeSets;
-import me.itzisonn_.meazy_addon.lexer.TokenTypes;
+import me.itzisonn_.meazy_addon.AddonMain;
+import me.itzisonn_.meazy_addon.AddonUtils;
+import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
+import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.ast.expression.*;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
@@ -23,7 +25,6 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 
 import java.util.*;
@@ -35,10 +36,10 @@ import static me.itzisonn_.meazy.parser.Parser.*;
  *
  * @see Registries#PARSING_FUNCTIONS
  */
-public final class ParsingFunctions {
+public final class AddonParsingFunctions {
     private static boolean isInit = false;
 
-    private ParsingFunctions() {}
+    private AddonParsingFunctions() {}
 
 
 
@@ -56,18 +57,18 @@ public final class ParsingFunctions {
         register("global_statement", extra -> {
             Set<Modifier> modifiers = parseModifiers();
 
-            if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-                return parse(RegistryIdentifier.ofDefault("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
+            if (getCurrent().getType().equals(AddonTokenTypes.FUNCTION())) {
+                return parse(AddonMain.getIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
             }
-            if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
+                        parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
-            if (getCurrent().getType().equals(TokenTypes.CLASS())) {
-                return parse(RegistryIdentifier.ofDefault("class_declaration_statement"), ClassDeclarationStatement.class, modifiers);
+            if (getCurrent().getType().equals(AddonTokenTypes.CLASS())) {
+                return parse(AddonMain.getIdentifier("class_declaration_statement"), ClassDeclarationStatement.class, modifiers);
             }
 
             throw new InvalidStatementException("At global environment you only can declare variable, function or class", getCurrent().getLine());
@@ -76,36 +77,36 @@ public final class ParsingFunctions {
         register("class_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
-            getCurrentAndNext(TokenTypes.CLASS(), "Expected class keyword");
-            String id = getCurrentAndNext(TokenTypes.ID(), "Expected id after class keyword").getValue();
+            getCurrentAndNext(AddonTokenTypes.CLASS(), "Expected class keyword");
+            String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected id after class keyword").getValue();
 
             List<Statement> generatedBody = new ArrayList<>();
-            if (modifiers.contains(Modifiers.DATA())) {
+            if (modifiers.contains(AddonModifiers.DATA())) {
                 generatedBody.addAll(generateDataBody(id, parseCallArgs()));
-                modifiers.remove(Modifiers.DATA());
+                modifiers.remove(AddonModifiers.DATA());
             }
 
             Set<String> baseClasses = new HashSet<>();
-            if (getCurrent().getType().equals(TokenTypes.COLON())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.COLON())) {
                 getCurrentAndNext();
-                baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected id as base class").getValue());
+                baseClasses.add(getCurrentAndNext(AddonTokenTypes.ID(), "Expected id as base class").getValue());
 
-                while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                while (getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                     getCurrentAndNext();
-                    baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected id as base class after comma").getValue());
+                    baseClasses.add(getCurrentAndNext(AddonTokenTypes.ID(), "Expected id as base class after comma").getValue());
                 }
             }
 
             boolean hasNewLine = getCurrent().getType().equals(TokenTypes.NEW_LINE());
             moveOverOptionalNewLines();
 
-            if (!getCurrent().getType().equals(TokenTypes.LEFT_BRACE()) && hasNewLine) {
+            if (!getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE()) && hasNewLine) {
                 return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
             }
 
-            getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
+            getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
 
-            if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
                 getCurrentAndNext();
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
                 moveOverOptionalNewLines();
@@ -116,22 +117,22 @@ public final class ParsingFunctions {
             moveOverOptionalNewLines();
 
             LinkedHashMap<String, List<Expression>> enumIds = new LinkedHashMap<>();
-            if (modifiers.contains(Modifiers.ENUM())) {
+            if (modifiers.contains(AddonModifiers.ENUM())) {
                 if (!baseClasses.isEmpty()) throw new InvalidSyntaxException("Enum class can't have base classes");
 
-                String enumId = getCurrentAndNext(TokenTypes.ID(), "Expected enum member id").getValue();
+                String enumId = getCurrentAndNext(AddonTokenTypes.ID(), "Expected enum member id").getValue();
                 List<Expression> args;
-                if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) args = parseArgs();
+                if (getCurrent().getType().equals(AddonTokenTypes.LEFT_PAREN())) args = parseArgs();
                 else args = new ArrayList<>();
                 enumIds.put(enumId, args);
 
-                while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                while (getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                     getCurrentAndNext();
                     moveOverOptionalNewLines();
 
-                    enumId = getCurrentAndNext(TokenTypes.ID(), "Expected enum member id").getValue();
+                    enumId = getCurrentAndNext(AddonTokenTypes.ID(), "Expected enum member id").getValue();
                     if (enumIds.containsKey(enumId)) throw new InvalidSyntaxException("Enum class can't have duplicated entries");
-                    if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) args = parseArgs();
+                    if (getCurrent().getType().equals(AddonTokenTypes.LEFT_PAREN())) args = parseArgs();
                     else args = new ArrayList<>();
                     enumIds.put(enumId, args);
                 }
@@ -140,29 +141,29 @@ public final class ParsingFunctions {
             }
 
             List<Statement> body = new ArrayList<>(generatedBody);
-            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                Statement statement = parse(RegistryIdentifier.ofDefault("class_body_statement"));
+            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
+                Statement statement = parse(AddonMain.getIdentifier("class_body_statement"));
                 body.add(statement);
 
                 if (statement instanceof VariableDeclarationStatement variableDeclarationStatement) {
-                    if (variableDeclarationStatement.getModifiers().contains(Modifiers.GET())) {
+                    if (variableDeclarationStatement.getModifiers().contains(AddonModifiers.GET())) {
                         for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
                             body.add(getGetFunction(variableDeclarationInfo.getId(), variableDeclarationInfo.getDataType()));
                         }
-                        variableDeclarationStatement.getModifiers().remove(Modifiers.GET());
+                        variableDeclarationStatement.getModifiers().remove(AddonModifiers.GET());
                     }
-                    if (variableDeclarationStatement.getModifiers().contains(Modifiers.SET()) && !variableDeclarationStatement.isConstant()) {
+                    if (variableDeclarationStatement.getModifiers().contains(AddonModifiers.SET()) && !variableDeclarationStatement.isConstant()) {
                         for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
                             body.add(getSetFunction(variableDeclarationInfo.getId(), variableDeclarationInfo.getDataType()));
                         }
-                        variableDeclarationStatement.getModifiers().remove(Modifiers.SET());
+                        variableDeclarationStatement.getModifiers().remove(AddonModifiers.SET());
                     }
                 }
 
                 moveOverOptionalNewLines();
             }
 
-            getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
+            getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
 
             return new ClassDeclarationStatement(modifiers, id, baseClasses, body, enumIds);
@@ -171,18 +172,18 @@ public final class ParsingFunctions {
         register("class_body_statement", extra -> {
             Set<Modifier> modifiers = parseModifiers();
 
-            if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-                return parse(RegistryIdentifier.ofDefault("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
+            if (getCurrent().getType().equals(AddonTokenTypes.FUNCTION())) {
+                return parse(AddonMain.getIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
             }
-            if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
+                        parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
-            if (getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) {
-                return parse(RegistryIdentifier.ofDefault("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
+            if (getCurrent().getType().equals(AddonTokenTypes.CONSTRUCTOR())) {
+                return parse(AddonMain.getIdentifier("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
             }
 
             throw new InvalidStatementException("Invalid statement found", getCurrent().getLine());
@@ -191,34 +192,34 @@ public final class ParsingFunctions {
         register("function_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
-            getCurrentAndNext(TokenTypes.FUNCTION(), "Expected function keyword");
+            getCurrentAndNext(AddonTokenTypes.FUNCTION(), "Expected function keyword");
 
             String classId = null;
-            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
-            if (getCurrent().getType().equals(TokenTypes.DOT())) {
+            String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after function keyword").getValue();
+            if (getCurrent().getType().equals(AddonTokenTypes.DOT())) {
                 getCurrentAndNext();
                 classId = id;
-                id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
+                id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after function keyword").getValue();
             }
 
             List<CallArgExpression> args = parseCallArgs();
             DataType dataType = parseDataType();
 
-            if (modifiers.contains(Modifiers.ABSTRACT())) {
+            if (modifiers.contains(AddonModifiers.ABSTRACT())) {
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
                 return new FunctionDeclarationStatement(modifiers, id, args, new ArrayList<>(), dataType);
             }
 
             List<Statement> body;
-            if (getCurrent().getType().equals(TokenTypes.ARROW())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.ARROW())) {
                 getCurrentAndNext();
-                body = new ArrayList<>(List.of(parse(RegistryIdentifier.ofDefault("statement"))));
+                body = new ArrayList<>(List.of(parse(AddonMain.getIdentifier("statement"))));
             }
             else {
                 moveOverOptionalNewLines();
-                getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open function body");
+                getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open function body");
                 body = parseBody();
-                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
+                getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
             }
 
@@ -226,10 +227,10 @@ public final class ParsingFunctions {
         });
 
         register("function_arg", extra -> {
-            if (!getCurrent().getType().equals(TokenTypes.VARIABLE()))
+            if (!getCurrent().getType().equals(AddonTokenTypes.VARIABLE()))
                 throw new UnexpectedTokenException("Expected variable keyword at the beginning of function arg", getCurrent().getLine());
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
-            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
+            String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
 
             DataType dataType = parseDataType();
             return new CallArgExpression(id, dataType == null ? new DataType("Any", true) : dataType, isConstant);
@@ -241,12 +242,12 @@ public final class ParsingFunctions {
             if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
             if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
-            boolean isConstant = getCurrentAndNext(TokenTypes.VARIABLE(), "Expected variable keyword").getValue().equals("val");
+            boolean isConstant = getCurrentAndNext(AddonTokenTypes.VARIABLE(), "Expected variable keyword").getValue().equals("val");
 
             List<VariableDeclarationStatement.VariableDeclarationInfo> declarations = new ArrayList<>();
             declarations.add(parseVariableDeclarationInfo(isConstant, canWithoutValue));
 
-            while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+            while (getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                 getCurrentAndNext();
                 declarations.add(parseVariableDeclarationInfo(isConstant, canWithoutValue));
             }
@@ -256,67 +257,67 @@ public final class ParsingFunctions {
 
         register("constructor_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
-            getCurrentAndNext(TokenTypes.CONSTRUCTOR(), "Expected constructor keyword");
+            getCurrentAndNext(AddonTokenTypes.CONSTRUCTOR(), "Expected constructor keyword");
 
             List<CallArgExpression> args = parseCallArgs();
 
             moveOverOptionalNewLines();
-            getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
+            getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
             moveOverOptionalNewLines();
 
             List<Statement> body = new ArrayList<>();
-            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                if (getCurrent().getType().equals(TokenTypes.BASE())) body.add(parse(RegistryIdentifier.ofDefault("base_call_statement")));
-                else body.add(parse(RegistryIdentifier.ofDefault("statement")));
+            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
+                if (getCurrent().getType().equals(AddonTokenTypes.BASE())) body.add(parse(AddonMain.getIdentifier("base_call_statement")));
+                else body.add(parse(AddonMain.getIdentifier("statement")));
                 moveOverOptionalNewLines();
             }
 
-            getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
+            getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
             return new ConstructorDeclarationStatement(modifiers, args, body);
         });
 
         register("base_call_statement", extra -> {
-            getCurrentAndNext(TokenTypes.BASE(), "Expected BASE to start base call statement");
+            getCurrentAndNext(AddonTokenTypes.BASE(), "Expected BASE to start base call statement");
 
-            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after base keyword").getValue();
+            String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after base keyword").getValue();
 
-            getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
+            getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
             List<Expression> args = new ArrayList<>();
-            if (getCurrent().getType() != TokenTypes.RIGHT_PAREN()) {
-                args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+            if (getCurrent().getType() != AddonTokenTypes.RIGHT_PAREN()) {
+                args.add(parse(AddonMain.getIdentifier("expression"), Expression.class));
 
-                while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                while (getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                     getCurrentAndNext();
-                    args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+                    args.add(parse(AddonMain.getIdentifier("expression"), Expression.class));
                 }
             }
-            getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
+            getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
             return new BaseCallStatement(id, args);
         });
 
         register("statement", extra -> {
             Set<Modifier> modifiers = parseModifiers();
 
-            if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
+                        parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
             if (!modifiers.isEmpty()) throw new InvalidStatementException("Unexpected Modifier found", getCurrent().getLine());
 
-            if (getCurrent().getType().equals(TokenTypes.IF())) return parse(RegistryIdentifier.ofDefault("if_statement"));
-            if (getCurrent().getType().equals(TokenTypes.FOR())) return parse(RegistryIdentifier.ofDefault("for_statement"));
-            if (getCurrent().getType().equals(TokenTypes.WHILE())) return parse(RegistryIdentifier.ofDefault("while_statement"));
-            if (getCurrent().getType().equals(TokenTypes.RETURN())) return parse(RegistryIdentifier.ofDefault("return_statement"));
-            if (getCurrent().getType().equals(TokenTypes.CONTINUE())) return parse(RegistryIdentifier.ofDefault("continue_statement"));
-            if (getCurrent().getType().equals(TokenTypes.BREAK())) return parse(RegistryIdentifier.ofDefault("break_statement"));
+            if (getCurrent().getType().equals(AddonTokenTypes.IF())) return parse(AddonMain.getIdentifier("if_statement"));
+            if (getCurrent().getType().equals(AddonTokenTypes.FOR())) return parse(AddonMain.getIdentifier("for_statement"));
+            if (getCurrent().getType().equals(AddonTokenTypes.WHILE())) return parse(AddonMain.getIdentifier("while_statement"));
+            if (getCurrent().getType().equals(AddonTokenTypes.RETURN())) return parse(AddonMain.getIdentifier("return_statement"));
+            if (getCurrent().getType().equals(AddonTokenTypes.CONTINUE())) return parse(AddonMain.getIdentifier("continue_statement"));
+            if (getCurrent().getType().equals(AddonTokenTypes.BREAK())) return parse(AddonMain.getIdentifier("break_statement"));
 
-            Expression expression = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+            Expression expression = parse(AddonMain.getIdentifier("expression"), Expression.class);
             if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression ||
                     expression instanceof AssignmentExpression || expression instanceof MemberExpression) {
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of expression");
@@ -327,39 +328,39 @@ public final class ParsingFunctions {
         });
 
         register("if_statement", extra -> {
-            getCurrentAndNext(TokenTypes.IF(), "Expected if keyword");
+            getCurrentAndNext(AddonTokenTypes.IF(), "Expected if keyword");
 
-            getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open if condition");
-            Expression condition = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-            getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close if condition");
+            getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open if condition");
+            Expression condition = parse(AddonMain.getIdentifier("expression"), Expression.class);
+            getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close if condition");
             moveOverOptionalNewLines();
 
             List<Statement> body = new ArrayList<>();
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
                 getCurrentAndNext();
                 body = parseBody();
-                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
+                getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the if statement");
             }
-            else body.add(parse(RegistryIdentifier.ofDefault("statement")));
+            else body.add(parse(AddonMain.getIdentifier("statement")));
 
             IfStatement elseStatement = null;
-            if (getCurrent().getType().equals(TokenTypes.ELSE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.ELSE())) {
                 getCurrentAndNext();
-                if (getCurrent().getType().equals(TokenTypes.IF())) {
-                    elseStatement = parse(RegistryIdentifier.ofDefault("if_statement"), IfStatement.class);
+                if (getCurrent().getType().equals(AddonTokenTypes.IF())) {
+                    elseStatement = parse(AddonMain.getIdentifier("if_statement"), IfStatement.class);
                 }
                 else {
                     List<Statement> elseBody = new ArrayList<>();
                     moveOverOptionalNewLines();
-                    if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
+                    if (getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
                         getCurrentAndNext();
                         elseBody = parseBody();
-                        getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
+                        getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
                         getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the if statement");
                     }
                     else {
-                        elseBody.add(parse(RegistryIdentifier.ofDefault("statement")));
+                        elseBody.add(parse(AddonMain.getIdentifier("statement")));
                     }
 
                     elseStatement = new IfStatement(null, elseBody, null);
@@ -370,24 +371,24 @@ public final class ParsingFunctions {
         });
 
         register("for_statement", extra -> {
-            getCurrentAndNext(TokenTypes.FOR(), "Expected for keyword");
+            getCurrentAndNext(AddonTokenTypes.FOR(), "Expected for keyword");
 
-            getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open for condition");
+            getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open for condition");
 
-            if (currentLineHasToken(TokenTypes.IN())) {
-                VariableDeclarationStatement variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), true);
+            if (currentLineHasToken(AddonTokenTypes.IN())) {
+                VariableDeclarationStatement variableDeclarationStatement = parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), true);
                 if (variableDeclarationStatement.getDeclarationInfos().size() > 1) {
                     throw new InvalidSyntaxException("Foreach statement can declare only one variable");
                 }
-                getCurrentAndNext(TokenTypes.IN(), "Expected IN after variable declaration");
-                Expression collection = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                getCurrentAndNext(AddonTokenTypes.IN(), "Expected IN after variable declaration");
+                Expression collection = parse(AddonMain.getIdentifier("expression"), Expression.class);
 
-                getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
+                getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
 
                 moveOverOptionalNewLines();
-                getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
+                getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
                 List<Statement> body = parseBody();
-                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
+                getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
 
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the for statement");
 
@@ -395,30 +396,30 @@ public final class ParsingFunctions {
             }
 
             VariableDeclarationStatement variableDeclarationStatement = null;
-            if (!getCurrent().getType().equals(TokenTypes.SEMICOLON())) {
-                variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), false);
+            if (!getCurrent().getType().equals(AddonTokenTypes.SEMICOLON())) {
+                variableDeclarationStatement = parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), false);
             }
-            getCurrentAndNext(TokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
+            getCurrentAndNext(AddonTokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
 
             Expression condition = null;
-            if (!getCurrent().getType().equals(TokenTypes.SEMICOLON())) {
-                condition = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+            if (!getCurrent().getType().equals(AddonTokenTypes.SEMICOLON())) {
+                condition = parse(AddonMain.getIdentifier("expression"), Expression.class);
             }
-            getCurrentAndNext(TokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
+            getCurrentAndNext(AddonTokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
 
             AssignmentExpression assignmentExpression = null;
-            if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
-                if (parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class) instanceof AssignmentExpression expression) {
+            if (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_PAREN())) {
+                if (parse(AddonMain.getIdentifier("assignment_expression"), Expression.class) instanceof AssignmentExpression expression) {
                     assignmentExpression = expression;
                 }
                 else throw new InvalidSyntaxException("Expected assignment expression as for statement's arg");
             }
-            getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
+            getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
 
             moveOverOptionalNewLines();
-            getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
+            getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
             List<Statement> body = parseBody();
-            getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
+            getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
 
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the for statement");
 
@@ -426,16 +427,16 @@ public final class ParsingFunctions {
         });
 
         register("while_statement", extra -> {
-            getCurrentAndNext(TokenTypes.WHILE(), "Expected while keyword");
+            getCurrentAndNext(AddonTokenTypes.WHILE(), "Expected while keyword");
 
-            getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open while condition");
-            Expression condition = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-            getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close while condition");
+            getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open while condition");
+            Expression condition = parse(AddonMain.getIdentifier("expression"), Expression.class);
+            getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close while condition");
 
             moveOverOptionalNewLines();
-            getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open while body");
+            getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open while body");
             List<Statement> body = parseBody();
-            getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close while body");
+            getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close while body");
 
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the while statement");
 
@@ -443,11 +444,11 @@ public final class ParsingFunctions {
         });
 
         register("return_statement", extra -> {
-            getCurrentAndNext(TokenTypes.RETURN(), "Expected return keyword");
+            getCurrentAndNext(AddonTokenTypes.RETURN(), "Expected return keyword");
 
             Expression expression = null;
             if (!getCurrent().getType().equals(TokenTypes.NEW_LINE())) {
-                expression = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                expression = parse(AddonMain.getIdentifier("expression"), Expression.class);
             }
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the return statement");
 
@@ -455,32 +456,32 @@ public final class ParsingFunctions {
         });
 
         register("continue_statement", extra ->  {
-            getCurrentAndNext(TokenTypes.CONTINUE(), "Expected continue keyword");
+            getCurrentAndNext(AddonTokenTypes.CONTINUE(), "Expected continue keyword");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the continue statement");
             return new ContinueStatement();
         });
 
         register("break_statement", extra ->  {
-            getCurrentAndNext(TokenTypes.BREAK(), "Expected break keyword");
+            getCurrentAndNext(AddonTokenTypes.BREAK(), "Expected break keyword");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the break statement");
             return new BreakStatement();
         });
 
-        register("expression", extra -> parseAfter(RegistryIdentifier.ofDefault("expression"), Expression.class));
+        register("expression", extra -> parseAfter(AddonMain.getIdentifier("expression"), Expression.class));
 
         register("assignment_expression", extra -> {
-            Expression left = parseAfter(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class);
+            Expression left = parseAfter(AddonMain.getIdentifier("assignment_expression"), Expression.class);
 
-            if (getCurrent().getType().equals(TokenTypes.ASSIGN())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
                 getCurrentAndNext();
-                Expression value = parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class);
+                Expression value = parse(AddonMain.getIdentifier("assignment_expression"), Expression.class);
                 return new AssignmentExpression(left, value);
             }
-            else if (TokenTypeSets.OPERATOR_ASSIGN().contains(getCurrent().getType())) {
+            else if (AddonTokenTypeSets.OPERATOR_ASSIGN().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
                 Expression value = new OperatorExpression(
                         left,
-                        parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class),
+                        parse(AddonMain.getIdentifier("assignment_expression"), Expression.class),
                         token.getValue().replaceAll("=$", ""), OperatorType.INFIX);
                 return new AssignmentExpression(left, value);
             }
@@ -489,53 +490,53 @@ public final class ParsingFunctions {
         });
 
         register("list_creation_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACKET())) {
                 getCurrentAndNext();
 
                 List<Expression> list = new ArrayList<>();
-                while (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) {
-                    list.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
-                    if (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) getCurrentAndNext(TokenTypes.COMMA(), "Expected comma as a separator between list elements");
+                while (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACKET())) {
+                    list.add(parse(AddonMain.getIdentifier("expression"), Expression.class));
+                    if (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACKET())) getCurrentAndNext(AddonTokenTypes.COMMA(), "Expected comma as a separator between list elements");
                 }
-                getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close list creation");
+                getCurrentAndNext(AddonTokenTypes.RIGHT_BRACKET(), "Expected right bracket to close list creation");
 
                 return new ListCreationExpression(list);
             }
 
-            return parseAfter(RegistryIdentifier.ofDefault("list_creation_expression"), Expression.class);
+            return parseAfter(AddonMain.getIdentifier("list_creation_expression"), Expression.class);
         });
 
         register("map_creation_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
                 getCurrentAndNext();
 
                 Map<Expression, Expression> map = new HashMap<>();
-                while (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                    Expression key = parse(RegistryIdentifier.ofDefault("list_creation_expression"), Expression.class);
+                while (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
+                    Expression key = parse(AddonMain.getIdentifier("list_creation_expression"), Expression.class);
                     Expression value;
-                    if (getCurrent().getType().equals(TokenTypes.ASSIGN())) {
+                    if (getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
                         getCurrentAndNext();
-                        value = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                        value = parse(AddonMain.getIdentifier("expression"), Expression.class);
                     }
                     else value = new NullLiteral();
                     map.put(key, value);
 
-                    if (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) getCurrentAndNext(TokenTypes.COMMA(), "Expected comma as a separator between map pairs");
+                    if (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) getCurrentAndNext(AddonTokenTypes.COMMA(), "Expected comma as a separator between map pairs");
                 }
-                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close map creation");
+                getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close map creation");
 
                 return new MapCreationExpression(map);
             }
 
-            return parseAfter(RegistryIdentifier.ofDefault("map_creation_expression"), Expression.class);
+            return parseAfter(AddonMain.getIdentifier("map_creation_expression"), Expression.class);
         });
 
         register("null_check_expression", extra -> {
-            Expression checkExpression = parseAfter(RegistryIdentifier.ofDefault("null_check_expression"), Expression.class);
+            Expression checkExpression = parseAfter(AddonMain.getIdentifier("null_check_expression"), Expression.class);
 
-            if (getCurrent().getType().equals(TokenTypes.QUESTION_COLON())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.QUESTION_COLON())) {
                 getCurrentAndNext();
-                Expression nullExpression = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                Expression nullExpression = parse(AddonMain.getIdentifier("expression"), Expression.class);
                 return new NullCheckExpression(checkExpression, nullExpression);
             }
 
@@ -543,12 +544,12 @@ public final class ParsingFunctions {
         });
 
         register("logical_expression", extra -> {
-            Expression left = parseAfter(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
+            Expression left = parseAfter(AddonMain.getIdentifier("logical_expression"), Expression.class);
 
             TokenType current = getCurrent().getType();
-            while (current.equals(TokenTypes.AND()) || current.equals(TokenTypes.OR())) {
+            while (current.equals(AddonTokenTypes.AND()) || current.equals(AddonTokenTypes.OR())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parseAfter(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
+                Expression right = parseAfter(AddonMain.getIdentifier("logical_expression"), Expression.class);
                 left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
 
                 current = getCurrent().getType();
@@ -558,13 +559,13 @@ public final class ParsingFunctions {
         });
 
         register("comparison_expression", extra -> {
-            Expression left = parseAfter(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
+            Expression left = parseAfter(AddonMain.getIdentifier("comparison_expression"), Expression.class);
 
             TokenType current = getCurrent().getType();
-            while (current.equals(TokenTypes.EQUALS()) || current.equals(TokenTypes.NOT_EQUALS()) || current.equals(TokenTypes.GREATER()) ||
-                    current.equals(TokenTypes.GREATER_OR_EQUALS()) || current.equals(TokenTypes.LESS()) || current.equals(TokenTypes.LESS_OR_EQUALS())) {
+            while (current.equals(AddonTokenTypes.EQUALS()) || current.equals(AddonTokenTypes.NOT_EQUALS()) || current.equals(AddonTokenTypes.GREATER()) ||
+                    current.equals(AddonTokenTypes.GREATER_OR_EQUALS()) || current.equals(AddonTokenTypes.LESS()) || current.equals(AddonTokenTypes.LESS_OR_EQUALS())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parseAfter(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
+                Expression right = parseAfter(AddonMain.getIdentifier("comparison_expression"), Expression.class);
                 left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
 
                 current = getCurrent().getType();
@@ -574,22 +575,22 @@ public final class ParsingFunctions {
         });
 
         register("is_expression", extra -> {
-            Expression value = parseAfter(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
+            Expression value = parseAfter(AddonMain.getIdentifier("is_expression"), Expression.class);
 
-            if (getCurrent().getType().equals(TokenTypes.IS()) || getCurrent().getType().equals(TokenTypes.IS_LIKE())) {
-                boolean isLike = getCurrentAndNext().getType().equals(TokenTypes.IS_LIKE());
-                return new IsExpression(value, getCurrentAndNext(TokenTypes.ID(), "Must specify data type after is keyword").getValue(), isLike);
+            if (getCurrent().getType().equals(AddonTokenTypes.IS()) || getCurrent().getType().equals(AddonTokenTypes.IS_LIKE())) {
+                boolean isLike = getCurrentAndNext().getType().equals(AddonTokenTypes.IS_LIKE());
+                return new IsExpression(value, getCurrentAndNext(AddonTokenTypes.ID(), "Must specify data type after is keyword").getValue(), isLike);
             }
 
             return value;
         });
 
         register("addition_expression", extra -> {
-            Expression left = parseAfter(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
+            Expression left = parseAfter(AddonMain.getIdentifier("addition_expression"), Expression.class);
 
-            while (getCurrent().getType().equals(TokenTypes.PLUS()) || getCurrent().getType().equals(TokenTypes.MINUS())) {
+            while (getCurrent().getType().equals(AddonTokenTypes.PLUS()) || getCurrent().getType().equals(AddonTokenTypes.MINUS())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
+                Expression right = parse(AddonMain.getIdentifier("addition_expression"), Expression.class);
                 left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
             }
 
@@ -597,12 +598,12 @@ public final class ParsingFunctions {
         });
 
         register("multiplication_expression", extra -> {
-            Expression left = parseAfter(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
+            Expression left = parseAfter(AddonMain.getIdentifier("multiplication_expression"), Expression.class);
 
-            while (getCurrent().getType().equals(TokenTypes.MULTIPLY()) || getCurrent().getType().equals(TokenTypes.DIVIDE()) ||
-                    getCurrent().getType().equals(TokenTypes.PERCENT())) {
+            while (getCurrent().getType().equals(AddonTokenTypes.MULTIPLY()) || getCurrent().getType().equals(AddonTokenTypes.DIVIDE()) ||
+                    getCurrent().getType().equals(AddonTokenTypes.PERCENT())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parseAfter(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
+                Expression right = parseAfter(AddonMain.getIdentifier("multiplication_expression"), Expression.class);
                 left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
             }
 
@@ -610,11 +611,11 @@ public final class ParsingFunctions {
         });
 
         register("power_expression", extra -> {
-            Expression left = parseAfter(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
+            Expression left = parseAfter(AddonMain.getIdentifier("power_expression"), Expression.class);
 
-            while (getCurrent().getType().equals(TokenTypes.POWER())) {
+            while (getCurrent().getType().equals(AddonTokenTypes.POWER())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parseAfter(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
+                Expression right = parseAfter(AddonMain.getIdentifier("power_expression"), Expression.class);
                 left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
             }
 
@@ -622,28 +623,28 @@ public final class ParsingFunctions {
         });
 
         register("inversion_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.INVERSION())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.INVERSION())) {
                 getCurrentAndNext();
-                Expression expression = parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
-                return new OperatorExpression(expression, null, Operators.INVERSION());
+                Expression expression = parseAfter(AddonMain.getIdentifier("inversion_expression"), Expression.class);
+                return new OperatorExpression(expression, null, AddonOperators.INVERSION());
             }
 
-            return parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
+            return parseAfter(AddonMain.getIdentifier("inversion_expression"), Expression.class);
         });
 
         register("negation_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.MINUS())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.MINUS())) {
                 getCurrentAndNext();
-                return new OperatorExpression(parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class), null, Operators.NEGATION());
+                return new OperatorExpression(parseAfter(AddonMain.getIdentifier("negation_expression"), Expression.class), null, AddonOperators.NEGATION());
             }
 
-            return parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class);
+            return parseAfter(AddonMain.getIdentifier("negation_expression"), Expression.class);
         });
 
         register("postfix_expression", extra -> {
-            Expression id = parseAfter(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
+            Expression id = parseAfter(AddonMain.getIdentifier("postfix_expression"), Expression.class);
 
-            if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
+            if (AddonTokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
                 Expression value = new OperatorExpression(id, new NumberLiteral("1"), token.getValue().substring(1), OperatorType.INFIX);
                 return new AssignmentExpression(id, value);
@@ -653,11 +654,11 @@ public final class ParsingFunctions {
         });
 
         register("member_expression", extra -> {
-            Expression object = parseAfter(RegistryIdentifier.ofDefault("member_expression"), Expression.class);
+            Expression object = parseAfter(AddonMain.getIdentifier("member_expression"), Expression.class);
 
-            while (TokenTypeSets.MEMBER_ACCESS().contains(getCurrent().getType())) {
-                boolean isNullSafe = getCurrentAndNext().getType().equals(TokenTypes.QUESTION_DOT());
-                Expression member = parseAfter(RegistryIdentifier.ofDefault("member_expression"), Expression.class);
+            while (AddonTokenTypeSets.MEMBER_ACCESS().contains(getCurrent().getType())) {
+                boolean isNullSafe = getCurrentAndNext().getType().equals(AddonTokenTypes.QUESTION_DOT());
+                Expression member = parseAfter(AddonMain.getIdentifier("member_expression"), Expression.class);
                 if (!(member instanceof Identifier) && !(member instanceof CallExpression)) {
                     throw new UnexpectedTokenException("Right side must be either Identifier or Call", getCurrent().getLine());
                 }
@@ -668,22 +669,22 @@ public final class ParsingFunctions {
         });
 
         register("class_call_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.NEW())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.NEW())) {
                 getCurrentAndNext();
-                Expression expression = parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
+                Expression expression = parseAfter(AddonMain.getIdentifier("class_call_expression"), Expression.class);
                 if (expression instanceof CallExpression callExpression) {
                     return new ClassCallExpression(new ClassIdentifier(callExpression.getCaller().getId()), callExpression.getArgs());
                 }
                 throw new InvalidSyntaxException("Class creation must be call expression");
             }
 
-            return parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
+            return parseAfter(AddonMain.getIdentifier("class_call_expression"), Expression.class);
         });
 
         register("function_call_expression", extra -> {
-            Expression expression = parseAfter(RegistryIdentifier.ofDefault("function_call_expression"), Expression.class);
+            Expression expression = parseAfter(AddonMain.getIdentifier("function_call_expression"), Expression.class);
 
-            if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.LEFT_PAREN())) {
                 if (!(expression instanceof Identifier identifier)) throw new InvalidSyntaxException("Can't call non-identifier");
                 return new FunctionCallExpression(new FunctionIdentifier(identifier.getId()), parseArgs());
             }
@@ -694,33 +695,33 @@ public final class ParsingFunctions {
         register("primary_expression", extra -> {
             TokenType tokenType = getCurrent().getType();
 
-            if (tokenType.equals(TokenTypes.ID())) {
-                if ((getPos() != 0 && getTokens().get(getPos() - 1).getType().equals(TokenTypes.NEW())) ||
-                        (getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(TokenTypes.DOT()) && getPos() != 0 && !getTokens().get(getPos() - 1).getType().equals(TokenTypes.DOT())))
+            if (tokenType.equals(AddonTokenTypes.ID())) {
+                if ((getPos() != 0 && getTokens().get(getPos() - 1).getType().equals(AddonTokenTypes.NEW())) ||
+                        (getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(AddonTokenTypes.DOT()) && getPos() != 0 && !getTokens().get(getPos() - 1).getType().equals(AddonTokenTypes.DOT())))
                     return new ClassIdentifier(getCurrentAndNext().getValue());
-                else if (getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(TokenTypes.LEFT_PAREN())) {
+                else if (getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(AddonTokenTypes.LEFT_PAREN())) {
                     return new FunctionIdentifier(getCurrentAndNext().getValue());
                 }
                 else return new VariableIdentifier(getCurrentAndNext().getValue());
             }
-            if (tokenType.equals(TokenTypes.NULL())) {
+            if (tokenType.equals(AddonTokenTypes.NULL())) {
                 getCurrentAndNext();
                 return new NullLiteral();
             }
-            if (tokenType.equals(TokenTypes.NUMBER())) return new NumberLiteral(getCurrentAndNext().getValue());
-            if (tokenType.equals(TokenTypes.STRING())) {
+            if (tokenType.equals(AddonTokenTypes.NUMBER())) return new NumberLiteral(getCurrentAndNext().getValue());
+            if (tokenType.equals(AddonTokenTypes.STRING())) {
                 String value = getCurrentAndNext().getValue();
                 return new StringLiteral(value.substring(1, value.length() - 1));
             }
-            if (tokenType.equals(TokenTypes.BOOLEAN())) return new BooleanLiteral(Boolean.parseBoolean(getCurrentAndNext().getValue()));
-            if (tokenType.equals(TokenTypes.THIS())) {
+            if (tokenType.equals(AddonTokenTypes.BOOLEAN())) return new BooleanLiteral(Boolean.parseBoolean(getCurrentAndNext().getValue()));
+            if (tokenType.equals(AddonTokenTypes.THIS())) {
                 getCurrentAndNext();
                 return new ThisLiteral();
             }
-            if (tokenType.equals(TokenTypes.LEFT_PAREN())) {
+            if (tokenType.equals(AddonTokenTypes.LEFT_PAREN())) {
                 getCurrentAndNext();
-                Expression value = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-                getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
+                Expression value = parse(AddonMain.getIdentifier("expression"), Expression.class);
+                getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
                 return value;
             }
 
@@ -732,9 +733,9 @@ public final class ParsingFunctions {
 
     private static Set<Modifier> parseModifiers() {
         Set<Modifier> modifiers = new HashSet<>();
-        while (getCurrent().getType().equals(TokenTypes.ID())) {
+        while (getCurrent().getType().equals(AddonTokenTypes.ID())) {
             String id = getCurrent().getValue();
-            Modifier modifier = Modifiers.parse(id);
+            Modifier modifier = AddonModifiers.parse(id);
             if (modifier == null) {
                 if (modifiers.isEmpty()) return modifiers;
                 throw new InvalidStatementException("Modifier with id " + id + " doesn't exist");
@@ -758,41 +759,41 @@ public final class ParsingFunctions {
     }
 
     private static List<CallArgExpression> parseCallArgs() {
-        getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
+        getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
         List<CallArgExpression> args = new ArrayList<>();
-        if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
-            args.add(parse(RegistryIdentifier.ofDefault("function_arg"), CallArgExpression.class));
+        if (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_PAREN())) {
+            args.add(parse(AddonMain.getIdentifier("function_arg"), CallArgExpression.class));
 
-            while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+            while (getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                 getCurrentAndNext();
-                args.add(parse(RegistryIdentifier.ofDefault("function_arg"), CallArgExpression.class));
+                args.add(parse(AddonMain.getIdentifier("function_arg"), CallArgExpression.class));
             }
         }
-        getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
+        getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
         return args;
     }
 
     private static List<Expression> parseArgs() {
-        getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
+        getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
         List<Expression> args = new ArrayList<>();
-        if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
-            args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+        if (!getCurrent().getType().equals(AddonTokenTypes.RIGHT_PAREN())) {
+            args.add(parse(AddonMain.getIdentifier("expression"), Expression.class));
 
-            while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+            while (getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                 getCurrentAndNext();
-                args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+                args.add(parse(AddonMain.getIdentifier("expression"), Expression.class));
             }
         }
-        getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
+        getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
         return args;
     }
 
     private static DataType parseDataType() {
-        if (getCurrent().getType().equals(TokenTypes.COLON())) {
+        if (getCurrent().getType().equals(AddonTokenTypes.COLON())) {
             getCurrentAndNext();
-            String dataTypeId = getCurrentAndNext(TokenTypes.ID(), "Must specify variable's data type after colon").getValue();
+            String dataTypeId = getCurrentAndNext(AddonTokenTypes.ID(), "Must specify variable's data type after colon").getValue();
 
-            if (getCurrent().getType().equals(TokenTypes.QUESTION())) {
+            if (getCurrent().getType().equals(AddonTokenTypes.QUESTION())) {
                 getCurrentAndNext();
                 return new DataType(dataTypeId, true);
             }
@@ -806,8 +807,8 @@ public final class ParsingFunctions {
         getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
         moveOverOptionalNewLines();
 
-        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-            body.add(parse(RegistryIdentifier.ofDefault("statement")));
+        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
+            body.add(parse(AddonMain.getIdentifier("statement")));
             moveOverOptionalNewLines();
         }
 
@@ -816,12 +817,12 @@ public final class ParsingFunctions {
     }
 
     private static VariableDeclarationStatement.VariableDeclarationInfo parseVariableDeclarationInfo(boolean isConstant, boolean canWithoutValue) {
-        String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
+        String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
 
         DataType dataType = parseDataType();
         if (dataType == null) dataType = new DataType("Any", true);
 
-        if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {
+        if (!getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
             if (canWithoutValue) {
                 return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, null);
             }
@@ -829,9 +830,9 @@ public final class ParsingFunctions {
             return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, new NullLiteral());
         }
 
-        getCurrentAndNext(TokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
+        getCurrentAndNext(AddonTokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
 
-        return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+        return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, parse(AddonMain.getIdentifier("expression"), Expression.class));
     }
 
     private static List<Statement> generateDataBody(String id, List<CallArgExpression> dataVariables) {
@@ -839,7 +840,7 @@ public final class ParsingFunctions {
 
         for (CallArgExpression dataVariable : dataVariables) {
             body.add(new VariableDeclarationStatement(
-                    Set.of(Modifiers.PRIVATE()),
+                    Set.of(AddonModifiers.PRIVATE()),
                     dataVariable.isConstant(),
                     List.of(new VariableDeclarationStatement.VariableDeclarationInfo(dataVariable.getId(), dataVariable.getDataType(), null))));
         }
@@ -904,7 +905,7 @@ public final class ParsingFunctions {
                     new MemberExpression(
                             new VariableIdentifier("value"),
                             new FunctionCallExpression(
-                                    new FunctionIdentifier(Utils.generatePrefixedName("get", dataVariables.getFirst().getId())),
+                                    new FunctionIdentifier(AddonUtils.generatePrefixedName("get", dataVariables.getFirst().getId())),
                                     List.of()),
                             false),
                     "==", OperatorType.INFIX);
@@ -917,7 +918,7 @@ public final class ParsingFunctions {
                                 new MemberExpression(
                                         new VariableIdentifier("value"),
                                         new FunctionCallExpression(
-                                                new FunctionIdentifier(Utils.generatePrefixedName("get", dataVariable.getId())),
+                                                new FunctionIdentifier(AddonUtils.generatePrefixedName("get", dataVariable.getId())),
                                                 List.of()),
                                         false),
                                 "==", OperatorType.INFIX),
@@ -927,7 +928,7 @@ public final class ParsingFunctions {
         }
         else equalsExpression = new BooleanLiteral(true);
         body.add(new FunctionDeclarationStatement(
-                Set.of(Modifiers.OPERATOR()),
+                Set.of(AddonModifiers.OPERATOR()),
                 "equals",
                 List.of(new CallArgExpression("value", new DataType("Any", true), true)),
                 List.of(
@@ -949,7 +950,7 @@ public final class ParsingFunctions {
     private static FunctionDeclarationStatement getGetFunction(String id, DataType dataType) {
         return new FunctionDeclarationStatement(
                 Set.of(),
-                Utils.generatePrefixedName("get", id),
+                AddonUtils.generatePrefixedName("get", id),
                 List.of(),
                 List.of(new ReturnStatement(new VariableIdentifier(id))),
                 dataType);
@@ -958,7 +959,7 @@ public final class ParsingFunctions {
     private static FunctionDeclarationStatement getSetFunction(String id, DataType dataType) {
         return new FunctionDeclarationStatement(
                 Set.of(),
-                Utils.generatePrefixedName("set", id),
+                AddonUtils.generatePrefixedName("set", id),
                 List.of(new CallArgExpression(id, dataType, true)),
                 List.of(new AssignmentExpression(new MemberExpression(new ThisLiteral(), new VariableIdentifier(id), false), new VariableIdentifier(id))),
                 null);
@@ -967,6 +968,6 @@ public final class ParsingFunctions {
 
 
     private static void register(String id, ParsingFunction<? extends Statement> parsingFunction) {
-        Registries.PARSING_FUNCTIONS.register(RegistryIdentifier.ofDefault(id), parsingFunction);
+        Registries.PARSING_FUNCTIONS.register(AddonMain.getIdentifier(id), parsingFunction);
     }
 }

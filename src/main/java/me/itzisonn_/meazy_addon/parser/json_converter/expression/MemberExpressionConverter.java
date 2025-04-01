@@ -2,15 +2,15 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
 public class MemberExpressionConverter extends Converter<MemberExpression> {
     public MemberExpressionConverter() {
-        super(RegistryIdentifier.ofDefault("member_expression"));
+        super(AddonMain.getIdentifier("member_expression"));
     }
 
     @Override

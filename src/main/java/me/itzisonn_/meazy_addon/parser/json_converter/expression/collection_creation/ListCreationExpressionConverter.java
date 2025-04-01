@@ -2,9 +2,9 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression.collection_cre
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCreationExpression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class ListCreationExpressionConverter extends Converter<ListCreationExpression> {
     public ListCreationExpressionConverter() {
-        super(RegistryIdentifier.ofDefault("list_creation_expression"));
+        super(AddonMain.getIdentifier("list_creation_expression"));
     }
 
     @Override

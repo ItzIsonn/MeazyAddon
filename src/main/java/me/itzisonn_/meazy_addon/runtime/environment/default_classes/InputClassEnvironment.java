@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes;
 
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
@@ -21,31 +21,31 @@ public class InputClassEnvironment extends ClassEnvironmentImpl {
         super(parent, true, "Input");
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
-        declareFunction(new DefaultFunctionValue("read", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("read", List.of(), new DataType("String", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(SCANNER.next());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readLine", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readLine", List.of(), new DataType("String", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(SCANNER.nextLine());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readInt", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readInt", List.of(), new DataType("String", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new IntValue(SCANNER.nextInt());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readFloat", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readFloat", List.of(), new DataType("String", false), this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(SCANNER.nextDouble());
             }

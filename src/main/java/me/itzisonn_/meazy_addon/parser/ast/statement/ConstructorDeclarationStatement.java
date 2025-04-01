@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.Modifier;
@@ -31,9 +30,9 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
 
         StringBuilder bodyBuilder = new StringBuilder();
         for (Statement statement : body) {
-            bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+            bodyBuilder.append(Statement.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
         }
 
-        return super.toCodeString(0) + "constructor(" + argsBuilder + ") {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+        return super.toCodeString(0) + "constructor(" + argsBuilder + ") {\n" + bodyBuilder + Statement.getOffset(offset - 1) + "}";
     }
 }

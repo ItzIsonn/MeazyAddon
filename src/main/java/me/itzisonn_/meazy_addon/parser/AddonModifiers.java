@@ -3,62 +3,62 @@ package me.itzisonn_.meazy_addon.parser;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
+import me.itzisonn_.registry.RegistryEntry;
 
 /**
  * All basic Modifiers
  *
  * @see Registries#MODIFIERS
  */
-public final class Modifiers {
+public final class AddonModifiers {
     private static boolean isInit = false;
 
-    private Modifiers() {}
+    private AddonModifiers() {}
 
 
 
     public static Modifier PRIVATE() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("private")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("private")).getValue();
     }
 
     public static Modifier PROTECTED() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("protected")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("protected")).getValue();
     }
 
     public static Modifier SHARED() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("shared")).getValue();
     }
 
     public static Modifier ABSTRACT() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("abstract")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("abstract")).getValue();
     }
 
     public static Modifier GET() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("get")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("get")).getValue();
     }
 
     public static Modifier SET() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("set")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("set")).getValue();
     }
 
     public static Modifier DATA() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("data")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("data")).getValue();
     }
 
     public static Modifier FINAL() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("final")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("final")).getValue();
     }
 
     public static Modifier OPERATOR() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("operator")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("operator")).getValue();
     }
 
     public static Modifier ENUM() {
-        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("enum")).getValue();
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("enum")).getValue();
     }
 
 
@@ -79,7 +79,7 @@ public final class Modifiers {
 
 
     private static void register(Modifier modifier) {
-        Registries.MODIFIERS.register(RegistryIdentifier.ofDefault(modifier.getId()), modifier);
+        Registries.MODIFIERS.register(AddonMain.getIdentifier(modifier.getId()), modifier);
     }
 
     /**
@@ -139,7 +139,7 @@ public final class Modifiers {
 
                 if (modifierStatement instanceof ClassDeclarationStatement) return true;
                 if (modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment classEnvironment) {
-                    return classEnvironment.getModifiers().contains(Modifiers.ABSTRACT());
+                    return classEnvironment.getModifiers().contains(AddonModifiers.ABSTRACT());
                 }
                 return false;
             }

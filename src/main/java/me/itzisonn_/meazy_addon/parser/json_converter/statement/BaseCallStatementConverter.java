@@ -2,9 +2,9 @@ package me.itzisonn_.meazy_addon.parser.json_converter.statement;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.statement.BaseCallStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class BaseCallStatementConverter extends Converter<BaseCallStatement> {
     public BaseCallStatementConverter() {
-        super(RegistryIdentifier.ofDefault("base_call_statement"));
+        super(AddonMain.getIdentifier("base_call_statement"));
     }
 
     @Override

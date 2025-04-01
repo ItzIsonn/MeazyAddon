@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections;
 
-import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy_addon.parser.Modifiers;
+import me.itzisonn_.meazy_addon.AddonUtils;
+import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
@@ -33,7 +33,7 @@ public class ListClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Any", false),
                 new InnerListValue(new ArrayList<>(list)),
                 false,
-                Set.of(Modifiers.PRIVATE()),
+                Set.of(AddonModifiers.PRIVATE()),
                 false));
 
 
@@ -161,7 +161,7 @@ public class ListClassEnvironment extends ClassEnvironmentImpl {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't convert non-list value to string");
 
-                return new StringValue(Utils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
+                return new StringValue(AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
             }
         });
     }

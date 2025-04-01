@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.Expression;
 
@@ -25,11 +24,11 @@ public class IfStatement implements Statement {
 
         StringBuilder bodyBuilder = new StringBuilder();
         for (Statement statement : body) {
-            bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+            bodyBuilder.append(Statement.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
         }
 
-        String elseString = elseStatement == null ? "" : "\n" + Utils.getOffset(offset - 1) + "else " + elseStatement.toCodeString(offset);
+        String elseString = elseStatement == null ? "" : "\n" + Statement.getOffset(offset - 1) + "else " + elseStatement.toCodeString(offset);
 
-        return conditionString + "{\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}" + elseString;
+        return conditionString + "{\n" + bodyBuilder + Statement.getOffset(offset - 1) + "}" + elseString;
     }
 }
