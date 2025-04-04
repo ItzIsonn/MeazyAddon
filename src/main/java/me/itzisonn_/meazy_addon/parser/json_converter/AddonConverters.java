@@ -2,8 +2,6 @@ package me.itzisonn_.meazy_addon.parser.json_converter;
 
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.parser.json_converter.ExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converter.StatementConverter;
 import me.itzisonn_.meazy_addon.parser.json_converter.expression.*;
 import me.itzisonn_.meazy_addon.parser.json_converter.expression.call_expression.ClassCallExpressionConverter;
 import me.itzisonn_.meazy_addon.parser.json_converter.expression.call_expression.FunctionCallExpressionConverter;
@@ -33,7 +31,7 @@ public final class AddonConverters {
     @SuppressWarnings("unchecked")
     private static <T extends Statement> void register(Converter<T> converter) {
         Registries.CONVERTERS.register(
-                converter.getIdentifier(),
+                converter.getId(),
                 (Class<T>) ((ParameterizedType) converter.getClass().getGenericSuperclass()).getActualTypeArguments()[0],
                 converter);
     }
@@ -80,9 +78,6 @@ public final class AddonConverters {
         register(new StringLiteralConverter());
         register(new BooleanLiteralConverter());
         register(new ThisLiteralConverter());
-
-        register(new StatementConverter());
-        register(new ExpressionConverter());
 
         Registries.updateGson();
     }
