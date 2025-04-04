@@ -3,6 +3,8 @@ package me.itzisonn_.meazy_addon;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -28,7 +30,9 @@ import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AddonMain extends Addon {
     public static final String NAMESPACE = "meazy_addon";
@@ -43,22 +47,44 @@ public class AddonMain extends Addon {
         AddonEvaluationFunctions.INIT();
         AddonConverters.INIT();
 
-        Registries.PARSE_TOKENS_FUNCTION.register(AddonMain.getIdentifier("parse_tokens"), tokens -> {
+        Registries.PARSE_TOKENS_FUNCTION.register(getIdentifier("parse_tokens"), tokens -> {
             if (tokens == null) throw new NullPointerException("Tokens can't be null!");
             Parser.setTokens(tokens);
 
             Parser.moveOverOptionalNewLines();
 
+            Map<String, String> requiredAddons = null;
+
             List<Statement> body = new ArrayList<>();
-            while (!Parser.getCurrent().getType().equals(me.itzisonn_.meazy.lexer.TokenTypes.END_OF_FILE())) {
-                body.add(Parser.parse(AddonMain.getIdentifier("global_statement"), Statement.class));
+            while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
+                if (Parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) requiredAddons = AddonParsingFunctions.parseRequiredAddons();
+                else body.add(Parser.parse(getIdentifier("global_statement"), Statement.class));
                 Parser.moveOverOptionalNewLines();
             }
 
-            return new Program(MeazyMain.VERSION, body);
+            if (requiredAddons == null) {
+                requiredAddons = new HashMap<>();
+                for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
+                    AddonInfo addonInfo = addon.getAddonInfo();
+                    requiredAddons.put(addonInfo.getId(), addonInfo.getVersion());
+                }
+            }
+
+            return new Program(MeazyMain.VERSION, requiredAddons, body);
         });
 
-        Registries.EVALUATE_PROGRAM_FUNCTION.register(AddonMain.getIdentifier("evaluate_program"), program -> {
+        Registries.EVALUATE_PROGRAM_FUNCTION.register(getIdentifier("evaluate_program"), program -> {
+            for (String addonId : program.getRequiredAddons().keySet()) {
+                Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
+                if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
+
+                String addonVersion = program.getRequiredAddons().get(addonId);
+                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonId)) {
+                    throw new RuntimeException("Can't find required addon with id " + addonId + " of version " + addonVersion +
+                            " (found version " + addon.getAddonInfo().getVersion() + ")");
+                }
+            }
+
             Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
 
             RuntimeValue<?> runtimeValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getFunction("main", new ArrayList<>());
@@ -103,13 +129,13 @@ public class AddonMain extends Addon {
         });
 
         GlobalEnvironmentImpl globalEnvironment = new GlobalEnvironmentImpl();
-        Registries.GLOBAL_ENVIRONMENT.register(AddonMain.getIdentifier("global_environment"), globalEnvironment);
+        Registries.GLOBAL_ENVIRONMENT.register(getIdentifier("global_environment"), globalEnvironment);
         globalEnvironment.init();
-        Registries.CLASS_ENVIRONMENT.register(AddonMain.getIdentifier("class_environment"), ClassEnvironmentImpl.class);
-        Registries.FUNCTION_ENVIRONMENT.register(AddonMain.getIdentifier("function_environment"), FunctionEnvironmentImpl.class);
-        Registries.CONSTRUCTOR_ENVIRONMENT.register(AddonMain.getIdentifier("constructor_environment"), ConstructorEnvironmentImpl.class);
-        Registries.LOOP_ENVIRONMENT.register(AddonMain.getIdentifier("loop_environment"), LoopEnvironmentImpl.class);
-        Registries.ENVIRONMENT.register(AddonMain.getIdentifier("environment"), EnvironmentImpl.class);
+        Registries.CLASS_ENVIRONMENT.register(getIdentifier("class_environment"), ClassEnvironmentImpl.class);
+        Registries.FUNCTION_ENVIRONMENT.register(getIdentifier("function_environment"), FunctionEnvironmentImpl.class);
+        Registries.CONSTRUCTOR_ENVIRONMENT.register(getIdentifier("constructor_environment"), ConstructorEnvironmentImpl.class);
+        Registries.LOOP_ENVIRONMENT.register(getIdentifier("loop_environment"), LoopEnvironmentImpl.class);
+        Registries.ENVIRONMENT.register(getIdentifier("environment"), EnvironmentImpl.class);
 
 
 

@@ -17,6 +17,10 @@ public final class AddonTokenTypes {
 
 
 
+    public static TokenType REQUIRE() {
+        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("require")).getValue();
+    }
+
     public static TokenType VARIABLE() {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("variable")).getValue();
     }
@@ -292,6 +296,7 @@ public final class AddonTokenTypes {
         if (isInit) throw new IllegalStateException("TokenTypes have already been initialized!");
         isInit = true;
 
+        register(new TokenType("require", "require", false));
         register(new TokenType("variable", "var|val", false));
         register(new TokenType("function", "function|fun", false));
         register(new TokenType("class", "class", false));

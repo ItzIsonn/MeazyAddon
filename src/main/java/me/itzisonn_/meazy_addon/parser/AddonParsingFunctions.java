@@ -729,6 +729,29 @@ public final class AddonParsingFunctions {
         });
     }
 
+    public static Map<String, String> parseRequiredAddons() {
+        Map<String, String> requiredAddons = new HashMap<>();
+
+        moveOverOptionalNewLines();
+
+        while (getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
+            getCurrentAndNext();
+
+            String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected id after require keyword").getValue();
+            String version;
+            if (getCurrent().getType().equals(AddonTokenTypes.STRING())) {
+                String value = getCurrentAndNext().getValue();
+                version = value.substring(1, value.length() - 1);
+            }
+            else version = null;
+            requiredAddons.put(id, version);
+
+            getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line in the end of the require statement");
+            moveOverOptionalNewLines();
+        }
+
+        return requiredAddons;
+    }
 
 
     private static Set<Modifier> parseModifiers() {

@@ -4,6 +4,8 @@ import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy_addon.AddonMain;
 
+import static me.itzisonn_.meazy_addon.lexer.AddonTokenTypes.*;
+
 public final class AddonTokenTypeSets {
     private static boolean isInit = false;
 
@@ -45,44 +47,45 @@ public final class AddonTokenTypeSets {
         isInit = true;
 
         register("keywords", new TokenTypeSet(
-                AddonTokenTypes.VARIABLE(),
-                AddonTokenTypes.FUNCTION(),
-                AddonTokenTypes.CLASS(),
-                AddonTokenTypes.CONSTRUCTOR(),
-                AddonTokenTypes.BASE(),
-                AddonTokenTypes.NEW(),
-                AddonTokenTypes.IF(),
-                AddonTokenTypes.ELSE(),
-                AddonTokenTypes.FOR(),
-                AddonTokenTypes.IN(),
-                AddonTokenTypes.WHILE(),
-                AddonTokenTypes.RETURN(),
-                AddonTokenTypes.CONTINUE(),
-                AddonTokenTypes.BREAK(),
-                AddonTokenTypes.IS(),
-                AddonTokenTypes.IS_LIKE(),
-                AddonTokenTypes.NULL(),
-                AddonTokenTypes.BOOLEAN(),
-                AddonTokenTypes.THIS()
+                REQUIRE(),
+                VARIABLE(),
+                FUNCTION(),
+                CLASS(),
+                CONSTRUCTOR(),
+                BASE(),
+                NEW(),
+                IF(),
+                ELSE(),
+                FOR(),
+                IN(),
+                WHILE(),
+                RETURN(),
+                CONTINUE(),
+                BREAK(),
+                IS(),
+                IS_LIKE(),
+                NULL(),
+                BOOLEAN(),
+                THIS()
         ));
 
         register("operator_assign", new TokenTypeSet(
-                AddonTokenTypes.PLUS_ASSIGN(),
-                AddonTokenTypes.MINUS_ASSIGN(),
-                AddonTokenTypes.MULTIPLY_ASSIGN(),
-                AddonTokenTypes.DIVIDE_ASSIGN(),
-                AddonTokenTypes.PERCENT_ASSIGN(),
-                AddonTokenTypes.POWER_ASSIGN()
+                PLUS_ASSIGN(),
+                MINUS_ASSIGN(),
+                MULTIPLY_ASSIGN(),
+                DIVIDE_ASSIGN(),
+                PERCENT_ASSIGN(),
+                POWER_ASSIGN()
         ));
 
         register("operator_postfix", new TokenTypeSet(
-                AddonTokenTypes.DOUBLE_PLUS(),
-                AddonTokenTypes.DOUBLE_MINUS()
+                DOUBLE_PLUS(),
+                DOUBLE_MINUS()
         ));
 
         register("member_access", new TokenTypeSet(
-                AddonTokenTypes.DOT(),
-                AddonTokenTypes.QUESTION_DOT()
+                DOT(),
+                QUESTION_DOT()
         ));
     }
 }
