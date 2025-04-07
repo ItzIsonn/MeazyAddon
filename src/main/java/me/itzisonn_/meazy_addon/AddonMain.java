@@ -15,6 +15,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
@@ -53,7 +54,7 @@ public class AddonMain extends Addon {
 
             Parser.moveOverOptionalNewLines();
 
-            Map<String, String> requiredAddons = null;
+            Map<String, Version> requiredAddons = null;
 
             List<Statement> body = new ArrayList<>();
             while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
@@ -78,8 +79,8 @@ public class AddonMain extends Addon {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
 
-                String addonVersion = program.getRequiredAddons().get(addonId);
-                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonId)) {
+                Version addonVersion = program.getRequiredAddons().get(addonId);
+                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonVersion)) {
                     throw new RuntimeException("Can't find required addon with id " + addonId + " of version " + addonVersion +
                             " (found version " + addon.getAddonInfo().getVersion() + ")");
                 }

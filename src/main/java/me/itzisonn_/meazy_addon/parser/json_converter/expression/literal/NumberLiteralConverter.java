@@ -18,7 +18,7 @@ public class NumberLiteralConverter extends Converter<NumberLiteral> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("value") == null) throw new InvalidCompiledFileException(getIdentifier(), "value");
+        if (object.get("value") == null) throw new InvalidCompiledFileException(getId(), "value");
         String value = object.get("value").getAsString();
 
         return new NumberLiteral(value);

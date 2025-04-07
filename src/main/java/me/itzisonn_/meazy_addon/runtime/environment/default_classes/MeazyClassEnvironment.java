@@ -28,7 +28,7 @@ public class MeazyClassEnvironment extends ClassEnvironmentImpl {
         declareVariable(new VariableValue(
                 "VERSION",
                 new DataType("String", false),
-                new StringValue(MeazyMain.VERSION),
+                new StringValue(MeazyMain.VERSION.toString()),
                 true,
                 Set.of(AddonModifiers.SHARED()),
                 false));

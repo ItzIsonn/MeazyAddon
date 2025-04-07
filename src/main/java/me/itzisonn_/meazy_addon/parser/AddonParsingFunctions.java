@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
@@ -729,8 +730,8 @@ public final class AddonParsingFunctions {
         });
     }
 
-    public static Map<String, String> parseRequiredAddons() {
-        Map<String, String> requiredAddons = new HashMap<>();
+    public static Map<String, Version> parseRequiredAddons() {
+        Map<String, Version> requiredAddons = new HashMap<>();
 
         moveOverOptionalNewLines();
 
@@ -738,10 +739,10 @@ public final class AddonParsingFunctions {
             getCurrentAndNext();
 
             String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected id after require keyword").getValue();
-            String version;
+            Version version;
             if (getCurrent().getType().equals(AddonTokenTypes.STRING())) {
                 String value = getCurrentAndNext().getValue();
-                version = value.substring(1, value.length() - 1);
+                version = Version.of(value.substring(1, value.length() - 1));
             }
             else version = null;
             requiredAddons.put(id, version);
