@@ -8,12 +8,17 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
+import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
@@ -22,6 +27,7 @@ import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.AddonParsingFunctions;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
+import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.environment.*;
@@ -30,10 +36,7 @@ import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AddonMain extends Addon {
     public static final String NAMESPACE = "meazy_addon";
@@ -86,9 +89,27 @@ public class AddonMain extends Addon {
                 }
             }
 
-            Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue();
+            Interpreter.evaluate(program, globalEnvironment);
 
-            RuntimeValue<?> runtimeValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getFunction("main", new ArrayList<>());
+            for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : AddonEvaluationFunctions.VARIABLE_QUEUE.keySet()) {
+                Environment environment = AddonEvaluationFunctions.VARIABLE_QUEUE.get(variableDeclarationInfo);
+                environment.assignVariable(variableDeclarationInfo.getId(), Interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
+            }
+            AddonEvaluationFunctions.VARIABLE_QUEUE.clear();
+
+            for (ClassValue classValue : globalEnvironment.getClasses()) {
+                if (AddonEvaluationFunctions.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>())) {
+                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated base classes");
+                }
+                if (AddonEvaluationFunctions.hasRepeatedVariables(
+                        classValue.getBaseClasses(),
+                        new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()))) {
+                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated variables");
+                }
+            }
+
+            RuntimeValue<?> runtimeValue = globalEnvironment.getFunction("main", new ArrayList<>());
             if (runtimeValue == null) {
                 MeazyMain.LOGGER.log(Level.WARN, "File doesn't contain main function");
                 return;
@@ -101,7 +122,7 @@ public class AddonMain extends Addon {
 
             FunctionEnvironment functionEnvironment;
             try {
-                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class).newInstance(globalEnvironment);
             }
             catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
@@ -137,8 +158,6 @@ public class AddonMain extends Addon {
         Registries.CONSTRUCTOR_ENVIRONMENT.register(getIdentifier("constructor_environment"), ConstructorEnvironmentImpl.class);
         Registries.LOOP_ENVIRONMENT.register(getIdentifier("loop_environment"), LoopEnvironmentImpl.class);
         Registries.ENVIRONMENT.register(getIdentifier("environment"), EnvironmentImpl.class);
-
-
 
         getLogger().log(Level.INFO, "Successfully initialized!");
     }

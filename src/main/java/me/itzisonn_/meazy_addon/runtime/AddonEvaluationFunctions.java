@@ -10,6 +10,7 @@ import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorVa
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.*;
+import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.CallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCreationExpression;
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
 public final class AddonEvaluationFunctions {
     private static boolean isInit = false;
     private static final List<FunctionDeclarationStatement> extensionFunctions = new ArrayList<>();
+    public static final LinkedHashMap<VariableDeclarationStatement.VariableDeclarationInfo, Environment> VARIABLE_QUEUE = new LinkedHashMap<>();
 
     private AddonEvaluationFunctions() {}
 
@@ -117,14 +119,14 @@ public final class AddonEvaluationFunctions {
                 ));
             }
 
-            if (hasRepeatedBaseClasses(classDeclarationStatement.getBaseClasses(), new ArrayList<>())) {
-                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated base classes");
-            }
-            if (hasRepeatedVariables(
-                    classDeclarationStatement.getBaseClasses(),
-                    new ArrayList<>(classEnvironment.getVariables().stream().map(VariableValue::getId).toList()))) {
-                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated variables");
-            }
+//            if (hasRepeatedBaseClasses(classDeclarationStatement.getBaseClasses(), new ArrayList<>())) {
+//                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated base classes");
+//            }
+//            if (hasRepeatedVariables(
+//                    classDeclarationStatement.getBaseClasses(),
+//                    new ArrayList<>(classEnvironment.getVariables().stream().map(VariableValue::getId).toList()))) {
+//                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated variables");
+//            }
 
             RuntimeClassValue runtimeClassValue = new RuntimeClassValue(
                     classDeclarationStatement.getBaseClasses(),
@@ -218,27 +220,35 @@ public final class AddonEvaluationFunctions {
 
         register("variable_declaration_statement", VariableDeclarationStatement.class, (variableDeclarationStatement, environment, extra) -> {
             for (Modifier modifier : variableDeclarationStatement.getModifiers()) {
-                if (!modifier.canUse(variableDeclarationStatement, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
+                if (!modifier.canUse(variableDeclarationStatement, environment))
+                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
             Set<Modifier> modifiers = new HashSet<>(variableDeclarationStatement.getModifiers());
-            if (!(environment instanceof ClassEnvironment) && environment.isShared() && !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED())) modifiers.add(AddonModifiers.SHARED());
+            if (!(environment instanceof ClassEnvironment) && environment.isShared() &&
+                    !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED())) modifiers.add(AddonModifiers.SHARED());
 
             variableDeclarationStatement.getDeclarationInfos().forEach(variableDeclarationInfo -> {
-                RuntimeValue<?> value;
-                if (variableDeclarationInfo.getValue() == null) value = null;
-                else if (environment instanceof ClassEnvironment && environment.isShared() &&
-                        !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED())) value = null;
-                else value = Interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
+                RuntimeValue<?> value = null;
+                if (variableDeclarationInfo.getValue() != null && !(environment instanceof ClassEnvironment && environment.isShared() &&
+                        !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED()))) {
+                    if ((variableDeclarationInfo.getValue() instanceof CallExpression || variableDeclarationInfo.getValue() instanceof MemberExpression) &&
+                            (environment instanceof GlobalEnvironment || environment instanceof ClassEnvironment)) {
+                        VARIABLE_QUEUE.put(variableDeclarationInfo, environment);
+                    }
+                    else value = Interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
+                }
 
-                environment.declareVariable(new VariableValue(
+
+                VariableValue variableValue = new VariableValue(
                         variableDeclarationInfo.getId(),
                         variableDeclarationInfo.getDataType(),
                         value,
                         variableDeclarationStatement.isConstant(),
                         modifiers,
                         false
-                ));
+                );
+                environment.declareVariable(variableValue);
             });
 
             return null;
@@ -698,7 +708,8 @@ public final class AddonEvaluationFunctions {
                         throw new InvalidAccessException("Can't access protected variable with id " + identifier.getId());
                     }
 
-                    if (!variableValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() && !variableValue.isArgument())
+                    if (!variableValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() && !variableValue.isArgument() &&
+                            !(variableDeclarationEnvironment instanceof GlobalEnvironment))
                         throw new InvalidAccessException("Can't access not-shared variable with id " + identifier.getId() + " from shared environment");
 
                     return variableValue;
@@ -743,7 +754,8 @@ public final class AddonEvaluationFunctions {
                         throw new InvalidAccessException("Can't access protected function with id " + identifier.getId());
                     }
 
-                    if (!functionValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared())
+                    if (!functionValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() &&
+                            !(functionDeclarationEnvironment instanceof GlobalEnvironment))
                         throw new InvalidAccessException("Can't access not-shared function with id " + identifier.getId() + " from shared environment");
 
                     return functionValue;
@@ -849,7 +861,7 @@ public final class AddonEvaluationFunctions {
         return returnValue;
     }
 
-    private static boolean hasRepeatedBaseClasses(Set<String> baseClassesList, List<String> baseClasses) {
+    public static boolean hasRepeatedBaseClasses(Set<String> baseClassesList, List<String> baseClasses) {
         for (String baseClass : baseClassesList) {
             if (baseClasses.contains(baseClass)) {
                 return true;
@@ -869,7 +881,7 @@ public final class AddonEvaluationFunctions {
         return false;
     }
 
-    private static boolean hasRepeatedVariables(Set<String> baseClassesList, List<String> variables) {
+    public static boolean hasRepeatedVariables(Set<String> baseClassesList, List<String> variables) {
         for (String baseClass : baseClassesList) {
             ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
             if (classValue == null) {
