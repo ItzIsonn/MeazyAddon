@@ -3,28 +3,24 @@ package me.itzisonn_.meazy_addon.runtime.environment;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.InputClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.MathClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.MeazyClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.RandomClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.CollectionClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.ListClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.MapClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.SetClassEnvironment;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.*;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.CollectionClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.ListClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.MapClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.SetClassValue;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.file.FileClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.file.FileReaderClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.file.FileWriterClassValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.primitive.*;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,105 +48,31 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     }
 
     public void init() {
-        declareClass(new DefaultClassValue(new AnyClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                return true;
-            }
-        });
+        declareClass(new AnyClassValue(this));
+        declareClass(new BooleanClassValue(this));
+        declareClass(new IntClassValue(this));
+        declareClass(new LongClassValue(this));
+        declareClass(new FloatClassValue(this));
+        declareClass(new DoubleClassValue(this));
+        declareClass(new CharClassValue(this));
+        declareClass(new StringClassValue(this));
 
-        declareClass(new DefaultClassValue(new BooleanClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                if (value == null) return true;
-                if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue) return true;
-                return value.toString().equals("true") || value.toString().equals("false");
-            }
-        });
+        declareClass(new CollectionClassValue(this));
+        declareClass(new ListClassValue(this));
+        declareClass(new SetClassValue(this));
+        declareClass(new MapClassValue(this));
 
-        declareClass(new DefaultClassValue(new IntClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                if (value == null) return true;
-                if (value instanceof Integer || value instanceof IntValue) return true;
-                try {
-                    Integer.parseInt(value.toString());
-                    return true;
-                }
-                catch (NumberFormatException ignore) {
-                    return false;
-                }
-            }
-        });
+        declareClass(new FileClassValue(this));
+        declareClass(new FileReaderClassValue(this));
+        declareClass(new FileWriterClassValue(this));
 
-        declareClass(new DefaultClassValue(new LongClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                if (value == null) return true;
-                if (value instanceof Integer || value instanceof IntValue || value instanceof Long || value instanceof LongValue) return true;
-                try {
-                    Long.parseLong(value.toString());
-                    return true;
-                }
-                catch (NumberFormatException ignore) {
-                    return false;
-                }
-            }
-        });
-
-        declareClass(new DefaultClassValue(new FloatClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                if (value == null) return true;
-                if (value instanceof Integer || value instanceof IntValue || value instanceof Float || value instanceof FloatValue) return true;
-                try {
-                    Float.parseFloat(value.toString());
-                    return true;
-                }
-                catch (NumberFormatException ignore) {
-                    return false;
-                }
-            }
-        });
-
-        declareClass(new DefaultClassValue(new DoubleClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                if (value == null) return true;
-                if (value instanceof Number || value instanceof NumberValue<?>) return true;
-                try {
-                    Double.parseDouble(value.toString());
-                    return true;
-                }
-                catch (NumberFormatException ignore) {
-                    return false;
-                }
-            }
-        });
-
-        declareClass(new DefaultClassValue(new CharClassEnvironment(this)) {
-            @Override
-            public boolean isMatches(Object value) {
-                if (value == null) return true;
-                if (value instanceof Character) return true;
-                return value.toString().length() == 1;
-            }
-        });
-
-        declareClass(new DefaultClassValue(new StringClassEnvironment(this, null)));
-        declareClass(new DefaultClassValue(new InputClassEnvironment(this)));
-
-        declareClass(new DefaultClassValue(new CollectionClassEnvironment(this)));
-        declareClass(new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(this)));
-        declareClass(new DefaultClassValue(Set.of("Collection"), new SetClassEnvironment(this)));
-        declareClass(new DefaultClassValue(new MapClassEnvironment(this)));
-
-        declareClass(new DefaultClassValue(new MathClassEnvironment(this)));
-        declareClass(new DefaultClassValue(new RandomClassEnvironment(this)));
-        declareClass(new DefaultClassValue(new MeazyClassEnvironment(this)));
+        declareClass(new InputClassValue(this));
+        declareClass(new MathClassValue(this));
+        declareClass(new MeazyClassValue(this));
+        declareClass(new RandomClassValue(this));
 
 
-        declareFunction(new DefaultFunctionValue("print", List.of(
+        declareFunction(new NativeFunctionValue("print", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
                 null, this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -161,7 +83,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             }
         });
 
-        declareFunction(new DefaultFunctionValue("println", List.of(
+        declareFunction(new NativeFunctionValue("println", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
                 null, this, Set.of(AddonModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -172,7 +94,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             }
         });
 
-        declareFunction(new DefaultFunctionValue("range",
+        declareFunction(new NativeFunctionValue("range",
                 List.of(new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true)),
                 new DataType("List", false), this, Set.of()) {
             @Override
@@ -181,11 +103,11 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
                 if (!(functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("End must be int");
 
                 List<RuntimeValue<?>> list = range(beginValue.getValue(), endValue.getValue(), 1);
-                return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+                return new ListClassValue(list);
             }
         });
 
-        declareFunction(new DefaultFunctionValue("range",
+        declareFunction(new NativeFunctionValue("range",
                 List.of(new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true), new CallArgExpression("step", new DataType("Int", false), true)),
                 new DataType("List", false), this, Set.of()) {
             @Override
@@ -197,7 +119,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
                 if (stepValue.getValue() <= 0) throw new InvalidArgumentException("Step must be positive int");
 
                 List<RuntimeValue<?>> list = range(beginValue.getValue(),  endValue.getValue(), stepValue.getValue());
-                return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+                return new ListClassValue(list);
             }
         });
     }

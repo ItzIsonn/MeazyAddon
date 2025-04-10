@@ -5,6 +5,9 @@ import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.interpreter.*;
+import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.*;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.*;
@@ -25,21 +28,18 @@ import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.CollectionClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.ListClassEnvironment;
-import me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections.MapClassEnvironment;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.CollectionClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.ListClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.MapClassValue;
 import me.itzisonn_.meazy.runtime.value.*;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.constructors.RuntimeConstructorValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BaseClassIdValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.StringValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ContinueInfoValue;
@@ -139,7 +139,7 @@ public final class AddonEvaluationFunctions {
                 ClassEnvironment enumEnvironment = initClassEnvironment(runtimeClassValue, classEnvironment, args);
 
                 int finalEnumOrdinal = enumOrdinal;
-                enumEnvironment.declareFunction(new DefaultFunctionValue("getOrdinal", List.of(), new DataType("Int", false), enumEnvironment, Set.of()) {
+                enumEnvironment.declareFunction(new NativeFunctionValue("getOrdinal", List.of(), new DataType("Int", false), enumEnvironment, Set.of()) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                         return new IntValue(finalEnumOrdinal);
@@ -147,16 +147,16 @@ public final class AddonEvaluationFunctions {
                 });
                 enumOrdinal++;
 
-                ClassValue enumValue = new DefaultClassValue(enumEnvironment);
+                ClassValue enumValue = new NativeClassValue(enumEnvironment);
                 classEnvironment.assignVariable(enumId, enumValue);
                 enumValues.add(enumValue);
             }
 
             if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
-                classEnvironment.declareFunction(new DefaultFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
+                classEnvironment.declareFunction(new NativeFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                        return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), new ArrayList<>(enumValues)));
+                        return new ListClassValue(new ArrayList<>(enumValues));
                     }
                 });
             }
@@ -417,7 +417,7 @@ public final class AddonEvaluationFunctions {
 
             VariableValue variable = classValue.getEnvironment().getVariable("value");
             if (variable == null) throw new InvalidSyntaxException("Can't get members of non-collection value");
-            if (!(variable.getValue() instanceof CollectionClassEnvironment.InnerCollectionValue<?> collectionValue)) throw new InvalidSyntaxException("Can't get members of non-collection value");
+            if (!(variable.getValue() instanceof CollectionClassValue.InnerCollectionValue<?> collectionValue)) throw new InvalidSyntaxException("Can't get members of non-collection value");
 
             main:
             for (RuntimeValue<?> runtimeValue : collectionValue.getValue()) {
@@ -543,7 +543,7 @@ public final class AddonEvaluationFunctions {
 
         register("list_creation_expression", ListCreationExpression.class, (listCreationExpression, environment, extra) -> {
             List<RuntimeValue<?>> list = listCreationExpression.getList().stream().map(expression -> Interpreter.evaluate(expression, environment)).collect(Collectors.toList());
-            return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+            return new ListClassValue(list);
         });
 
         register("map_creation_expression", MapCreationExpression.class, (mapCreationExpression, environment, extra) -> {
@@ -554,7 +554,7 @@ public final class AddonEvaluationFunctions {
                 map.put(Interpreter.evaluate(key, environment), Interpreter.evaluate(value, environment));
             }
 
-            return new DefaultClassValue(new MapClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), map));
+            return new MapClassValue(map);
         });
 
         register("null_check_expression", NullCheckExpression.class, (nullCheckExpression, environment, extra) -> {
@@ -626,7 +626,7 @@ public final class AddonEvaluationFunctions {
 
             ClassEnvironment classEnvironment = initClassEnvironment(classValue, extraEnvironment, args);
             if (classValue instanceof RuntimeClassValue runtimeClassValue) return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-            if (classValue instanceof DefaultClassValue) return new DefaultClassValue(classValue.getBaseClasses(), classEnvironment);
+            if (classValue instanceof NativeClassValue) return new NativeClassValue(classValue.getBaseClasses(), classEnvironment);
 
             throw new InvalidCallException("Can't call " + classValue.getClass().getName() + " because it's unknown class");
         });
@@ -789,14 +789,14 @@ public final class AddonEvaluationFunctions {
                 }
             }
         });
-        register("string_literal", StringLiteral.class, (stringLiteral, environment, extra) -> new StringValue(stringLiteral.getValue()));
+        register("string_literal", StringLiteral.class, (stringLiteral, environment, extra) -> new StringClassValue(stringLiteral.getValue()));
         register("boolean_literal", BooleanLiteral.class, (booleanLiteral, environment, extra) -> new BooleanValue(booleanLiteral.isValue()));
 
         register("this_literal", ThisLiteral.class, (thisLiteral, environment, extra) -> {
             Environment parent = environment.getParent(env -> env instanceof ClassEnvironment);
             if (!(parent instanceof ClassEnvironment classEnvironment)) throw new RuntimeException("Can't use 'this' keyword not inside a class");
             if (environment.isShared()) throw new RuntimeException("Can't use 'this' keyword inside a shared environment");
-            return new DefaultClassValue(
+            return new NativeClassValue(
                     classEnvironment.getBaseClasses().stream().map(ClassEnvironment::getId).collect(Collectors.toSet()),
                     classEnvironment);
         });
@@ -1016,25 +1016,25 @@ public final class AddonEvaluationFunctions {
                 throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
             }
         }
-        else if (classValue instanceof DefaultClassValue defaultClassValue) {
-            defaultClassValue.getEnvironment().getVariables().forEach(variable -> classEnvironment.declareVariable(new VariableValue(
+        else if (classValue instanceof NativeClassValue nativeClassValue) {
+            nativeClassValue.getEnvironment().getVariables().forEach(variable -> classEnvironment.declareVariable(new VariableValue(
                     variable.getId(),
                     variable.getDataType(),
                     variable.getValue(),
                     variable.isConstant(),
                     variable.getModifiers(),
                     variable.isArgument())));
-            defaultClassValue.getEnvironment().getFunctions().forEach(function -> classEnvironment.declareFunction(function.copy(classEnvironment)));
-            defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> classEnvironment.declareConstructor(constructor.copy(classEnvironment)));
+            nativeClassValue.getEnvironment().getFunctions().forEach(function -> classEnvironment.declareFunction(function.copy(classEnvironment)));
+            nativeClassValue.getEnvironment().getConstructors().forEach(constructor -> classEnvironment.declareConstructor(constructor.copy(classEnvironment)));
 
             if (classEnvironment.hasConstructor()) {
                 RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
-                if (rawConstructor == null) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
+                if (rawConstructor == null) throw new InvalidCallException("Class with id " + nativeClassValue.getId() + " doesn't have requested constructor");
 
-                if (rawConstructor instanceof DefaultConstructorValue defaultConstructorValue) {
+                if (rawConstructor instanceof NativeConstructorValue defaultConstructorValue) {
                     if (defaultConstructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
                         if (env instanceof ClassEnvironment classEnv) {
-                            return classEnv.getId().equals(defaultClassValue.getId());
+                            return classEnv.getId().equals(nativeClassValue.getId());
                         }
                         return false;
                     })) {
@@ -1059,7 +1059,7 @@ public final class AddonEvaluationFunctions {
                     defaultConstructorValue.run(args, constructorEnvironment);
                 }
             }
-            else if (!args.isEmpty()) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
+            else if (!args.isEmpty()) throw new InvalidCallException("Class with id " + nativeClassValue.getId() + " doesn't have requested constructor");
         }
         else throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
 
@@ -1104,7 +1104,7 @@ public final class AddonEvaluationFunctions {
     }
 
     private static RuntimeValue<?> callFunction(FunctionValue functionValue, List<RuntimeValue<?>> args) {
-        if (functionValue instanceof DefaultFunctionValue defaultFunctionValue) {
+        if (functionValue instanceof NativeFunctionValue defaultFunctionValue) {
             if (defaultFunctionValue.getArgs().size() != args.size()) {
                 throw new InvalidCallException("Expected " + defaultFunctionValue.getArgs().size() + " args but found " + args.size());
             }

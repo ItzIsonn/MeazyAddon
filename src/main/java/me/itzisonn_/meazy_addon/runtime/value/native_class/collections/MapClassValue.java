@@ -1,7 +1,8 @@
-package me.itzisonn_.meazy_addon.runtime.environment.default_classes.collections;
+package me.itzisonn_.meazy_addon.runtime.value.native_class.collections;
 
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
@@ -10,24 +11,33 @@ import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy_addon.runtime.value.StringValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.*;
 
-public class MapClassEnvironment extends ClassEnvironmentImpl {
-    public MapClassEnvironment(ClassDeclarationEnvironment parent) {
+public class MapClassValue extends NativeClassValue {
+    public MapClassValue(ClassDeclarationEnvironment parent) {
         this(parent, new HashMap<>());
     }
 
-    public MapClassEnvironment(ClassDeclarationEnvironment parent, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        super(parent, false, "Map");
+    public MapClassValue(Map<RuntimeValue<?>, RuntimeValue<?>> map) {
+        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), map);
+    }
 
-        declareVariable(new VariableValue(
+    public MapClassValue(ClassDeclarationEnvironment parent, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
+        super(getClassEnvironment(parent, map));
+    }
+
+    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
+        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Map");
+
+
+        classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
                 new InnerMapValue(new HashMap<>(map)),
@@ -36,14 +46,14 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
                 false));
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of()) {
+        classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of()) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
-        declareConstructor(new DefaultConstructorValue(List.of(
+        classEnvironment.declareConstructor(new NativeConstructorValue(List.of(
                 new CallArgExpression("key", new DataType("Any", true), true), new CallArgExpression("value", new DataType("Any", true), true)),
-                this, Set.of()) {
+                classEnvironment, Set.of()) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
                 RuntimeValue<?> value = constructorEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -54,7 +64,7 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
         });
 
 
-        declareFunction(new DefaultFunctionValue("getSize", List.of(), new DataType("Int", false), this, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValue("getSize", List.of(), new DataType("Int", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -64,9 +74,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("put", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("put", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true), new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, new HashSet<>()) {
+                null, classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -77,9 +87,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("putIfAbsent", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("putIfAbsent", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true), new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, new HashSet<>()) {
+                null, classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -90,9 +100,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("remove", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("remove", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true)),
-                new DataType("Any", true), this, new HashSet<>()) {
+                new DataType("Any", true), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -102,9 +112,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("remove", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("remove", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true), new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, new HashSet<>()) {
+                null, classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -115,9 +125,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("get", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("get", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true)),
-                new DataType("Any", true), this, new HashSet<>()) {
+                new DataType("Any", true), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -127,9 +137,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("getOrDefault", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("getOrDefault", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true), new CallArgExpression("defaultValue", new DataType("Any", true), true)),
-                new DataType("Any", true), this, new HashSet<>()) {
+                new DataType("Any", true), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -139,7 +149,7 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("isEmpty", List.of(), new DataType("Boolean", false), this, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValue("isEmpty", List.of(), new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -149,9 +159,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("containsKey", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("containsKey", List.of(
                 new CallArgExpression("key", new DataType("Any", true), true)),
-                new DataType("Boolean", false), this, new HashSet<>()) {
+                new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -161,9 +171,9 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("containsValue", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValue("containsValue", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
-                new DataType("Boolean", false), this, new HashSet<>()) {
+                new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -173,35 +183,37 @@ public class MapClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("getKeySet", List.of(), new DataType("Set", false), this, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValue("getKeySet", List.of(), new DataType("Set", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't get key set of non-map value");
 
-                return new DefaultClassValue(Set.of("Collection"), new SetClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), mapValue.getValue().keySet()));
+                return new SetClassValue(mapValue.getValue().keySet());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("getValueList", List.of(), new DataType("List", false), this, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValue("getValueList", List.of(), new DataType("List", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't get value list of non-map value");
 
-                return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), new ArrayList<>(mapValue.getValue().values())));
+                return new ListClassValue(new ArrayList<>(mapValue.getValue().values()));
             }
         });
 
-        declareFunction(new DefaultFunctionValue("toString", List.of(), new DataType("String", false), this, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValue("toString", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't convert non-map value to string");
 
-                return new StringValue(unpackRuntimeValuesMap(mapValue.getValue()).toString());
+                return new StringClassValue(unpackRuntimeValuesMap(mapValue.getValue()).toString());
             }
         });
+
+        return classEnvironment;
     }
 
     private static Map<Object, Object> unpackRuntimeValuesMap(Map<RuntimeValue<?>, RuntimeValue<?>> map) {
