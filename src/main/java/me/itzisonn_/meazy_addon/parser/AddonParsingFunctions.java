@@ -52,12 +52,18 @@ public final class AddonParsingFunctions {
      * @throws IllegalStateException If {@link Registries#PARSING_FUNCTIONS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("ParsingFunctions have already been initialized!");
+        if (isInit) throw new IllegalStateException("ParsingFunctions have already been initialized");
         isInit = true;
 
         register("global_statement", extra -> {
-            Set<Modifier> modifiers = parseModifiers();
+            if (getCurrent().getType().equals(AddonTokenTypes.IMPORT())) {
+                return parse(AddonMain.getIdentifier("import_statement"), ImportStatement.class);
+            }
 
+            Set<Modifier> modifiers = parseModifiers();
+            if (getCurrent().getType().equals(AddonTokenTypes.CLASS())) {
+                return parse(AddonMain.getIdentifier("class_declaration_statement"), ClassDeclarationStatement.class, modifiers);
+            }
             if (getCurrent().getType().equals(AddonTokenTypes.FUNCTION())) {
                 return parse(AddonMain.getIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
             }
@@ -68,11 +74,14 @@ public final class AddonParsingFunctions {
                 moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
-            if (getCurrent().getType().equals(AddonTokenTypes.CLASS())) {
-                return parse(AddonMain.getIdentifier("class_declaration_statement"), ClassDeclarationStatement.class, modifiers);
-            }
 
             throw new InvalidStatementException("At global environment you only can declare variable, function or class", getCurrent().getLine());
+        });
+
+        register("import_statement", extra -> {
+            getCurrentAndNext(AddonTokenTypes.IMPORT(), "Expected import keyword");
+            String file = getCurrentAndNext(AddonTokenTypes.STRING(), "Expected file path after import keyword").getValue();
+            return new ImportStatement(file.substring(1, file.length() - 1));
         });
 
         register("class_declaration_statement", extra -> {

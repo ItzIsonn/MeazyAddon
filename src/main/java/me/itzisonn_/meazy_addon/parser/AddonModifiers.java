@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.registry.RegistryEntry;
@@ -27,6 +28,10 @@ public final class AddonModifiers {
 
     public static Modifier PROTECTED() {
         return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("protected")).getValue();
+    }
+
+    public static Modifier OPEN() {
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("open")).getValue();
     }
 
     public static Modifier SHARED() {
@@ -90,13 +95,14 @@ public final class AddonModifiers {
      * @throws IllegalStateException If {@link Registries#MODIFIERS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("Modifiers have already been initialized!");
+        if (isInit) throw new IllegalStateException("Modifiers have already been initialized");
         isInit = true;
 
         register(new Modifier("private") {
             @Override
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
-                if (modifierStatement.getModifiers().contains(ABSTRACT()) || modifierStatement.getModifiers().contains(PROTECTED())) return false;
+                if (modifierStatement.getModifiers().contains(ABSTRACT()) || modifierStatement.getModifiers().contains(PROTECTED()) ||
+                        modifierStatement.getModifiers().contains(OPEN())) return false;
 
                 if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
                     modifierStatement instanceof ConstructorDeclarationStatement) {
@@ -109,12 +115,31 @@ public final class AddonModifiers {
         register(new Modifier("protected") {
             @Override
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
-                if (modifierStatement.getModifiers().contains(PRIVATE())) return false;
+                if (modifierStatement.getModifiers().contains(PRIVATE()) || modifierStatement.getModifiers().contains(OPEN())) return false;
 
                 if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
                         modifierStatement instanceof ConstructorDeclarationStatement) {
                     return environment instanceof ClassEnvironment;
                 }
+                return false;
+            }
+        });
+
+        register(new Modifier("open") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(PRIVATE()) || modifierStatement.getModifiers().contains(PROTECTED())) return false;
+
+                if (environment instanceof GlobalEnvironment) {
+                    return modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
+                            modifierStatement instanceof ClassDeclarationStatement;
+                }
+
+                if (environment instanceof ClassEnvironment classEnvironment && classEnvironment.getModifiers().contains(OPEN())) {
+                    return modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
+                            modifierStatement instanceof ConstructorDeclarationStatement;
+                }
+
                 return false;
             }
         });

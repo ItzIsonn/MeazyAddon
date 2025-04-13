@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 
 import java.util.List;
@@ -20,18 +20,16 @@ import java.util.Set;
 
 public class BooleanClassValue extends NativeClassValue {
     public BooleanClassValue(ClassDeclarationEnvironment parent) {
-        super(getClassEnvironment(parent));
+        super(new ClassEnvironmentImpl(parent, false, "Boolean"));
+        setupEnvironment(getEnvironment());
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Boolean");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
-
 
         classEnvironment.declareFunction(new NativeFunctionValue("valueOf", List.of(
                 new CallArgExpression("object", new DataType("Any", false), true)),
@@ -46,8 +44,6 @@ public class BooleanClassValue extends NativeClassValue {
                 };
             }
         });
-
-        return classEnvironment;
     }
 
     @Override

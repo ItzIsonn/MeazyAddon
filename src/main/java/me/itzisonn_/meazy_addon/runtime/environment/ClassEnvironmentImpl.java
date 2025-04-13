@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 
 import java.util.HashSet;
@@ -48,7 +48,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
     @Override
     public void declareVariable(VariableValue value) {
-        if (getVariable(value.getId()) != null) throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists!");
+        if (getVariable(value.getId()) != null) throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
         variables.add(value);
     }
 
@@ -93,7 +93,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
                     if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
                 }
 
-                throw new InvalidSyntaxException("Function for operator " + value.getId() + " already exists!");
+                throw new InvalidSyntaxException("Function for operator " + value.getId() + " already exists");
             }
         }
 
@@ -145,7 +145,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
                 if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
             }
 
-            throw new InvalidSyntaxException("Constructor with this args already exists!");
+            throw new InvalidSyntaxException("Constructor with these args already exists");
         }
 
         constructors.add(value);

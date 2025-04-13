@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
@@ -22,29 +22,29 @@ import java.util.Set;
 
 public class MathClassValue extends NativeClassValue {
     public MathClassValue(ClassDeclarationEnvironment parent) {
-        super(getClassEnvironment(parent));
+        super(new ClassEnvironmentImpl(parent, false, "Math"));
+        setupEnvironment(getEnvironment());
     }
 
-
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Math");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "PI",
-                new DataType("Float", false),
+                new DataType("Double", false),
                 new DoubleValue(Math.PI),
                 true,
                 Set.of(AddonModifiers.SHARED()),
-                false));
+                false,
+                classEnvironment));
 
         classEnvironment.declareVariable(new VariableValue(
                 "E",
-                new DataType("Float", false),
+                new DataType("Double", false),
                 new DoubleValue(Math.E),
                 true,
                 Set.of(AddonModifiers.SHARED()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of(AddonModifiers.PRIVATE())) {
@@ -140,7 +140,5 @@ public class MathClassValue extends NativeClassValue {
                 return new IntValue(result);
             }
         });
-        
-        return classEnvironment;
     }
 }

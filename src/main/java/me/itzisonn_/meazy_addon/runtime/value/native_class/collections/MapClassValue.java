@@ -3,8 +3,8 @@ package me.itzisonn_.meazy_addon.runtime.value.native_class.collections;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
@@ -13,7 +13,7 @@ import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
@@ -21,29 +21,34 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import java.util.*;
 
 public class MapClassValue extends NativeClassValue {
+    private static GlobalEnvironment globalEnvironment = null;
+
     public MapClassValue(ClassDeclarationEnvironment parent) {
         this(parent, new HashMap<>());
     }
 
     public MapClassValue(Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), map);
+        this(globalEnvironment, map);
     }
 
     public MapClassValue(ClassDeclarationEnvironment parent, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        super(getClassEnvironment(parent, map));
+        super(new ClassEnvironmentImpl(parent, false, "Map"));
+        setupEnvironment(getEnvironment());
+        getEnvironment().assignVariable("value", new InnerMapValue(new HashMap<>(map)));
+
+        if (parent instanceof GlobalEnvironment globalEnv) globalEnvironment = globalEnv;
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Map");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerMapValue(new HashMap<>(map)),
+                new InnerMapValue(new HashMap<>()),
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of()) {
@@ -212,8 +217,6 @@ public class MapClassValue extends NativeClassValue {
                 return new StringClassValue(unpackRuntimeValuesMap(mapValue.getValue()).toString());
             }
         });
-
-        return classEnvironment;
     }
 
     private static Map<Object, Object> unpackRuntimeValuesMap(Map<RuntimeValue<?>, RuntimeValue<?>> map) {

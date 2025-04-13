@@ -1,18 +1,18 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.file;
 
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
@@ -25,29 +25,34 @@ import java.util.List;
 import java.util.Set;
 
 public class FileReaderClassValue extends NativeClassValue {
+    private static GlobalEnvironment globalEnvironment = null;
+
     public FileReaderClassValue(ClassDeclarationEnvironment parent) {
         this(parent, null);
     }
 
     public FileReaderClassValue(BufferedReader fileReader) {
-        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), fileReader);
+        this(globalEnvironment, fileReader);
     }
 
     public FileReaderClassValue(ClassDeclarationEnvironment parent, BufferedReader fileReader) {
-        super(getClassEnvironment(parent, fileReader));
+        super(new ClassEnvironmentImpl(parent, false, "FileReader"));
+        setupEnvironment(getEnvironment());
+        getEnvironment().assignVariable("value", new InnerFileReaderValue(fileReader));
+
+        if (parent instanceof GlobalEnvironment globalEnv) globalEnvironment = globalEnv;
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, BufferedReader fileReader) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "FileReader");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerFileReaderValue(fileReader),
+                null,
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(
@@ -117,8 +122,6 @@ public class FileReaderClassValue extends NativeClassValue {
                 return null;
             }
         });
-
-        return classEnvironment;
     }
 
     public static class InnerFileReaderValue extends RuntimeValue<BufferedReader> {

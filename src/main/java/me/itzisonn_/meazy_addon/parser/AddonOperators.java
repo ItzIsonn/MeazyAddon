@@ -137,7 +137,7 @@ public final class AddonOperators {
      * @throws IllegalStateException If {@link Registries#OPERATORS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("Operators have already been initialized!");
+        if (isInit) throw new IllegalStateException("Operators have already been initialized");
         isInit = true;
 
         register("plus", new Operator("+", OperatorType.INFIX) {

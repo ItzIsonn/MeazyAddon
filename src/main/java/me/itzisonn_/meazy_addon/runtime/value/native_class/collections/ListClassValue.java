@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.collections;
 
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
@@ -12,7 +12,7 @@ import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.*;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
@@ -24,29 +24,34 @@ import java.util.List;
 import java.util.Set;
 
 public class ListClassValue extends NativeClassValue {
+    private static GlobalEnvironment globalEnvironment = null;
+
     public ListClassValue(ClassDeclarationEnvironment parent) {
         this(parent, new ArrayList<>());
     }
 
     public ListClassValue(List<RuntimeValue<?>> list) {
-        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list);
+        this(globalEnvironment, list);
     }
 
     public ListClassValue(ClassDeclarationEnvironment parent, List<RuntimeValue<?>> list) {
-        super(Set.of("Collection"), getClassEnvironment(parent, list));
+        super(Set.of("Collection"), new ClassEnvironmentImpl(parent, false, "List"));
+        setupEnvironment(getEnvironment());
+        getEnvironment().assignVariable("value", new InnerListValue(new ArrayList<>(list)));
+
+        if (parent instanceof GlobalEnvironment globalEnv) globalEnvironment = globalEnv;
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, List<RuntimeValue<?>> list) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "List");
-
-        
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerListValue(new ArrayList<>(list)),
+                new InnerListValue(new ArrayList<>()),
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of()) {
@@ -176,8 +181,6 @@ public class ListClassValue extends NativeClassValue {
                 return new StringClassValue(AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
             }
         });
-        
-        return classEnvironment;
     }
 
     public static class InnerListValue extends CollectionClassValue.InnerCollectionValue<List<RuntimeValue<?>>> {

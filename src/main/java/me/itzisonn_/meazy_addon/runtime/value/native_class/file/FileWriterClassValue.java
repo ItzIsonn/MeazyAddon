@@ -1,17 +1,17 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.file;
 
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.CollectionClassValue;
@@ -25,29 +25,34 @@ import java.util.List;
 import java.util.Set;
 
 public class FileWriterClassValue extends NativeClassValue {
+    private static GlobalEnvironment globalEnvironment = null;
+
     public FileWriterClassValue(ClassDeclarationEnvironment parent) {
         this(parent, null);
     }
 
     public FileWriterClassValue(File file) {
-        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), file);
+        this(globalEnvironment, file);
     }
 
     public FileWriterClassValue(ClassDeclarationEnvironment parent, File file) {
-        super(getClassEnvironment(parent, file));
+        super(new ClassEnvironmentImpl(parent, false, "FileWriter"));
+        setupEnvironment(getEnvironment());
+        getEnvironment().assignVariable("value", new InnerFileValue(file));
+
+        if (parent instanceof GlobalEnvironment globalEnv) globalEnvironment = globalEnv;
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, File file) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "FileWriter");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerFileValue(file),
+                null,
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(
@@ -133,8 +138,6 @@ public class FileWriterClassValue extends NativeClassValue {
                 return null;
             }
         });
-
-        return classEnvironment;
     }
 
     public static class InnerFileValue extends RuntimeValue<File> {

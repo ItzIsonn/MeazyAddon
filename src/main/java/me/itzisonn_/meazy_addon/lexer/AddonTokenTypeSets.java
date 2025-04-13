@@ -43,11 +43,12 @@ public final class AddonTokenTypeSets {
      * @throws IllegalStateException If {@link Registries#TOKEN_TYPE_SETS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("TokenTypeSets have already been initialized!");
+        if (isInit) throw new IllegalStateException("TokenTypeSets have already been initialized");
         isInit = true;
 
         register("keywords", new TokenTypeSet(
                 REQUIRE(),
+                IMPORT(),
                 VARIABLE(),
                 FUNCTION(),
                 CLASS(),

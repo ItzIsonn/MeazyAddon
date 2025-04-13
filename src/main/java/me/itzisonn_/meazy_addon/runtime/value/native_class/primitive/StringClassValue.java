@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
@@ -13,7 +13,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.*;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.ListClassValue;
@@ -22,38 +22,53 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import java.util.*;
 
 public class StringClassValue extends NativeClassValue {
+    private static GlobalEnvironment globalEnvironment = null;
+
     public StringClassValue(ClassDeclarationEnvironment parent) {
         this(parent, null);
     }
 
     public StringClassValue(String string) {
-        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), string);
+        this(globalEnvironment, string);
     }
 
     public StringClassValue(ClassDeclarationEnvironment parent, String string) {
-        this(getClassEnvironment(parent, string));
+        super(new ClassEnvironmentImpl(parent, false, "String"));
+        setupEnvironment(getEnvironment());
+        getEnvironment().assignVariable("value", new InnerStringValue(string));
+
+        if (parent instanceof GlobalEnvironment globalEnv) globalEnvironment = globalEnv;
     }
 
     protected StringClassValue(ClassEnvironment environment) {
         super(environment);
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, String string) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "String");
+    @Override
+    public NativeClassValue newInstance(Set<String> baseClasses, ClassEnvironment classEnvironment) {
+        return new StringClassValue(classEnvironment);
+    }
 
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerStringValue(string),
+                null,
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
-        classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of(AddonModifiers.PRIVATE())) {
+        classEnvironment.declareConstructor(new NativeConstructorValue(List.of(
+                new CallArgExpression("str", new DataType("String", false), true)),
+                classEnvironment, Set.of()) {
             @Override
-            public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
+            public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
+                constructorEnvironment.getVariableDeclarationEnvironment("value").assignVariable("value",
+                        new InnerStringValue(String.valueOf(constructorArgs.getFirst().getFinalValue())));
+            }
         });
 
 
@@ -360,24 +375,6 @@ public class StringClassValue extends NativeClassValue {
                 return new ListClassValue(list);
             }
         });
-
-
-        classEnvironment.declareFunction(new NativeFunctionValue("copy", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
-            @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
-                if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't copy non-string value");
-
-                if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-                    throw new InvalidCallException("Invalid function call");
-                }
-                if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
-
-                return new StringClassValue(stringValue.getValue());
-            }
-        });
-
-        return classEnvironment;
     }
 
     @Override

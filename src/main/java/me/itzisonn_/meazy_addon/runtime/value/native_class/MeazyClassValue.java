@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.ListClassValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 
@@ -22,20 +22,20 @@ import java.util.Set;
 
 public class MeazyClassValue extends NativeClassValue {
     public MeazyClassValue(ClassDeclarationEnvironment parent) {
-        super(getClassEnvironment(parent));
+        super(new ClassEnvironmentImpl(parent, false, "Meazy"));
+        setupEnvironment(getEnvironment());
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Meazy");
-
-        
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "VERSION",
                 new DataType("String", false),
                 new StringClassValue(MeazyMain.VERSION.toString()),
                 true,
                 Set.of(AddonModifiers.SHARED()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of(AddonModifiers.PRIVATE())) {
@@ -54,7 +54,5 @@ public class MeazyClassValue extends NativeClassValue {
                 return new ListClassValue(addons);
             }
         });
-
-        return classEnvironment;
     }
 }

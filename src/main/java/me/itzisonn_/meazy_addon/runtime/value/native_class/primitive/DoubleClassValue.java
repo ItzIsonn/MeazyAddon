@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
@@ -20,12 +20,12 @@ import java.util.Set;
 
 public class DoubleClassValue extends NativeClassValue {
     public DoubleClassValue(ClassDeclarationEnvironment parent) {
-        super(getClassEnvironment(parent));
+        super(new ClassEnvironmentImpl(parent, false, "Double"));
+        setupEnvironment(getEnvironment());
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Double");
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of(AddonModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
@@ -45,8 +45,6 @@ public class DoubleClassValue extends NativeClassValue {
                 }
             }
         });
-
-        return classEnvironment;
     }
 
     @Override

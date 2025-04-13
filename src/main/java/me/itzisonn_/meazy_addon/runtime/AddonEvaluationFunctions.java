@@ -1,12 +1,17 @@
 package me.itzisonn_.meazy_addon.runtime;
 
+import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.runtime.InvalidFileException;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.*;
@@ -35,7 +40,7 @@ import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.MapClassV
 import me.itzisonn_.meazy.runtime.value.*;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.RuntimeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.RuntimeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BaseClassIdValue;
@@ -46,8 +51,9 @@ import me.itzisonn_.meazy_addon.runtime.value.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ContinueInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 import me.itzisonn_.registry.RegistryEntry;
+import org.apache.logging.log4j.Level;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,7 +79,7 @@ public final class AddonEvaluationFunctions {
      * @throws IllegalStateException If {@link Registries#EVALUATION_FUNCTIONS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("EvaluationFunctions have already been initialized!");
+        if (isInit) throw new IllegalStateException("EvaluationFunctions have already been initialized");
         isInit = true;
 
         register("program", Program.class, (program, environment, extra) -> {
@@ -84,9 +90,42 @@ public final class AddonEvaluationFunctions {
             return null;
         });
 
+        register("import_statement", ImportStatement.class, (importStatement, environment, extra) -> {
+            if (!(environment instanceof GlobalEnvironment globalEnvironment)) {
+                throw new InvalidSyntaxException("Can't use imports in non-global environment");
+            }
+
+            File file = new File(importStatement.getFile());
+            if (file.isDirectory() || !file.exists()) {
+                throw new InvalidFileException("File '" + file.getAbsolutePath() + "' doesn't exist");
+            }
+
+            String extension = Utils.getExtension(file);
+            Program program;
+            switch (extension) {
+                case "mea" -> {
+                    Parser.reset();
+                    List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                    program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
+                }
+                case "meac" -> {
+                    program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
+                    if (program == null) throw new InvalidFileException("Failed to read file '" + file.getAbsolutePath() + "'");
+                    if (MeazyMain.VERSION.isBefore(program.getVersion())) throw new InvalidFileException("Can't run file that has been compiled by a more recent version of the Meazy (" + program.getVersion() + "), in a more older version (" + MeazyMain.VERSION + ")");
+                    if (MeazyMain.VERSION.isAfter(program.getVersion())) {
+                        MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
+                    }
+                }
+                default -> throw new InvalidFileException("Can't run file with extension " + extension);
+            }
+
+            globalEnvironment.addRelatedGlobalEnvironment(Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program, file));
+            return null;
+        });
+
         register("class_declaration_statement", ClassDeclarationStatement.class, (classDeclarationStatement, environment, extra) -> {
             if (!(environment instanceof ClassDeclarationEnvironment classDeclarationEnvironment)) {
-                throw new InvalidSyntaxException("Can't declare class in this environment!");
+                throw new InvalidSyntaxException("Can't declare class in this environment");
             }
 
             for (Modifier modifier : classDeclarationStatement.getModifiers()) {
@@ -94,15 +133,11 @@ public final class AddonEvaluationFunctions {
                     throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
-            ClassEnvironment classEnvironment;
-            try {
-                classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue()
-                        .getConstructor(ClassDeclarationEnvironment.class, boolean.class, String.class, Set.class)
-                        .newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), true, classDeclarationStatement.getId(), classDeclarationStatement.getModifiers());
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+            ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                    environment.getGlobalEnvironment(),
+                    true,
+                    classDeclarationStatement.getId(),
+                    classDeclarationStatement.getModifiers());
 
             for (Statement statement : classDeclarationStatement.getBody()) {
                 Interpreter.evaluate(statement, classEnvironment);
@@ -115,18 +150,10 @@ public final class AddonEvaluationFunctions {
                         null,
                         true,
                         Set.of(AddonModifiers.SHARED()),
-                        false
+                        false,
+                        classEnvironment
                 ));
             }
-
-//            if (hasRepeatedBaseClasses(classDeclarationStatement.getBaseClasses(), new ArrayList<>())) {
-//                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated base classes");
-//            }
-//            if (hasRepeatedVariables(
-//                    classDeclarationStatement.getBaseClasses(),
-//                    new ArrayList<>(classEnvironment.getVariables().stream().map(VariableValue::getId).toList()))) {
-//                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated variables");
-//            }
 
             RuntimeClassValue runtimeClassValue = new RuntimeClassValue(
                     classDeclarationStatement.getBaseClasses(),
@@ -167,19 +194,16 @@ public final class AddonEvaluationFunctions {
         });
 
         register("function_declaration_statement", FunctionDeclarationStatement.class, (functionDeclarationStatement, environment, extra) -> {
-            FunctionDeclarationEnvironment functionDeclarationEnvironment;
-
             if (functionDeclarationStatement.getClassId() != null) {
-                ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(functionDeclarationStatement.getClassId());
+                ClassValue classValue = environment.getGlobalEnvironment().getClass(functionDeclarationStatement.getClassId());
                 if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + functionDeclarationStatement.getClassId());
                 if (classValue.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidIdentifierException("Can't extend final class with id " + functionDeclarationStatement.getClassId());
                 if (!extensionFunctions.contains(functionDeclarationStatement)) extensionFunctions.add(functionDeclarationStatement);
                 return null;
             }
-            if (!(environment instanceof FunctionDeclarationEnvironment declarationEnvironment)) {
-                throw new InvalidSyntaxException("Can't declare function in this environment!");
+            if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
+                throw new InvalidSyntaxException("Can't declare function in this environment");
             }
-            else functionDeclarationEnvironment = declarationEnvironment;
 
             for (Modifier modifier : functionDeclarationStatement.getModifiers()) {
                 if (!modifier.canUse(functionDeclarationStatement, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
@@ -239,14 +263,14 @@ public final class AddonEvaluationFunctions {
                     else value = Interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
                 }
 
-
                 VariableValue variableValue = new VariableValue(
                         variableDeclarationInfo.getId(),
                         variableDeclarationInfo.getDataType(),
                         value,
                         variableDeclarationStatement.isConstant(),
                         modifiers,
-                        false
+                        false,
+                        environment
                 );
                 environment.declareVariable(variableValue);
             });
@@ -256,7 +280,7 @@ public final class AddonEvaluationFunctions {
 
         register("constructor_declaration_statement", ConstructorDeclarationStatement.class, (constructorDeclarationStatement, environment, extra) -> {
             if (!(environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment)) {
-                throw new InvalidSyntaxException("Can't declare constructor in this environment!");
+                throw new InvalidSyntaxException("Can't declare constructor in this environment");
             }
 
             for (Modifier modifier : constructorDeclarationStatement.getModifiers()) {
@@ -280,10 +304,10 @@ public final class AddonEvaluationFunctions {
             else throw new InvalidSyntaxException("Unknown error occurred");
 
             if (!(environment instanceof ConstructorEnvironment constructorEnvironment)) {
-                throw new InvalidSyntaxException("Can't use BaseCallStatement in this environment!");
+                throw new InvalidSyntaxException("Can't use BaseCallStatement in this environment");
             }
 
-            ClassValue baseClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseCallStatement.getId());
+            ClassValue baseClassValue = environment.getGlobalEnvironment().getClass(baseCallStatement.getId());
             List<RuntimeValue<?>> args = baseCallStatement.getArgs().stream().map(expression -> Interpreter.evaluate(expression, environment)).collect(Collectors.toList());
             classEnvironment.addBaseClass(initClassEnvironment(baseClassValue, constructorEnvironment, args));
             return new BaseClassIdValue(baseCallStatement.getId());
@@ -299,13 +323,7 @@ public final class AddonEvaluationFunctions {
                     }
                 }
 
-                Environment ifEnvironment;
-                try {
-                    ifEnvironment = Registries.ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
+                Environment ifEnvironment = Registries.ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
 
                 for (int i = 0; i < ifStatement.getBody().size(); i++) {
                     Statement statement = ifStatement.getBody().get(i);
@@ -341,13 +359,7 @@ public final class AddonEvaluationFunctions {
         });
 
         register("for_statement", ForStatement.class, (forStatement, environment, extra) -> {
-            LoopEnvironment forEnvironment;
-            try {
-                forEnvironment = Registries.LOOP_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+            LoopEnvironment forEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
 
             forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
                     forEnvironment.declareVariable(new VariableValue(
@@ -358,7 +370,9 @@ public final class AddonEvaluationFunctions {
                                     Interpreter.evaluate(variableDeclarationInfo.getValue(), environment),
                             forStatement.getVariableDeclarationStatement().isConstant(),
                             Set.of(),
-                            false))
+                            false,
+                            forEnvironment
+                    ))
             );
 
             main:
@@ -404,7 +418,9 @@ public final class AddonEvaluationFunctions {
                             variableValue.getValue(),
                             variableValue.isConstant(),
                             new HashSet<>(),
-                            false));
+                            false,
+                            forEnvironment
+                    ));
                 }
                 evaluateAssignmentExpression(forStatement.getAssignmentExpression(), forEnvironment);
             }
@@ -413,13 +429,7 @@ public final class AddonEvaluationFunctions {
         });
 
         register("foreach_statement", ForeachStatement.class, (foreachStatement, environment, extra) -> {
-            LoopEnvironment foreachEnvironment;
-            try {
-                foreachEnvironment = Registries.LOOP_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+            LoopEnvironment foreachEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
 
             RuntimeValue<?> rawCollectionValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment).getFinalRuntimeValue();
             if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getBaseClasses().contains("Collection")))
@@ -439,7 +449,9 @@ public final class AddonEvaluationFunctions {
                         runtimeValue,
                         foreachStatement.getVariableDeclarationStatement().isConstant(),
                         new HashSet<>(),
-                        false));
+                        false,
+                        foreachEnvironment
+                ));
 
                 for (int i = 0; i < foreachStatement.getBody().size(); i++) {
                     Statement statement = foreachStatement.getBody().get(i);
@@ -475,13 +487,7 @@ public final class AddonEvaluationFunctions {
         });
 
         register("while_statement", WhileStatement.class, (whileStatement, environment, extra) -> {
-            LoopEnvironment whileEnvironment;
-            try {
-                whileEnvironment = Registries.LOOP_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+            LoopEnvironment whileEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
 
             main:
             while (parseCondition(whileStatement.getCondition(), environment)) {
@@ -579,7 +585,7 @@ public final class AddonEvaluationFunctions {
         register("is_expression", IsExpression.class, (isExpression, environment, extra) -> {
             RuntimeValue<?> value = Interpreter.evaluate(isExpression.getValue(), environment).getFinalRuntimeValue();
 
-            ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(isExpression.getDataType());
+            ClassValue classValue = environment.getGlobalEnvironment().getClass(isExpression.getDataType());
             if (classValue == null) throw new InvalidSyntaxException("Data type with id " + isExpression.getDataType() + " doesn't exist");
 
             if (isExpression.isLike()) return new BooleanValue(classValue.isLikeMatches(value.getFinalRuntimeValue()));
@@ -636,7 +642,7 @@ public final class AddonEvaluationFunctions {
 
             ClassEnvironment classEnvironment = initClassEnvironment(classValue, extraEnvironment, args);
             if (classValue instanceof RuntimeClassValue runtimeClassValue) return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-            if (classValue instanceof NativeClassValue) return new NativeClassValue(classValue.getBaseClasses(), classEnvironment);
+            if (classValue instanceof NativeClassValue nativeClassValue) return nativeClassValue.newInstance(nativeClassValue.getBaseClasses(), classEnvironment);
 
             throw new InvalidCallException("Can't call " + classValue.getClass().getName() + " because it's unknown class");
         });
@@ -663,7 +669,7 @@ public final class AddonEvaluationFunctions {
             else extraEnvironment = environment;
 
             List<RuntimeValue<?>> args = functionCallExpression.getArgs().stream().map(expression -> Interpreter.evaluate(expression, extraEnvironment)).collect(Collectors.toList());
-            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, args);
+            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, extraEnvironment, args);
             if (!(function instanceof FunctionValue functionValue)) {
                 throw new InvalidCallException("Can't call " + function.getValue() + " because it's not a function");
             }
@@ -697,7 +703,7 @@ public final class AddonEvaluationFunctions {
                                     if (declarationEnvironment == null) return false;
                                     if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                                    ClassValue parentClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(classEnvironment.getId());
+                                    ClassValue parentClassValue = parentEnv.getGlobalEnvironment().getClass(classEnvironment.getId());
                                     if (parentClassValue == null) {
                                         throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
                                     }
@@ -708,15 +714,20 @@ public final class AddonEvaluationFunctions {
                         throw new InvalidAccessException("Can't access protected variable with id " + identifier.getId());
                     }
 
+                    if (!variableValue.getModifiers().contains(AddonModifiers.OPEN()) &&
+                            !variableDeclarationEnvironment.getParentFile().equals(requestEnvironment.getParentFile())) {
+                        throw new InvalidAccessException("Can't access non-open variable with id " + identifier.getId() + " from different file (" + requestEnvironment.getParentFile().getName() + ")");
+                    }
+
                     if (!variableValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() && !variableValue.isArgument() &&
                             !(variableDeclarationEnvironment instanceof GlobalEnvironment))
-                        throw new InvalidAccessException("Can't access not-shared variable with id " + identifier.getId() + " from shared environment");
+                        throw new InvalidAccessException("Can't access non-shared variable with id " + identifier.getId() + " from shared environment");
 
                     return variableValue;
                 }
 
                 if (identifier instanceof FunctionIdentifier) {
-                    if (extra.length == 0 || !(extra[0] instanceof List<?> rawArgs)) throw new RuntimeException("Invalid function args");
+                    if (extra.length == 1 || !(extra[1] instanceof List<?> rawArgs)) throw new RuntimeException("Invalid function args");
 
                     List<RuntimeValue<?>> args = rawArgs.stream().map(object -> {
                         if (object instanceof RuntimeValue<?> arg) return arg;
@@ -743,7 +754,7 @@ public final class AddonEvaluationFunctions {
                             if (declarationEnvironment == null) return false;
                             if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                            ClassValue parentClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(classEnvironment.getId());
+                            ClassValue parentClassValue = parentEnv.getGlobalEnvironment().getClass(classEnvironment.getId());
                             if (parentClassValue == null) {
                                 throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
                             }
@@ -754,18 +765,28 @@ public final class AddonEvaluationFunctions {
                         throw new InvalidAccessException("Can't access protected function with id " + identifier.getId());
                     }
 
+                    if (!functionValue.getModifiers().contains(AddonModifiers.OPEN()) &&
+                            !functionDeclarationEnvironment.getParentFile().equals(requestEnvironment.getParentFile())) {
+                        throw new InvalidAccessException("Can't access non-open function with id " + identifier.getId() + " from different file (" + requestEnvironment.getParentFile().getName() + ")");
+                    }
+
                     if (!functionValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() &&
                             !(functionDeclarationEnvironment instanceof GlobalEnvironment))
-                        throw new InvalidAccessException("Can't access not-shared function with id " + identifier.getId() + " from shared environment");
+                        throw new InvalidAccessException("Can't access non-shared function with id " + identifier.getId() + " from shared environment");
 
                     return functionValue;
                 }
 
                 if (identifier instanceof ClassIdentifier) {
-                    ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(identifier.getId());
-                    if (classValue != null) return classValue;
+                    ClassValue classValue = environment.getGlobalEnvironment().getClass(identifier.getId());
+                    if (classValue == null) return evaluate(new VariableIdentifier(identifier.getId()), environment, extra);
 
-                    return evaluate(new VariableIdentifier(identifier.getId()), environment, extra);
+                    if (!classValue.getModifiers().contains(AddonModifiers.OPEN()) &&
+                            !classValue.getEnvironment().getParentFile().equals(requestEnvironment.getParentFile())) {
+                        throw new InvalidAccessException("Can't access non-open class with id " + identifier.getId() + " from different file (" + requestEnvironment.getParentFile().getName() + ")");
+                    }
+
+                    return classValue;
                 }
 
                 throw new InvalidIdentifierException("Invalid identifier " + identifier.getClass().getName());
@@ -841,7 +862,7 @@ public final class AddonEvaluationFunctions {
         return booleanValue.getValue();
     }
 
-    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, boolean isDefault) {
+    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, boolean isDefault, GlobalEnvironment globalEnvironment) {
         String defaultString = isDefault ? ". It's probably an Addon's error" : "";
 
         if (returnValue == null) {
@@ -854,36 +875,36 @@ public final class AddonEvaluationFunctions {
             throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing" + defaultString);
         }
 
-        if (!returnDataType.isMatches(returnValue)) {
+        if (!returnDataType.isMatches(returnValue, globalEnvironment)) {
             throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")" + defaultString);
         }
 
         return returnValue;
     }
 
-    public static boolean hasRepeatedBaseClasses(Set<String> baseClassesList, List<String> baseClasses) {
+    public static boolean hasRepeatedBaseClasses(Set<String> baseClassesList, List<String> baseClasses, GlobalEnvironment globalEnvironment) {
         for (String baseClass : baseClassesList) {
             if (baseClasses.contains(baseClass)) {
                 return true;
             }
             baseClasses.add(baseClass);
 
-            ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
+            ClassValue classValue = globalEnvironment.getClass(baseClass);
             if (classValue == null) {
                 throw new InvalidIdentifierException("Class with id " + baseClass + " doesn't exist");
             }
             if (classValue.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidAccessException("Can't inherit final class with id " + baseClass);
 
-            boolean check = hasRepeatedBaseClasses(classValue.getBaseClasses(), baseClasses);
+            boolean check = hasRepeatedBaseClasses(classValue.getBaseClasses(), baseClasses, globalEnvironment);
             if (check) return true;
         }
 
         return false;
     }
 
-    public static boolean hasRepeatedVariables(Set<String> baseClassesList, List<String> variables) {
+    public static boolean hasRepeatedVariables(Set<String> baseClassesList, List<String> variables, GlobalEnvironment globalEnvironment) {
         for (String baseClass : baseClassesList) {
-            ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
+            ClassValue classValue = globalEnvironment.getClass(baseClass);
             if (classValue == null) {
                 throw new InvalidIdentifierException("Class with id " + baseClass + " doesn't exist");
             }
@@ -896,7 +917,7 @@ public final class AddonEvaluationFunctions {
                 variables.add(variableValue.getId());
             }
 
-            boolean check = hasRepeatedVariables(classValue.getBaseClasses(), variables);
+            boolean check = hasRepeatedVariables(classValue.getBaseClasses(), variables, globalEnvironment);
             if (check) return true;
         }
 
@@ -935,23 +956,12 @@ public final class AddonEvaluationFunctions {
     }
 
     private static ClassEnvironment initClassEnvironment(ClassValue classValue, Environment callEnvironment, List<RuntimeValue<?>> args) {
-        ClassEnvironment classEnvironment;
-        try {
-            classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue()
-                    .getConstructor(ClassDeclarationEnvironment.class, String.class, Set.class)
-                    .newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), classValue.getId(), classValue.getModifiers());
-        }
-        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+        ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                classValue.getEnvironment().getGlobalEnvironment(),
+                classValue.getId(),
+                classValue.getModifiers());
 
-        ConstructorEnvironment constructorEnvironment;
-        try {
-            constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT.getEntry().getValue().getConstructor(ConstructorDeclarationEnvironment.class).newInstance(classEnvironment);
-        }
-        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+        ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment);
 
         Set<String> calledBaseClasses = new HashSet<>();
         if (classValue instanceof RuntimeClassValue runtimeClassValue) {
@@ -989,7 +999,7 @@ public final class AddonEvaluationFunctions {
                         if (env instanceof ClassEnvironment classEnv) {
                             if (classEnv.getId().equals(classValue.getId())) return true;
 
-                            ClassValue parentClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(classEnv.getId());
+                            ClassValue parentClassValue = env.getGlobalEnvironment().getClass(classEnv.getId());
                             if (parentClassValue == null) {
                                 throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
                             }
@@ -998,6 +1008,11 @@ public final class AddonEvaluationFunctions {
                         return false;
                     })) {
                         throw new InvalidCallException("Requested constructor has protected access");
+                    }
+
+                    if (!runtimeConstructorValue.getModifiers().contains(AddonModifiers.OPEN()) &&
+                            !classEnvironment.getParentFile().equals(callEnvironment.getParentFile())) {
+                        throw new InvalidAccessException("Can't access non-open constructor from different file (" + callEnvironment.getParentFile().getName() + ")");
                     }
 
                     for (int i = 0; i < runtimeConstructorValue.getArgs().size(); i++) {
@@ -1009,7 +1024,9 @@ public final class AddonEvaluationFunctions {
                                 args.get(i),
                                 callArgExpression.isConstant(),
                                 new HashSet<>(),
-                                true));
+                                true,
+                                constructorEnvironment
+                        ));
                     }
 
                     for (Statement statement : runtimeConstructorValue.getBody()) {
@@ -1029,15 +1046,7 @@ public final class AddonEvaluationFunctions {
             }
         }
         else if (classValue instanceof NativeClassValue nativeClassValue) {
-            nativeClassValue.getEnvironment().getVariables().forEach(variable -> classEnvironment.declareVariable(new VariableValue(
-                    variable.getId(),
-                    variable.getDataType(),
-                    variable.getValue(),
-                    variable.isConstant(),
-                    variable.getModifiers(),
-                    variable.isArgument())));
-            nativeClassValue.getEnvironment().getFunctions().forEach(function -> classEnvironment.declareFunction(function.copy(classEnvironment)));
-            nativeClassValue.getEnvironment().getConstructors().forEach(constructor -> classEnvironment.declareConstructor(constructor.copy(classEnvironment)));
+            nativeClassValue.setupEnvironment(classEnvironment);
 
             if (classEnvironment.hasConstructor()) {
                 RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
@@ -1057,7 +1066,7 @@ public final class AddonEvaluationFunctions {
                         if (env instanceof ClassEnvironment classEnv) {
                             if (classEnv.getId().equals(classValue.getId())) return true;
 
-                            ClassValue parentClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(classEnv.getId());
+                            ClassValue parentClassValue = env.getGlobalEnvironment().getClass(classEnv.getId());
                             if (parentClassValue == null) {
                                 throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
                             }
@@ -1066,6 +1075,11 @@ public final class AddonEvaluationFunctions {
                         return false;
                     })) {
                         throw new InvalidCallException("Requested constructor has protected access");
+                    }
+
+                    if (!defaultConstructorValue.getModifiers().contains(AddonModifiers.OPEN()) &&
+                            !classEnvironment.getParentFile().equals(callEnvironment.getParentFile())) {
+                        throw new InvalidAccessException("Can't access non-open constructor from different file (" + callEnvironment.getParentFile().getName() + ")");
                     }
 
                     defaultConstructorValue.run(args, constructorEnvironment);
@@ -1083,7 +1097,7 @@ public final class AddonEvaluationFunctions {
 
         for (String baseClass : classValue.getBaseClasses()) {
             if (calledBaseClasses.contains(baseClass)) continue;
-            ClassValue baseClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
+            ClassValue baseClassValue = classValue.getEnvironment().getGlobalEnvironment().getClass(baseClass);
             classEnvironment.addBaseClass(initClassEnvironment(baseClassValue, constructorEnvironment, new ArrayList<>()));
         }
 
@@ -1116,42 +1130,25 @@ public final class AddonEvaluationFunctions {
     }
 
     private static RuntimeValue<?> callFunction(FunctionValue functionValue, List<RuntimeValue<?>> args) {
+        if (functionValue.getArgs().size() != args.size()) {
+            throw new InvalidCallException("Expected " + functionValue.getArgs().size() + " args but found " + args.size());
+        }
+
+        FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                functionValue.getParentEnvironment(),
+                functionValue.getModifiers().contains(AddonModifiers.SHARED()));
+
         if (functionValue instanceof NativeFunctionValue defaultFunctionValue) {
-            if (defaultFunctionValue.getArgs().size() != args.size()) {
-                throw new InvalidCallException("Expected " + defaultFunctionValue.getArgs().size() + " args but found " + args.size());
-            }
-
-            FunctionEnvironment functionEnvironment;
-            try {
-                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
-                        .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(AddonModifiers.SHARED()));
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-
             RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
             if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
             return checkReturnValue(
                     returnValue,
                     defaultFunctionValue.getReturnDataType(),
                     defaultFunctionValue.getId(),
-                    true);
+                    true,
+                    functionEnvironment.getGlobalEnvironment());
         }
         if (functionValue instanceof RuntimeFunctionValue runtimeFunctionValue) {
-            if (runtimeFunctionValue.getArgs().size() != args.size()) {
-                throw new InvalidCallException("Expected " + runtimeFunctionValue.getArgs().size() + " args but found " + args.size());
-            }
-
-            FunctionEnvironment functionEnvironment;
-            try {
-                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
-                        .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(AddonModifiers.SHARED()));
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-
             for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
                 CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
 
@@ -1161,7 +1158,9 @@ public final class AddonEvaluationFunctions {
                         args.get(i),
                         callArgExpression.isConstant(),
                         new HashSet<>(),
-                        true));
+                        true,
+                        functionEnvironment
+                ));
             }
 
             RuntimeValue<?> result = null;
@@ -1176,7 +1175,8 @@ public final class AddonEvaluationFunctions {
                                 result.getFinalRuntimeValue(),
                                 runtimeFunctionValue.getReturnDataType(),
                                 runtimeFunctionValue.getId(),
-                                false);
+                                false,
+                                functionEnvironment.getGlobalEnvironment());
                     }
                     if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
                     break;
@@ -1190,7 +1190,8 @@ public final class AddonEvaluationFunctions {
                                 result.getFinalRuntimeValue(),
                                 runtimeFunctionValue.getReturnDataType(),
                                 runtimeFunctionValue.getId(),
-                                false);
+                                false,
+                                functionEnvironment.getGlobalEnvironment());
                     }
                     break;
                 }

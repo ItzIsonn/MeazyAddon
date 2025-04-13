@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
@@ -23,20 +23,20 @@ import java.util.Set;
 
 public class RandomClassValue extends NativeClassValue {
     public RandomClassValue(ClassDeclarationEnvironment parent) {
-        super(getClassEnvironment(parent));
+        super(new ClassEnvironmentImpl(parent, false, "Random"));
+        setupEnvironment(getEnvironment());
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Random");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
                 new InnerRandomValue(new Random()),
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of()) {
@@ -129,8 +129,6 @@ public class RandomClassValue extends NativeClassValue {
                 return new DoubleValue(randomValue.getValue().nextDouble(beginValue.getValue(), endValue.getValue()));
             }
         });
-        
-        return classEnvironment;
     }
 
     public static class InnerRandomValue extends RuntimeValue<Random> {

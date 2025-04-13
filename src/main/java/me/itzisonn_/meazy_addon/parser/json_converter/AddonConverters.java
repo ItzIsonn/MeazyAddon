@@ -44,9 +44,10 @@ public final class AddonConverters {
      * @throws IllegalStateException If {@link Registries#CONVERTERS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("Converters have already been initialized!");
+        if (isInit) throw new IllegalStateException("Converters have already been initialized");
         isInit = true;
 
+        register(new ImportStatementConverter());
         register(new ClassDeclarationStatementConverter());
         register(new FunctionDeclarationStatementConverter());
         register(new VariableDeclarationConverter());

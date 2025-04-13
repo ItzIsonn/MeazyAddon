@@ -17,13 +17,12 @@ import java.util.Set;
 
 public class CollectionClassValue extends NativeClassValue {
     public CollectionClassValue(ClassDeclarationEnvironment parent) {
-        super(getClassEnvironment(parent));
+        super(new ClassEnvironmentImpl(parent, false, "Collection", Set.of(AddonModifiers.ABSTRACT())));
+        setupEnvironment(getEnvironment());
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Collection", Set.of(AddonModifiers.ABSTRACT()));
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareFunction(new NativeFunctionValue("getSize", List.of(), new DataType("Int", false), classEnvironment, Set.of(AddonModifiers.ABSTRACT())) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -71,8 +70,6 @@ public class CollectionClassValue extends NativeClassValue {
                 return null;
             }
         });
-
-        return classEnvironment;
     }
 
     public static class InnerCollectionValue<T extends Collection<RuntimeValue<?>>> extends RuntimeValue<T> {

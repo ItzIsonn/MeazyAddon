@@ -34,7 +34,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
                     if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
                 }
 
-                throw new InvalidSyntaxException("Function with id " + value.getId() + " already exists!");
+                throw new InvalidSyntaxException("Function with id " + value.getId() + " already exists");
             }
         }
 

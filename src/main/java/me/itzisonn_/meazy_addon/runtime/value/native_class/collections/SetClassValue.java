@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.collections;
 
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
@@ -14,7 +14,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructors.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
@@ -24,29 +24,34 @@ import java.util.List;
 import java.util.Set;
 
 public class SetClassValue extends NativeClassValue {
+    private static GlobalEnvironment globalEnvironment = null;
+
     public SetClassValue(ClassDeclarationEnvironment parent) {
         this(parent, new HashSet<>());
     }
 
     public SetClassValue(Set<RuntimeValue<?>> set) {
-        this(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), set);
+        this(globalEnvironment, set);
     }
 
     public SetClassValue(ClassDeclarationEnvironment parent, Set<RuntimeValue<?>> set) {
-        super(Set.of("Collection"), getClassEnvironment(parent, set));
+        super(Set.of("Collection"), new ClassEnvironmentImpl(parent, false, "Set"));
+        setupEnvironment(getEnvironment());
+        getEnvironment().assignVariable("value", new InnerSetValue(new HashSet<>(set)));
+
+        if (parent instanceof GlobalEnvironment globalEnv) globalEnvironment = globalEnv;
     }
 
-    private static ClassEnvironment getClassEnvironment(ClassDeclarationEnvironment parent, Set<RuntimeValue<?>> set) {
-        ClassEnvironment classEnvironment = new ClassEnvironmentImpl(parent, false, "Set");
-
-
+    @Override
+    public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerSetValue(new HashSet<>(set)),
+                new InnerSetValue(new HashSet<>()),
                 false,
                 Set.of(AddonModifiers.PRIVATE()),
-                false));
+                false,
+                classEnvironment));
 
 
         classEnvironment.declareConstructor(new NativeConstructorValue(List.of(), classEnvironment, Set.of()) {
@@ -138,8 +143,6 @@ public class SetClassValue extends NativeClassValue {
                 return new StringClassValue(AddonUtils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
             }
         });
-        
-        return classEnvironment;
     }
 
     public static class InnerSetValue extends CollectionClassValue.InnerCollectionValue<Set<RuntimeValue<?>>> {

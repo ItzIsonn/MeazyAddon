@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
+import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
@@ -22,23 +24,81 @@ import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements GlobalEnvironment {
+    private final File parentFile;
+    private final Set<GlobalEnvironment> relatedGlobalEnvironments;
     private final Set<ClassValue> classes;
 
-    public GlobalEnvironmentImpl() {
+    public GlobalEnvironmentImpl(File parentFile) {
         super(null, false);
+        this.parentFile = parentFile;
+        relatedGlobalEnvironments = new HashSet<>();
         classes = new HashSet<>();
+        init();
     }
+
+
+
+    @Override
+    public File getParentFile() {
+        return parentFile;
+    }
+
+    @Override
+    public GlobalEnvironment getGlobalEnvironment() {
+        return this;
+    }
+
+    @Override
+    public void addRelatedGlobalEnvironment(GlobalEnvironment globalEnvironment) {
+        relatedGlobalEnvironments.add(globalEnvironment);
+    }
+
+    @Override
+    public Set<GlobalEnvironment> getRelatedGlobalEnvironments() {
+        return new HashSet<>(relatedGlobalEnvironments);
+    }
+
+
+
+    @Override
+    public VariableValue getVariable(String id) {
+        VariableValue variableValue = super.getVariable(id);
+        if (variableValue != null) return variableValue;
+
+        for (GlobalEnvironment globalEnvironment : relatedGlobalEnvironments) {
+            variableValue = globalEnvironment.getVariable(id);
+            if (variableValue != null) return variableValue;
+        }
+
+        return null;
+    }
+
+    @Override
+    public FunctionValue getFunction(String id, List<RuntimeValue<?>> args) {
+        FunctionValue functionValue = super.getFunction(id, args);
+        if (functionValue != null) return functionValue;
+
+        for (GlobalEnvironment globalEnvironment : relatedGlobalEnvironments) {
+            functionValue = globalEnvironment.getFunction(id, args);
+            if (functionValue != null) return functionValue;
+        }
+
+        return null;
+    }
+
+
 
     @Override
     public void declareClass(ClassValue value) {
         ClassValue classValue = getClass(value.getId());
-        if (classValue != null) throw new InvalidSyntaxException("Class with id " + value.getId() + " already exists!");
+        if (classValue != null) throw new InvalidSyntaxException("Class with id " + value.getId() + " already exists");
         classes.add(value);
     }
 
@@ -46,6 +106,24 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     public Set<ClassValue> getClasses() {
         return new HashSet<>(classes);
     }
+
+    @Override
+    public ClassValue getClass(String id) {
+        if (id == null) throw new NullPointerException("Id can't be null");
+
+        for (ClassValue classValue : getClasses()) {
+            if (classValue.getId().equals(id)) return classValue;
+        }
+
+        for (GlobalEnvironment globalEnvironment : relatedGlobalEnvironments) {
+            ClassValue classValue = globalEnvironment.getClass(id);
+            if (classValue != null) return classValue;
+        }
+
+        return null;
+    }
+
+
 
     public void init() {
         declareClass(new AnyClassValue(this));

@@ -11,7 +11,7 @@ import java.util.Set;
 public class EnvironmentImpl implements Environment {
     @Getter
     protected final Environment parent;
-    protected boolean isShared;
+    protected final boolean isShared;
     protected final Set<VariableValue> variables;
 
     public EnvironmentImpl(Environment parent, boolean isShared) {
@@ -24,6 +24,7 @@ public class EnvironmentImpl implements Environment {
         this(parent, false);
     }
 
+    @Override
     public boolean isShared() {
         if (isShared) return true;
         if (parent != null) return parent.isShared();
@@ -34,11 +35,11 @@ public class EnvironmentImpl implements Environment {
     public void declareVariable(VariableValue value) {
         if (value.isArgument()) {
             if (getVariable(value.getId()) != null) {
-                throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists!");
+                throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
             }
         }
         else if (getVariableDeclarationEnvironment(value.getId()) != null) {
-            throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists!");
+            throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
         }
         variables.add(value);
     }
