@@ -106,7 +106,7 @@ public final class AddonEvaluationFunctions {
                 case "mea" -> {
                     Parser.reset();
                     List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
-                    program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
+                    program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
                 }
                 case "meac" -> {
                     program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
@@ -119,7 +119,7 @@ public final class AddonEvaluationFunctions {
                 default -> throw new InvalidFileException("Can't run file with extension " + extension);
             }
 
-            globalEnvironment.addRelatedGlobalEnvironment(Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program, file));
+            globalEnvironment.addRelatedGlobalEnvironment(Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program));
             return null;
         });
 

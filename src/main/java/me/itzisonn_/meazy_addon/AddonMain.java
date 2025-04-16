@@ -2,11 +2,8 @@ package me.itzisonn_.meazy_addon;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
-import me.itzisonn_.meazy.command.Command;
-import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
@@ -38,7 +35,6 @@ import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
-import java.io.File;
 import java.util.*;
 
 public class AddonMain extends Addon {
@@ -54,50 +50,7 @@ public class AddonMain extends Addon {
         AddonEvaluationFunctions.INIT();
         AddonConverters.INIT();
 
-        Registries.COMMANDS.register(RegistryIdentifier.of("meazy", "run"), new Command("run", List.of("<file_to_run>")) {
-            @Override
-            public String execute(String... args) {
-                File file = new File(args[0]);
-                if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
-                    return null;
-                }
-
-                MeazyMain.LOGGER.log(Level.INFO, "Running file '{}'", file.getAbsolutePath());
-
-                String extension = Utils.getExtension(file);
-                long startMillis = System.currentTimeMillis();
-                if (extension.equals("mea")) {
-                    List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
-                    Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
-                    Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program, file);
-                }
-                else if (extension.equals("meac")) {
-                    Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
-                    if (program == null) {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
-                        return null;
-                    }
-                    if (MeazyMain.VERSION.isBefore(program.getVersion())) {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
-                        return null;
-                    }
-                    if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                        MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
-                    }
-                    Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program, file);
-                }
-                else {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't run file with extension {}", extension);
-                    return null;
-                }
-                long endMillis = System.currentTimeMillis();
-
-                return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
-            }
-        });
-
-        Registries.PARSE_TOKENS_FUNCTION.register(getIdentifier("parse_tokens"), tokens -> {
+        Registries.PARSE_TOKENS_FUNCTION.register(getIdentifier("parse_tokens"), (file, tokens) -> {
             if (tokens == null) throw new NullPointerException("Tokens can't be null");
             Parser.setTokens(tokens);
 
@@ -128,10 +81,10 @@ public class AddonMain extends Addon {
                 }
             }
 
-            return new Program(MeazyMain.VERSION, requiredAddons, body);
+            return new Program(file, MeazyMain.VERSION, requiredAddons, body);
         });
 
-        Registries.EVALUATE_PROGRAM_FUNCTION.register(getIdentifier("evaluate_program"), (program, parentFile) -> {
+        Registries.EVALUATE_PROGRAM_FUNCTION.register(getIdentifier("evaluate_program"), program -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
@@ -143,7 +96,7 @@ public class AddonMain extends Addon {
                 }
             }
 
-            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(parentFile);
+            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(program.getFile());
             Interpreter.evaluate(program, globalEnvironment);
 
             for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : AddonEvaluationFunctions.VARIABLE_QUEUE.keySet()) {
