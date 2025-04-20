@@ -48,6 +48,7 @@ public final class AddonConverters {
         isInit = true;
 
         register(new ImportStatementConverter());
+        register(new UsingStatementConverter());
         register(new ClassDeclarationStatementConverter());
         register(new FunctionDeclarationStatementConverter());
         register(new VariableDeclarationConverter());

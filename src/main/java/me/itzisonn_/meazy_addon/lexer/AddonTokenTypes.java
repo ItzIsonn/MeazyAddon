@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy_addon.lexer;
 
-import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy_addon.AddonMain;
@@ -23,6 +23,10 @@ public final class AddonTokenTypes {
 
     public static TokenType IMPORT() {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("import")).getValue();
+    }
+
+    public static TokenType USING() {
+        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("using")).getValue();
     }
 
     public static TokenType VARIABLE() {
@@ -87,16 +91,6 @@ public final class AddonTokenTypes {
 
     public static TokenType IS_LIKE() {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("is_like")).getValue();
-    }
-
-
-
-    public static TokenType COMMENT() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("comment")).getValue();
-    }
-
-    public static TokenType MULTI_LINE_COMMENT() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("multi_line_comment")).getValue();
     }
 
 
@@ -302,6 +296,7 @@ public final class AddonTokenTypes {
 
         register(new TokenType("require", "require", false));
         register(new TokenType("import", "import", false));
+        register(new TokenType("using", "using", false));
         register(new TokenType("variable", "var|val", false));
         register(new TokenType("function", "function|fun", false));
         register(new TokenType("class", "class", false));
@@ -368,7 +363,7 @@ public final class AddonTokenTypes {
         register(new TokenType("string", "\"[^\"]*\"", false));
         register(new TokenType("boolean", "true|false", false));
         register(new TokenType("this", "this", false));
-        register(new TokenType("id", Utils.IDENTIFIER_REGEX, false) {
+        register(new TokenType("id", MeazyMain.IDENTIFIER_REGEX, false) {
             @Override
             public boolean canMatch(String string) {
                 for (TokenType tokenType : AddonTokenTypeSets.KEYWORDS().getTokenTypes()) {

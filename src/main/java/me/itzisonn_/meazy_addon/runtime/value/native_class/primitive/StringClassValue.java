@@ -1,22 +1,19 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
-import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.*;
 import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.collections.ListClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.*;
@@ -65,7 +62,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("str", new DataType("String", false), true)),
                 classEnvironment, Set.of()) {
             @Override
-            public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
+            public void run(List<RuntimeValue<?>> constructorArgs, ConstructorEnvironment constructorEnvironment) {
                 constructorEnvironment.getVariableDeclarationEnvironment("value").assignVariable("value",
                         new InnerStringValue(String.valueOf(constructorArgs.getFirst().getFinalValue())));
             }
@@ -76,14 +73,14 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("object", new DataType("Any", false), true)),
                 new DataType("String", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 return new StringClassValue(functionArgs.getFirst().getFinalValue().toString());
             }
         });
 
         classEnvironment.declareFunction(new NativeFunctionValue("getLength", List.of(), new DataType("Int", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get length of non-string value");
 
@@ -95,7 +92,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("target", new DataType("String", false), true), new CallArgExpression("replacement", new DataType("String", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't replace in non-string value");
 
@@ -114,7 +111,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("target", new DataType("String", false), true), new CallArgExpression("replacement", new DataType("String", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't replace in non-string value");
 
@@ -133,7 +130,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("target", new DataType("String", false), true), new CallArgExpression("replacement", new DataType("String", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't replace in non-string value");
 
@@ -150,7 +147,7 @@ public class StringClassValue extends NativeClassValue {
 
         classEnvironment.declareFunction(new NativeFunctionValue("toUpperCase", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't make uppercase non-string value");
 
@@ -166,7 +163,7 @@ public class StringClassValue extends NativeClassValue {
 
         classEnvironment.declareFunction(new NativeFunctionValue("toLowerCase", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't make lowercase non-string value");
 
@@ -184,7 +181,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("pos", new DataType("Int", false), true)),
                 new DataType("Char", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get char of non-string value");
 
@@ -208,7 +205,7 @@ public class StringClassValue extends NativeClassValue {
                 List.of(new CallArgExpression("pos", new DataType("Int", false), true), new CallArgExpression("char", new DataType("Char", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't change char of non-string value");
 
@@ -231,7 +228,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("target", new DataType("String", false), true)),
                 new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -248,7 +245,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("target", new DataType("String", false), true)),
                 new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -265,7 +262,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("target", new DataType("String", false), true)),
                 new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -282,7 +279,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("count", new DataType("Int", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't repeat non-string value");
 
@@ -301,7 +298,7 @@ public class StringClassValue extends NativeClassValue {
 
         classEnvironment.declareFunction(new NativeFunctionValue("trim", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't trim non-string value");
 
@@ -317,7 +314,7 @@ public class StringClassValue extends NativeClassValue {
 
         classEnvironment.declareFunction(new NativeFunctionValue("isBlank", List.of(), new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -334,7 +331,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get substring of non-string value");
 
@@ -356,7 +353,7 @@ public class StringClassValue extends NativeClassValue {
                 new CallArgExpression("regex", new DataType("String", false), true)),
                 new DataType("List", false), classEnvironment, new HashSet<>()) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't split non-string value");
 
@@ -372,7 +369,8 @@ public class StringClassValue extends NativeClassValue {
                 for (String str : splitString) {
                     list.add(new StringClassValue(str));
                 }
-                return new ListClassValue(list);
+
+                return ListClassNative.newList(functionEnvironment, list);
             }
         });
     }

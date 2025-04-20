@@ -1,0 +1,19 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.MathClassNative"
+
+final class Math {
+    shared val PI:Double = 3.141592653589793
+    shared val E:Double = 2.718281828459045
+
+    private constructor()
+
+    native shared function round(val value:Double):Long
+    native shared function floor(val value:Double):Long
+    native shared function ceil(val value:Double):Long
+
+    native shared function pow(val number:Double, val power:Double):Any
+    native shared function abs(val value:Double):Any
+    native shared function factorial(val value:Int):Long
+
+    native shared function min(val a:Double, val b:Double):Double
+    native shared function max(val a:Double, val b:Double):Double
+}

@@ -1,0 +1,41 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.file.FileClassNative"
+
+class File {
+    private val file
+    private native function getNativeFile(val path:String):Any
+
+    constructor(val path:String) {
+        file = getNativeFile(path)
+    }
+
+    native function getPath():String
+    native function getName():String
+    native function getExtension():String
+
+    native function getParent():String
+    function getParentFile():File {
+        return new File(getParent())
+    }
+
+    native function exists():Boolean
+    native function isHidden():Boolean
+    native function isFile():Boolean
+    native function isDirectory():Boolean
+
+    native function isReadable():Boolean
+    native function isWritable():Boolean
+    native function setReadable(val value:Boolean):Boolean
+    native function setWritable(val value:Boolean):Boolean
+    function getReader():FileReader {
+        return new FileReader(this)
+    }
+    function getWriter():FileWriter {
+        return new FileWriter(this)
+    }
+
+    native function create():Boolean
+    native function delete():Boolean
+    native function rename(val destination:File):Boolean
+    native function createDirectory():Boolean
+    native function createDirectories():Boolean
+}

@@ -1,0 +1,11 @@
+abstract class Collection {
+    abstract function getSize():Int
+
+    abstract function add(val element):Boolean
+    abstract function remove(val element):Boolean
+
+    abstract function isEmpty():Boolean
+    abstract function contains(val element):Boolean
+
+    abstract function toString():String
+}

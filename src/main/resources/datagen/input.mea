@@ -1,0 +1,10 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.InputClassNative"
+
+final class Input {
+    private constructor()
+
+    native shared function read():String
+    native shared function readLine():String
+    native shared function readInt():Int
+    native shared function readDouble():Double
+}

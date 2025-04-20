@@ -27,6 +27,7 @@ import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.AddonParsingFunctions;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
+import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
@@ -59,15 +60,18 @@ public class AddonMain extends Addon {
             Map<String, Version> requiredAddons = null;
 
             List<Statement> body = new ArrayList<>();
-            boolean hasNotImport = true;
+            boolean isProgramHead = true;
             while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
                 if (Parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) requiredAddons = AddonParsingFunctions.parseRequiredAddons();
                 else {
                     Statement statement = Parser.parse(getIdentifier("global_statement"), Statement.class);
                     if (statement instanceof ImportStatement) {
-                        if (!hasNotImport) throw new InvalidSyntaxException("Imports must be at file's beginning");
+                        if (!isProgramHead) throw new InvalidSyntaxException("Imports must be at file's beginning");
                     }
-                    else hasNotImport = false;
+                    else if (statement instanceof UsingStatement) {
+                        if (!isProgramHead) throw new InvalidSyntaxException("Using statements must be at file's beginning");
+                    }
+                    else isProgramHead = false;
                     body.add(statement);
                 }
                 Parser.moveOverOptionalNewLines();
@@ -85,6 +89,8 @@ public class AddonMain extends Addon {
         });
 
         Registries.EVALUATE_PROGRAM_FUNCTION.register(getIdentifier("evaluate_program"), program -> {
+            if (program.getFile() == null) throw new NullPointerException("Program's file is null");
+
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);

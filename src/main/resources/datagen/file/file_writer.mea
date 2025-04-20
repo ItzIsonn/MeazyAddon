@@ -1,0 +1,14 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.file.FileWriterClassNative"
+
+class FileWriter {
+    private val file
+    private native function getNativeFile(val file:File):Any
+
+    constructor(val file:File) {
+        this.file = getNativeFile(file)
+    }
+
+    native function write(val value:Any)
+    native function writeAppend(val value:Any)
+    native function writeLines(val collection:Collection)
+}

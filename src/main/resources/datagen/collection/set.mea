@@ -1,0 +1,24 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.SetClassNative"
+
+class Set : Collection {
+    private val collection
+    private native function getNativeSet():Any
+
+    constructor() {
+        collection = getNativeSet()
+    }
+    constructor(val element) {
+        collection = getNativeSet()
+        add(element)
+    }
+
+    native function getSize():Int
+
+    native function add(val element):Boolean
+    native function remove(val element):Boolean
+
+    native function isEmpty():Boolean
+    native function contains(val element):Boolean
+
+    native function toString():String
+}

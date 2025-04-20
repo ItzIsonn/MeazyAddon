@@ -49,6 +49,7 @@ public final class AddonTokenTypeSets {
         register("keywords", new TokenTypeSet(
                 REQUIRE(),
                 IMPORT(),
+                USING(),
                 VARIABLE(),
                 FUNCTION(),
                 CLASS(),

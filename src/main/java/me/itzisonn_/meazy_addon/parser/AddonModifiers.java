@@ -66,6 +66,10 @@ public final class AddonModifiers {
         return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("enum")).getValue();
     }
 
+    public static Modifier NATIVE() {
+        return Registries.MODIFIERS.getEntry(AddonMain.getIdentifier("native")).getValue();
+    }
+
 
     /**
      * Finds registered Modifier with given id
@@ -218,6 +222,16 @@ public final class AddonModifiers {
                 if (modifierStatement.getModifiers().contains(ABSTRACT())) return false;
 
                 return modifierStatement instanceof ClassDeclarationStatement;
+            }
+        });
+
+        register(new Modifier("native") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (environment.getGlobalEnvironment().getNativeClasses().isEmpty()) return false;
+
+                return modifierStatement instanceof FunctionDeclarationStatement || modifierStatement instanceof ConstructorDeclarationStatement ||
+                        modifierStatement instanceof ClassDeclarationStatement;
             }
         });
     }

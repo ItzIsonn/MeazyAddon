@@ -45,7 +45,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
         String returnDataTypeString = returnDataType == null ? "" : ":" + returnDataType;
 
         String bodyString;
-        if (!modifiers.contains(AddonModifiers.ABSTRACT())) {
+        if (!modifiers.contains(AddonModifiers.ABSTRACT()) && !modifiers.contains(AddonModifiers.NATIVE())) {
             StringBuilder bodyBuilder = new StringBuilder();
             for (Statement statement : body) {
                 bodyBuilder.append(Statement.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");

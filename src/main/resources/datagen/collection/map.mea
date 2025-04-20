@@ -1,0 +1,32 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.MapClassNative"
+
+class Map {
+    private val map
+    private native function getNativeMap():Any
+
+    constructor() {
+        map = getNativeMap()
+    }
+    constructor(val key, val value) {
+        map = getNativeMap()
+        put(key, value)
+    }
+
+    native function getSize():Int
+
+    native function put(val key, val value)
+    native function putIfAbsent(val key, val value)
+    native function remove(val key):Any?
+    native function remove(val key, val value):Boolean
+    native function get(val key):Any?
+    native function getOrDefault(val key, val defaultValue):Any?
+
+    native function isEmpty():Boolean
+    native function containsKey(val key):Boolean
+    native function containsValue(val value):Boolean
+
+    native function getKeySet():Set
+    native function getValueList():List
+
+    native function toString():String
+}

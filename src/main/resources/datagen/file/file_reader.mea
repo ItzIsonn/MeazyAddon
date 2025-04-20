@@ -1,0 +1,14 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.file.FileReaderClassNative"
+
+class FileReader {
+    private val fileReader
+    private native function getNativeFileReader(val file:File):Any
+
+    constructor(val file:File) {
+        fileReader = getNativeFileReader(file)
+    }
+
+    native function readLine():String
+    native function readAllLines():List
+    native function close()
+}

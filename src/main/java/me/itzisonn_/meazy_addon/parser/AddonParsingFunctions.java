@@ -59,6 +59,9 @@ public final class AddonParsingFunctions {
             if (getCurrent().getType().equals(AddonTokenTypes.IMPORT())) {
                 return parse(AddonMain.getIdentifier("import_statement"), ImportStatement.class);
             }
+            if (getCurrent().getType().equals(AddonTokenTypes.USING())) {
+                return parse(AddonMain.getIdentifier("using_statement"), UsingStatement.class);
+            }
 
             Set<Modifier> modifiers = parseModifiers();
             if (getCurrent().getType().equals(AddonTokenTypes.CLASS())) {
@@ -82,6 +85,12 @@ public final class AddonParsingFunctions {
             getCurrentAndNext(AddonTokenTypes.IMPORT(), "Expected import keyword");
             String file = getCurrentAndNext(AddonTokenTypes.STRING(), "Expected file path after import keyword").getValue();
             return new ImportStatement(file.substring(1, file.length() - 1));
+        });
+
+        register("using_statement", extra -> {
+            getCurrentAndNext(AddonTokenTypes.USING(), "Expected using keyword");
+            String nativeClass = getCurrentAndNext(AddonTokenTypes.STRING(), "Expected native class name after using keyword").getValue();
+            return new UsingStatement(nativeClass.substring(1, nativeClass.length() - 1));
         });
 
         register("class_declaration_statement", extra -> {
@@ -215,7 +224,7 @@ public final class AddonParsingFunctions {
             List<CallArgExpression> args = parseCallArgs();
             DataType dataType = parseDataType();
 
-            if (modifiers.contains(AddonModifiers.ABSTRACT())) {
+            if (modifiers.contains(AddonModifiers.ABSTRACT()) || modifiers.contains(AddonModifiers.NATIVE())) {
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
                 return new FunctionDeclarationStatement(modifiers, id, args, new ArrayList<>(), dataType);
             }
@@ -271,7 +280,18 @@ public final class AddonParsingFunctions {
 
             List<CallArgExpression> args = parseCallArgs();
 
+            if (modifiers.contains(AddonModifiers.NATIVE())) {
+                getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
+                return new ConstructorDeclarationStatement(modifiers, args, new ArrayList<>());
+            }
+
+            boolean hasNewLine = getCurrent().getType().equals(TokenTypes.NEW_LINE());
             moveOverOptionalNewLines();
+
+            if (!getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE()) && hasNewLine) {
+                return new ConstructorDeclarationStatement(modifiers, args, new ArrayList<>());
+            }
+
             getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
             moveOverOptionalNewLines();

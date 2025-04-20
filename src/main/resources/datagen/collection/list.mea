@@ -1,0 +1,27 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative"
+
+class List : Collection {
+    private val collection
+    private native function getNativeList():Any
+
+    constructor() {
+        collection = getNativeList()
+    }
+    constructor(val element) {
+        collection = getNativeList()
+        add(element)
+    }
+
+    native function getSize():Int
+
+    native function add(val element):Boolean
+    native function add(val element, val pos:Int)
+    native function remove(val element):Boolean
+    native function removeFromPos(val pos:Int):Any?
+    native function get(val pos:Int):Any?
+
+    native function isEmpty():Boolean
+    native function contains(val element):Boolean
+
+    native function toString():String
+}

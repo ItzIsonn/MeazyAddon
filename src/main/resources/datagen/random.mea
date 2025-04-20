@@ -1,0 +1,23 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.RandomClassNative"
+
+class Random {
+    private val random
+    private native function getNativeRandom():Any
+
+    constructor() {
+        random = getNativeRandom()
+    }
+    constructor(val seed:Int) {
+        random = getNativeRandom()
+        setSeed(seed)
+    }
+
+    native function setSeed(val seed:Int)
+
+    native function randomInt(val value:Int):Int
+    native function randomInt(val begin:Int, val end:Int):Int
+
+    native function randomDouble():Double
+    native function randomDouble(val value:Double):Double
+    native function randomDouble(val begin:Double, val end:Double):Double
+}
