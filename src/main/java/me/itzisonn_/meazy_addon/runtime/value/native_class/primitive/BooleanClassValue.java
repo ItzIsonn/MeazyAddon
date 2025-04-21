@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.NullValue;
@@ -47,7 +46,7 @@ public class BooleanClassValue extends NativeClassValue {
     @Override
     public boolean isMatches(Object value) {
         if (value == null) return true;
-        if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue) return true;
+        if (value instanceof Boolean || value instanceof BooleanValue) return true;
         return value.toString().equals("true") || value.toString().equals("false");
     }
 }

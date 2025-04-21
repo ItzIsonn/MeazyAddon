@@ -11,14 +11,14 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.FloatValue;
-import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
+import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 import java.util.List;
 import java.util.Set;
 
 public class FloatClassValue extends NativeClassValue {
     public FloatClassValue(ClassDeclarationEnvironment parent) {
-        super(new ClassEnvironmentImpl(parent, false, "Float"));
+        super(Set.of("Number"), new ClassEnvironmentImpl(parent, false, "Float"));
         setupEnvironment(getEnvironment());
     }
 
@@ -48,13 +48,13 @@ public class FloatClassValue extends NativeClassValue {
     @Override
     public boolean isMatches(Object value) {
         if (value == null) return true;
-        if (value instanceof Integer || value instanceof IntValue || value instanceof Float || value instanceof FloatValue) return true;
-        try {
-            Float.parseFloat(value.toString());
-            return true;
-        }
-        catch (NumberFormatException ignore) {
-            return false;
-        }
+        if (value instanceof Float || value instanceof FloatValue) return true;
+
+        double doubleValue;
+        if (value instanceof Number number) doubleValue = number.doubleValue();
+        else if (value instanceof NumberValue<?> number) doubleValue = number.getValue().doubleValue();
+        else return false;
+
+        return doubleValue >= -Float.MAX_VALUE && doubleValue <= Float.MAX_VALUE;
     }
 }

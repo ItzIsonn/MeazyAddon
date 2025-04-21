@@ -10,15 +10,15 @@ import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
-import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.LongValue;
+import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 import java.util.List;
 import java.util.Set;
 
 public class LongClassValue extends NativeClassValue {
     public LongClassValue(ClassDeclarationEnvironment parent) {
-        super(new ClassEnvironmentImpl(parent, false, "Long"));
+        super(Set.of("Number"), new ClassEnvironmentImpl(parent, false, "Long"));
         setupEnvironment(getEnvironment());
     }
 
@@ -48,13 +48,13 @@ public class LongClassValue extends NativeClassValue {
     @Override
     public boolean isMatches(Object value) {
         if (value == null) return true;
-        if (value instanceof Integer || value instanceof IntValue || value instanceof Long || value instanceof LongValue) return true;
-        try {
-            Long.parseLong(value.toString());
-            return true;
-        }
-        catch (NumberFormatException ignore) {
-            return false;
-        }
+        if (value instanceof Long || value instanceof LongValue) return true;
+
+        double doubleValue;
+        if (value instanceof Number number) doubleValue = number.doubleValue();
+        else if (value instanceof NumberValue<?> number) doubleValue = number.getValue().doubleValue();
+        else return false;
+
+        return doubleValue >= Long.MIN_VALUE && doubleValue <= Long.MAX_VALUE && doubleValue % 1 == 0;
     }
 }

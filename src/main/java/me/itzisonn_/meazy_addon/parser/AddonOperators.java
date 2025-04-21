@@ -4,8 +4,8 @@ import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 import me.itzisonn_.meazy_addon.AddonMain;
+import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
@@ -144,7 +144,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return optimalNumberValue(numberValue1.getValue().doubleValue() + numberValue2.getValue().doubleValue());
+                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() + numberValue2.getValue().doubleValue());
                 }
                 return new StringClassValue(String.valueOf(value1.getValue()) + value2.getValue());
             }
@@ -153,7 +153,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return optimalNumberValue(numberValue1.getValue().doubleValue() - numberValue2.getValue().doubleValue());
+                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() - numberValue2.getValue().doubleValue());
                 }
                 return null;
             }
@@ -162,7 +162,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return optimalNumberValue(numberValue1.getValue().doubleValue() * numberValue2.getValue().doubleValue());
+                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() * numberValue2.getValue().doubleValue());
                 }
 
                 String string;
@@ -187,7 +187,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return optimalNumberValue(numberValue1.getValue().doubleValue() / numberValue2.getValue().doubleValue());
+                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() / numberValue2.getValue().doubleValue());
                 }
                 return null;
             }
@@ -196,7 +196,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return optimalNumberValue(numberValue1.getValue().doubleValue() % numberValue2.getValue().doubleValue());
+                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() % numberValue2.getValue().doubleValue());
                 }
                 return null;
             }
@@ -205,7 +205,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return optimalNumberValue(Math.pow(numberValue1.getValue().doubleValue(), numberValue2.getValue().doubleValue()));
+                    return AddonUtils.optimalNumberValue(Math.pow(numberValue1.getValue().doubleValue(), numberValue2.getValue().doubleValue()));
                 }
                 return null;
             }
@@ -214,7 +214,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue) {
-                    return optimalNumberValue(-numberValue.getValue().doubleValue());
+                    return AddonUtils.optimalNumberValue(-numberValue.getValue().doubleValue());
                 }
                 return null;
             }
@@ -310,17 +310,5 @@ public final class AddonOperators {
                 return null;
             }
         });
-    }
-
-    private static NumberValue<?> optimalNumberValue(double value) {
-        if (value % 1 == 0) {
-            if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) return new IntValue((int) value);
-            if (value >= Long.MIN_VALUE && value <= Long.MAX_VALUE) return new LongValue((long) value);
-        }
-        else {
-            if (value >= -Float.MAX_VALUE && value <= Float.MAX_VALUE) return new FloatValue((float) value);
-            if (value >= -Double.MAX_VALUE && value <= Double.MAX_VALUE) return new DoubleValue(value);
-        }
-        throw new InvalidValueException("Resulted value " + value + " is out of bounds");
     }
 }

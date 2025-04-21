@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class DoubleClassValue extends NativeClassValue {
     public DoubleClassValue(ClassDeclarationEnvironment parent) {
-        super(new ClassEnvironmentImpl(parent, false, "Double"));
+        super(Set.of("Number"), new ClassEnvironmentImpl(parent, false, "Double"));
         setupEnvironment(getEnvironment());
     }
 
@@ -48,13 +48,13 @@ public class DoubleClassValue extends NativeClassValue {
     @Override
     public boolean isMatches(Object value) {
         if (value == null) return true;
-        if (value instanceof Number || value instanceof NumberValue<?>) return true;
-        try {
-            Double.parseDouble(value.toString());
-            return true;
-        }
-        catch (NumberFormatException ignore) {
-            return false;
-        }
+        if (value instanceof Double || value instanceof DoubleValue) return true;
+
+        double doubleValue;
+        if (value instanceof Number number) doubleValue = number.doubleValue();
+        else if (value instanceof NumberValue<?> number) doubleValue = number.getValue().doubleValue();
+        else return false;
+
+        return doubleValue >= -Double.MAX_VALUE && doubleValue <= Double.MAX_VALUE;
     }
 }

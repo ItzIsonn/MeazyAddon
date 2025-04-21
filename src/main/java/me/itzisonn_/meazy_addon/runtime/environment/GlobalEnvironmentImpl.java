@@ -162,6 +162,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     public void init() {
         declareClass(new AnyClassValue(this));
         declareClass(new BooleanClassValue(this));
+        declareClass(new NumberClassValue(this));
         declareClass(new IntClassValue(this));
         declareClass(new LongClassValue(this));
         declareClass(new FloatClassValue(this));

@@ -11,13 +11,14 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
+import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 import java.util.List;
 import java.util.Set;
 
 public class IntClassValue extends NativeClassValue {
     public IntClassValue(ClassDeclarationEnvironment parent) {
-        super(new ClassEnvironmentImpl(parent, false, "Int"));
+        super(Set.of("Number"), new ClassEnvironmentImpl(parent, false, "Int"));
         setupEnvironment(getEnvironment());
     }
 
@@ -48,12 +49,12 @@ public class IntClassValue extends NativeClassValue {
     public boolean isMatches(Object value) {
         if (value == null) return true;
         if (value instanceof Integer || value instanceof IntValue) return true;
-        try {
-            Integer.parseInt(value.toString());
-            return true;
-        }
-        catch (NumberFormatException ignore) {
-            return false;
-        }
+
+        double doubleValue;
+        if (value instanceof Number number) doubleValue = number.doubleValue();
+        else if (value instanceof NumberValue<?> number) doubleValue = number.getValue().doubleValue();
+        else return false;
+
+        return doubleValue >= Integer.MIN_VALUE && doubleValue <= Integer.MAX_VALUE && doubleValue % 1 == 0;
     }
 }
