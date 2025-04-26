@@ -135,10 +135,10 @@ public class MapClassNative {
 
     
     
-    private static Map<Object, Object> unpackRuntimeValuesMap(Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        Map<Object, Object> unpackedMap = new HashMap<>();
+    private static Map<RuntimeValue<?>, RuntimeValue<?>> unpackRuntimeValuesMap(Map<RuntimeValue<?>, RuntimeValue<?>> map) {
+        Map<RuntimeValue<?>, RuntimeValue<?>> unpackedMap = new HashMap<>();
         for (RuntimeValue<?> runtimeValue : map.keySet()) {
-            unpackedMap.put(runtimeValue.getFinalValue(), map.get(runtimeValue).getFinalValue());
+            unpackedMap.put(runtimeValue.getFinalRuntimeValue(), map.get(runtimeValue).getFinalRuntimeValue());
         }
         return unpackedMap;
     }

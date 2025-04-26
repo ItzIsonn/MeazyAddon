@@ -19,10 +19,10 @@ public final class AddonUtils {
      * @param collection Collection of RuntimeValues
      * @return Unpacked list
      */
-    public static List<Object> unpackRuntimeValuesCollection(Collection<RuntimeValue<?>> collection) {
-        List<Object> unpackedList = new ArrayList<>();
+    public static List<RuntimeValue<?>> unpackRuntimeValuesCollection(Collection<RuntimeValue<?>> collection) {
+        List<RuntimeValue<?>> unpackedList = new ArrayList<>();
         for (RuntimeValue<?> runtimeValue : collection) {
-            unpackedList.add(runtimeValue.getFinalValue());
+            unpackedList.add(runtimeValue.getFinalRuntimeValue());
         }
         return unpackedList;
     }

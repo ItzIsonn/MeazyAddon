@@ -1279,6 +1279,111 @@ public final class AddonEvaluationFunctions {
         return classEnvironment;
     }
 
+    public static ClassValue callEmptyClassValue(ClassValue classValue) {
+        ClassEnvironment classEnvironment = initEmptyClassEnvironment(classValue);
+
+        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
+            if (runtimeClassValue.getModifiers().contains(AddonModifiers.NATIVE())) {
+                for (Class<?> nativeClass : classEnvironment.getGlobalEnvironment().getNativeClasses()) {
+                    Method method;
+                    try {
+                        method = nativeClass.getDeclaredMethod("newInstance", Set.class, ClassEnvironment.class, List.class);
+                    }
+                    catch (NoSuchMethodException e) {
+                        continue;
+                    }
+
+                    if (!method.accessFlags().contains(AccessFlag.STATIC)) {
+                        throw new InvalidSyntaxException("Can't call non-static native method to create new instance of class with id " + classEnvironment.getId());
+                    }
+                    if (!method.canAccess(null)) {
+                        throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
+                    }
+                    if (!RuntimeClassValue.class.isAssignableFrom(method.getReturnType())) {
+                        throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
+                    }
+
+                    try {
+                        Object object = method.invoke(null, classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
+                        return (RuntimeClassValue) object;
+                    }
+                    catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException("Failed to call native method", e);
+                    }
+                }
+
+                throw new InvalidSyntaxException("Can't find native method to create new instance of class with id " + classEnvironment.getId());
+            }
+            else return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
+        }
+        if (classValue instanceof NativeClassValue nativeClassValue) return nativeClassValue.newInstance(nativeClassValue.getBaseClasses(), classEnvironment);
+
+        throw new InvalidCallException("Can't call " + classValue.getClass().getName() + " because it's unknown class");
+    }
+
+    public static ClassEnvironment initEmptyClassEnvironment(ClassValue classValue) {
+        ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                classValue.getEnvironment().getGlobalEnvironment(),
+                classValue.getId(),
+                classValue.getModifiers());
+
+        ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment);
+
+        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
+            for (Statement statement : runtimeClassValue.getBody()) {
+                Interpreter.evaluate(statement, classEnvironment);
+            }
+            for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
+                if (functionDeclarationStatement.getClassId().equals(runtimeClassValue.getId())) {
+                    Interpreter.evaluate(new FunctionDeclarationStatement(
+                            functionDeclarationStatement.getModifiers(),
+                            functionDeclarationStatement.getId(),
+                            null,
+                            functionDeclarationStatement.getArgs(),
+                            functionDeclarationStatement.getBody(),
+                            functionDeclarationStatement.getReturnDataType()
+                    ), classEnvironment);
+                }
+            }
+        }
+        else if (classValue instanceof NativeClassValue nativeClassValue) {
+            nativeClassValue.setupEnvironment(classEnvironment);
+        }
+        else throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
+
+        for (String baseClass : classValue.getBaseClasses()) {
+            ClassValue baseClassValue = classValue.getEnvironment().getGlobalEnvironment().getClass(baseClass);
+            classEnvironment.addBaseClass(initClassEnvironment(baseClassValue, constructorEnvironment, new ArrayList<>()));
+        }
+
+        for (FunctionValue value : classEnvironment.getFunctions()) {
+            for (ClassEnvironment baseClass : classEnvironment.getDeepBaseClasses()) {
+                for (FunctionValue baseClassFunction : baseClass.getFunctions()) {
+                    if (baseClassFunction.isLike(value) && !baseClassFunction.getModifiers().contains(AddonModifiers.PRIVATE())) {
+                        if (baseClassFunction.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidAccessException("Can't override final function with id " + baseClassFunction.getId());
+                        baseClassFunction.setOverridden();
+                    }
+                }
+            }
+        }
+
+        if (hasRepeatedFunctions(classEnvironment.getBaseClasses(), new ArrayList<>(classEnvironment.getFunctions()))) {
+            throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " has repeated functions");
+        }
+
+        if (!classEnvironment.getModifiers().contains(AddonModifiers.ABSTRACT())) {
+            for (ClassEnvironment baseClass : classEnvironment.getBaseClasses()) {
+                for (FunctionValue functionValue : getFinalFunctions(baseClass)) {
+                    if (functionValue.getModifiers().contains(AddonModifiers.ABSTRACT())) {
+                        throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " in class with id " + classEnvironment.getId() + " hasn't been initialized");
+                    }
+                }
+            }
+        }
+
+        return classEnvironment;
+    }
+
     private static RuntimeValue<?> callFunction(FunctionValue functionValue, List<RuntimeValue<?>> args) {
         if (functionValue.getArgs().size() != args.size()) {
             throw new InvalidCallException("Expected " + functionValue.getArgs().size() + " args but found " + args.size());

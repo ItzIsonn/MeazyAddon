@@ -1,0 +1,6 @@
+abstract class Addon {
+    private get val id:String
+    private get val version:String
+    private get val description:String
+    private get val authors:List
+}
