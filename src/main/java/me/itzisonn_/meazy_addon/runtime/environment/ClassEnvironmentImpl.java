@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructor.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.constructor.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 
 import java.util.HashSet;

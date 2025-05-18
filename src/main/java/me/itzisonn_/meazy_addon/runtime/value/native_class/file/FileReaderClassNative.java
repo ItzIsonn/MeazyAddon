@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 
@@ -73,7 +74,7 @@ public class FileReaderClassNative {
 
 
 
-    public static class InnerFileReaderValue extends RuntimeValue<BufferedReader> {
+    public static class InnerFileReaderValue extends RuntimeValueImpl<BufferedReader> {
         protected InnerFileReaderValue(BufferedReader value) {
             super(value);
         }

@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
+import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
@@ -143,7 +144,7 @@ public class MapClassNative {
         return unpackedMap;
     }
 
-    public static class InnerMapValue extends RuntimeValue<Map<RuntimeValue<?>, RuntimeValue<?>>> {
+    public static class InnerMapValue extends RuntimeValueImpl<Map<RuntimeValue<?>, RuntimeValue<?>>> {
         private InnerMapValue(Map<RuntimeValue<?>, RuntimeValue<?>> value) {
             super(value);
         }

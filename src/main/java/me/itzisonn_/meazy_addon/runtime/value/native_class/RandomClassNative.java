@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
@@ -67,7 +68,7 @@ public class RandomClassNative {
         return new DoubleValue(randomValue.getValue().nextDouble(beginValue.getValue(), endValue.getValue()));
     }
 
-    public static class InnerRandomValue extends RuntimeValue<Random> {
+    public static class InnerRandomValue extends RuntimeValueImpl<Random> {
         private InnerRandomValue(Random value) {
             super(value);
         }

@@ -12,8 +12,9 @@ import me.itzisonn_.meazy.runtime.InvalidFileException;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructor.ConstructorValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.constructor.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.constructor.NativeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.constructor.RuntimeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.*;
@@ -36,13 +37,18 @@ import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.constructor.RuntimeConstructorValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.function.NativeFunctionValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.function.RuntimeFunctionValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.InnerCollectionValue;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.MapClassNative;
 import me.itzisonn_.meazy.runtime.value.*;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.constructor.RuntimeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BaseClassIdValue;
@@ -182,7 +188,7 @@ public final class AddonEvaluationFunctions {
             }
 
             for (String enumId : classDeclarationStatement.getEnumIds().keySet()) {
-                classEnvironment.declareVariable(new VariableValue(
+                classEnvironment.declareVariable(new VariableValueImpl(
                         enumId,
                         new DataType(classDeclarationStatement.getId(), false),
                         null,
@@ -227,7 +233,7 @@ public final class AddonEvaluationFunctions {
                     throw new InvalidSyntaxException("Can't find native method to create new instance of class with id " + classEnvironment.getId());
                 }
             }
-            else runtimeClassValue = new RuntimeClassValue(
+            else runtimeClassValue = new RuntimeClassValueImpl(
                     classDeclarationStatement.getBaseClasses(),
                     classEnvironment,
                     classDeclarationStatement.getBody());
@@ -241,7 +247,7 @@ public final class AddonEvaluationFunctions {
                 ClassEnvironment enumEnvironment = initClassEnvironment(runtimeClassValue, classEnvironment, args);
 
                 int finalEnumOrdinal = enumOrdinal;
-                enumEnvironment.declareFunction(new NativeFunctionValue("getOrdinal", List.of(), new DataType("Int", false), enumEnvironment, Set.of()) {
+                enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), new DataType("Int", false), enumEnvironment, Set.of()) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                         return new IntValue(finalEnumOrdinal);
@@ -249,13 +255,13 @@ public final class AddonEvaluationFunctions {
                 });
                 enumOrdinal++;
 
-                ClassValue enumValue = new NativeClassValue(enumEnvironment);
+                ClassValue enumValue = new NativeClassValueImpl(enumEnvironment);
                 classEnvironment.assignVariable(enumId, enumValue);
                 enumValues.add(enumValue);
             }
 
             if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
-                classEnvironment.declareFunction(new NativeFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
+                classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                         return ListClassNative.newList(functionEnvironment, new ArrayList<>(enumValues));
@@ -282,7 +288,7 @@ public final class AddonEvaluationFunctions {
                 if (!modifier.canUse(functionDeclarationStatement, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
-            RuntimeFunctionValue runtimeFunctionValue = new RuntimeFunctionValue(
+            RuntimeFunctionValue runtimeFunctionValue = new RuntimeFunctionValueImpl(
                     functionDeclarationStatement.getId(),
                     functionDeclarationStatement.getArgs(),
                     functionDeclarationStatement.getBody(),
@@ -336,7 +342,7 @@ public final class AddonEvaluationFunctions {
                     else value = Interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
                 }
 
-                VariableValue variableValue = new VariableValue(
+                VariableValue variableValue = new VariableValueImpl(
                         variableDeclarationInfo.getId(),
                         variableDeclarationInfo.getDataType(),
                         value,
@@ -361,7 +367,7 @@ public final class AddonEvaluationFunctions {
                     throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
-            RuntimeConstructorValue runtimeConstructorValue = new RuntimeConstructorValue(
+            RuntimeConstructorValue runtimeConstructorValue = new RuntimeConstructorValueImpl(
                     constructorDeclarationStatement.getArgs(),
                     constructorDeclarationStatement.getBody(),
                     constructorDeclarationEnvironment,
@@ -435,7 +441,7 @@ public final class AddonEvaluationFunctions {
             LoopEnvironment forEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
 
             forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
-                    forEnvironment.declareVariable(new VariableValue(
+                    forEnvironment.declareVariable(new VariableValueImpl(
                             variableDeclarationInfo.getId(),
                             variableDeclarationInfo.getDataType(),
                             variableDeclarationInfo.getValue() == null ?
@@ -485,7 +491,7 @@ public final class AddonEvaluationFunctions {
 
                 forEnvironment.clearVariables();
                 for (VariableValue variableValue : variableValues) {
-                    forEnvironment.declareVariable(new VariableValue(
+                    forEnvironment.declareVariable(new VariableValueImpl(
                             variableValue.getId(),
                             variableValue.getDataType(),
                             variableValue.getValue(),
@@ -516,7 +522,7 @@ public final class AddonEvaluationFunctions {
             for (RuntimeValue<?> runtimeValue : collectionValue.getValue()) {
                 foreachEnvironment.clearVariables();
 
-                foreachEnvironment.declareVariable(new VariableValue(
+                foreachEnvironment.declareVariable(new VariableValueImpl(
                         foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getId(),
                         foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getDataType(),
                         runtimeValue,
@@ -898,7 +904,7 @@ public final class AddonEvaluationFunctions {
             Environment parent = environment.getParent(env -> env instanceof ClassEnvironment);
             if (!(parent instanceof ClassEnvironment classEnvironment)) throw new RuntimeException("Can't use 'this' keyword not inside a class");
             if (environment.isShared()) throw new RuntimeException("Can't use 'this' keyword inside a shared environment");
-            return new NativeClassValue(
+            return new NativeClassValueImpl(
                     classEnvironment.getBaseClasses().stream().map(ClassEnvironment::getId).collect(Collectors.toSet()),
                     classEnvironment);
         });
@@ -1059,7 +1065,7 @@ public final class AddonEvaluationFunctions {
 
                 throw new InvalidSyntaxException("Can't find native method to create new instance of class with id " + classEnvironment.getId());
             }
-            else return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
+            else return new RuntimeClassValueImpl(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
         }
         if (classValue instanceof NativeClassValue nativeClassValue) return nativeClassValue.newInstance(nativeClassValue.getBaseClasses(), classEnvironment);
 
@@ -1168,7 +1174,7 @@ public final class AddonEvaluationFunctions {
                     for (int i = 0; i < runtimeConstructorValue.getArgs().size(); i++) {
                         CallArgExpression callArgExpression = runtimeConstructorValue.getArgs().get(i);
 
-                        constructorEnvironment.declareVariable(new VariableValue(
+                        constructorEnvironment.declareVariable(new VariableValueImpl(
                                 callArgExpression.getId(),
                                 callArgExpression.getDataType(),
                                 args.get(i),
@@ -1314,7 +1320,7 @@ public final class AddonEvaluationFunctions {
 
                 throw new InvalidSyntaxException("Can't find native method to create new instance of class with id " + classEnvironment.getId());
             }
-            else return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
+            else return new RuntimeClassValueImpl(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
         }
         if (classValue instanceof NativeClassValue nativeClassValue) return nativeClassValue.newInstance(nativeClassValue.getBaseClasses(), classEnvironment);
 
@@ -1457,7 +1463,7 @@ public final class AddonEvaluationFunctions {
             for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
                 CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
 
-                functionEnvironment.declareVariable(new VariableValue(
+                functionEnvironment.declareVariable(new VariableValueImpl(
                         callArgExpression.getId(),
                         callArgExpression.getDataType(),
                         args.get(i),

@@ -10,15 +10,18 @@ import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.*;
-import me.itzisonn_.meazy.runtime.value.classes.constructor.NativeConstructorValue;
-import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
+import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.constructor.NativeConstructorValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.function.NativeFunctionValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.*;
 
-public class StringClassValue extends NativeClassValue {
+public class StringClassValue extends NativeClassValueImpl {
     private static GlobalEnvironment globalEnvironment = null;
 
     public StringClassValue(ClassDeclarationEnvironment parent) {
@@ -48,7 +51,7 @@ public class StringClassValue extends NativeClassValue {
 
     @Override
     public void setupEnvironment(ClassEnvironment classEnvironment) {
-        classEnvironment.declareVariable(new VariableValue(
+        classEnvironment.declareVariable(new VariableValueImpl(
                 "value",
                 new DataType("Any", false),
                 null,
@@ -58,7 +61,7 @@ public class StringClassValue extends NativeClassValue {
                 classEnvironment));
 
 
-        classEnvironment.declareConstructor(new NativeConstructorValue(List.of(
+        classEnvironment.declareConstructor(new NativeConstructorValueImpl(List.of(
                 new CallArgExpression("str", new DataType("String", false), true)),
                 classEnvironment, Set.of()) {
             @Override
@@ -69,7 +72,7 @@ public class StringClassValue extends NativeClassValue {
         });
 
 
-        classEnvironment.declareFunction(new NativeFunctionValue("valueOf", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("valueOf", List.of(
                 new CallArgExpression("object", new DataType("Any", false), true)),
                 new DataType("String", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
             @Override
@@ -78,7 +81,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("getLength", List.of(), new DataType("Int", false), classEnvironment, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("getLength", List.of(), new DataType("Int", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -88,7 +91,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("replace", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("replace", List.of(
                 new CallArgExpression("target", new DataType("String", false), true), new CallArgExpression("replacement", new DataType("String", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -107,7 +110,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("replaceRegex", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("replaceRegex", List.of(
                 new CallArgExpression("target", new DataType("String", false), true), new CallArgExpression("replacement", new DataType("String", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -126,7 +129,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("replaceFirst", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("replaceFirst", List.of(
                 new CallArgExpression("target", new DataType("String", false), true), new CallArgExpression("replacement", new DataType("String", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -145,7 +148,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("toUpperCase", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("toUpperCase", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -161,7 +164,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("toLowerCase", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("toLowerCase", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -177,7 +180,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("getCharAt", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("getCharAt", List.of(
                 new CallArgExpression("pos", new DataType("Int", false), true)),
                 new DataType("Char", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -201,7 +204,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("setCharAt",
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("setCharAt",
                 List.of(new CallArgExpression("pos", new DataType("Int", false), true), new CallArgExpression("char", new DataType("Char", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -224,7 +227,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("contains", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("contains", List.of(
                 new CallArgExpression("target", new DataType("String", false), true)),
                 new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -241,7 +244,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("startsWith", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("startsWith", List.of(
                 new CallArgExpression("target", new DataType("String", false), true)),
                 new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -258,7 +261,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("endsWith", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("endsWith", List.of(
                 new CallArgExpression("target", new DataType("String", false), true)),
                 new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -275,7 +278,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("repeat", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("repeat", List.of(
                 new CallArgExpression("count", new DataType("Int", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -296,7 +299,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("trim", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("trim", List.of(), new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -312,7 +315,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("isBlank", List.of(), new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("isBlank", List.of(), new DataType("Boolean", false), classEnvironment, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -327,7 +330,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("substring", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("substring", List.of(
                 new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true)),
                 new DataType("String", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -349,7 +352,7 @@ public class StringClassValue extends NativeClassValue {
             }
         });
 
-        classEnvironment.declareFunction(new NativeFunctionValue("split", List.of(
+        classEnvironment.declareFunction(new NativeFunctionValueImpl("split", List.of(
                 new CallArgExpression("regex", new DataType("String", false), true)),
                 new DataType("List", false), classEnvironment, new HashSet<>()) {
             @Override
@@ -393,7 +396,7 @@ public class StringClassValue extends NativeClassValue {
         }
     }
 
-    public static class InnerStringValue extends RuntimeValue<String> {
+    public static class InnerStringValue extends RuntimeValueImpl<String> {
         private InnerStringValue(String value) {
             super(value);
         }

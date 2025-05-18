@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.InnerCollectionValue;
 
 import java.io.*;
@@ -77,7 +78,7 @@ public class FileWriterClassNative {
 
 
 
-    public static class InnerFileValue extends RuntimeValue<File> {
+    public static class InnerFileValue extends RuntimeValueImpl<File> {
         private InnerFileValue(File value) {
             super(value);
         }
