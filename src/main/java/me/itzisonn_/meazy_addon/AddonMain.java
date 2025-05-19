@@ -31,6 +31,7 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
+import me.itzisonn_.meazy_addon.runtime.environment.GlobalEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 import me.itzisonn_.registry.RegistryIdentifier;
@@ -105,11 +106,13 @@ public class AddonMain extends Addon {
             GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(program.getFile());
             Interpreter.evaluate(program, globalEnvironment);
 
-            for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : AddonEvaluationFunctions.VARIABLE_QUEUE.keySet()) {
-                Environment environment = AddonEvaluationFunctions.VARIABLE_QUEUE.get(variableDeclarationInfo);
+            if (!(globalEnvironment instanceof GlobalEnvironmentImpl globalEnvironmentImpl)) throw new RuntimeException("Can't get variables from queue");
+
+            for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : globalEnvironmentImpl.getVariableQueue().keySet()) {
+                Environment environment = globalEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
                 environment.assignVariable(variableDeclarationInfo.getId(), Interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
             }
-            AddonEvaluationFunctions.VARIABLE_QUEUE.clear();
+            globalEnvironmentImpl.getVariableQueue().clear();
 
             for (ClassValue classValue : globalEnvironment.getClasses()) {
                 if (AddonEvaluationFunctions.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>(), globalEnvironment)) {

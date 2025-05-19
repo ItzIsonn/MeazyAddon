@@ -1,12 +1,15 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
+import lombok.Getter;
 import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.*;
 
 import java.io.*;
@@ -17,6 +20,8 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     private final Set<GlobalEnvironment> relatedGlobalEnvironments;
     private final Set<Class<?>> nativeClasses;
     private final Set<ClassValue> classes;
+    @Getter
+    private final LinkedHashMap<VariableDeclarationStatement.VariableDeclarationInfo, Environment> variableQueue = new LinkedHashMap<>();
 
     public GlobalEnvironmentImpl(File parentFile) {
         super(null, false);
