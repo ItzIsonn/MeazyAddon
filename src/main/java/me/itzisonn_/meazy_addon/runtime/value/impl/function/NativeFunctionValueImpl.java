@@ -2,7 +2,7 @@ package me.itzisonn_.meazy_addon.runtime.value.impl.function;
 
 import lombok.EqualsAndHashCode;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;

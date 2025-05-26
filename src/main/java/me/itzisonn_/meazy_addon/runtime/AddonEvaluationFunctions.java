@@ -25,7 +25,7 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCr
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.MapCreationExpression;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
-import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
@@ -37,7 +37,9 @@ import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.GlobalEnvironmentImpl;
+import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
@@ -190,7 +192,7 @@ public final class AddonEvaluationFunctions {
             for (String enumId : classDeclarationStatement.getEnumIds().keySet()) {
                 classEnvironment.declareVariable(new VariableValueImpl(
                         enumId,
-                        new DataType(classDeclarationStatement.getId(), false),
+                        new DataTypeImpl(classDeclarationStatement.getId(), false),
                         null,
                         true,
                         Set.of(AddonModifiers.SHARED()),
@@ -247,7 +249,7 @@ public final class AddonEvaluationFunctions {
                 ClassEnvironment enumEnvironment = initClassEnvironment(runtimeClassValue, classEnvironment, args);
 
                 int finalEnumOrdinal = enumOrdinal;
-                enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), new DataType("Int", false), enumEnvironment, Set.of()) {
+                enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), new DataTypeImpl("Int", false), enumEnvironment, Set.of()) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                         return new IntValue(finalEnumOrdinal);
@@ -261,7 +263,7 @@ public final class AddonEvaluationFunctions {
             }
 
             if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
-                classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
+                classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), new DataTypeImpl("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
                         return ListClassNative.newList(functionEnvironment, new ArrayList<>(enumValues));

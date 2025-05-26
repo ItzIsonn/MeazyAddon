@@ -29,6 +29,7 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
+import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.environment.GlobalEnvironmentImpl;
@@ -162,6 +163,7 @@ public class AddonMain extends Addon {
             return globalEnvironment;
         });
 
+        Registries.DATA_TYPE_FACTORY.register(getIdentifier("data_type_factory"), new DataTypeFactoryImpl());
         Registries.GLOBAL_ENVIRONMENT_FACTORY.register(getIdentifier("global_environment_factory"), new GlobalEnvironmentFactoryImpl());
         Registries.CLASS_ENVIRONMENT_FACTORY.register(getIdentifier("class_environment_factory"), new ClassEnvironmentFactoryImpl());
         Registries.FUNCTION_ENVIRONMENT_FACTORY.register(getIdentifier("function_environment_factory"), new FunctionEnvironmentFactoryImpl());

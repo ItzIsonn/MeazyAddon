@@ -1,6 +1,6 @@
 {
   "id": "meazy_addon",
-  "version": "2.6",
+  "version": "2.7",
   "main": "me.itzisonn_.meazy_addon.AddonMain",
-  "core_depend": "2.6"
+  "core_depend": "2.7"
 }

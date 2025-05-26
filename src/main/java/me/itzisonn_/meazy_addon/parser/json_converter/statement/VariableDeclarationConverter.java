@@ -4,11 +4,11 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
-import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
+import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -48,7 +48,7 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
                 value = jsonDeserializationContext.deserialize(declarationObject.get("value"), Expression.class);
             }
 
-            return new VariableDeclarationStatement.VariableDeclarationInfo(id, new DataType(dataTypeId, dataTypeIsNullable), value);
+            return new VariableDeclarationStatement.VariableDeclarationInfo(id, new DataTypeImpl(dataTypeId, dataTypeIsNullable), value);
         }).toList();
 
         return new VariableDeclarationStatement(modifiers, isConstant, declarationInfos);

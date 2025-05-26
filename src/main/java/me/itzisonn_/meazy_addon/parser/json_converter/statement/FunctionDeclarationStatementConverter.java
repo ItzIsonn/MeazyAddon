@@ -4,12 +4,13 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
-import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
+import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -53,7 +54,7 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
             JsonObject dataTypeObject = getElement(object, "return_data_type").getAsJsonObject();
             String dataTypeId = getElement(dataTypeObject, "id", "return_data_type.id").getAsString();
             boolean dataTypeIsNullable = getElement(dataTypeObject, "is_nullable", "return_data_type.is_nullable").getAsBoolean();
-            dataType = new DataType(dataTypeId, dataTypeIsNullable);
+            dataType = new DataTypeImpl(dataTypeId, dataTypeIsNullable);
         }
         else dataType = null;
 

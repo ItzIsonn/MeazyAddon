@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.Expression;
 import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
@@ -27,6 +28,7 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentif
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
+import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 
 import java.util.*;
 
@@ -252,7 +254,7 @@ public final class AddonParsingFunctions {
             String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
 
             DataType dataType = parseDataType();
-            return new CallArgExpression(id, dataType == null ? new DataType("Any", true) : dataType, isConstant);
+            return new CallArgExpression(id, dataType == null ? new DataTypeImpl("Any", true) : dataType, isConstant);
         });
 
         register("variable_declaration_statement", extra -> {
@@ -848,9 +850,9 @@ public final class AddonParsingFunctions {
 
             if (getCurrent().getType().equals(AddonTokenTypes.QUESTION())) {
                 getCurrentAndNext();
-                return new DataType(dataTypeId, true);
+                return new DataTypeImpl(dataTypeId, true);
             }
-            return new DataType(dataTypeId, false);
+            return new DataTypeImpl(dataTypeId, false);
         }
         return null;
     }
@@ -873,7 +875,7 @@ public final class AddonParsingFunctions {
         String id = getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
 
         DataType dataType = parseDataType();
-        if (dataType == null) dataType = new DataType("Any", true);
+        if (dataType == null) dataType = new DataTypeImpl("Any", true);
 
         if (!getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
             if (canWithoutValue) {
@@ -938,7 +940,7 @@ public final class AddonParsingFunctions {
                 "toString",
                 List.of(),
                 List.of(new ReturnStatement(toStringExpression)),
-                new DataType("String", false)));
+                new DataTypeImpl("String", false)));
 
         List<Expression> copyArgs = new ArrayList<>();
         for (CallArgExpression dataVariable : dataVariables) {
@@ -949,7 +951,7 @@ public final class AddonParsingFunctions {
                 "copy",
                 List.of(),
                 List.of(new ReturnStatement(new ClassCallExpression(new ClassIdentifier(id), copyArgs))),
-                new DataType(id, false)));
+                new DataTypeImpl(id, false)));
 
         Expression equalsExpression;
         if (!dataVariables.isEmpty()) {
@@ -983,7 +985,7 @@ public final class AddonParsingFunctions {
         body.add(new FunctionDeclarationStatement(
                 Set.of(AddonModifiers.OPERATOR()),
                 "equals",
-                List.of(new CallArgExpression("value", new DataType("Any", true), true)),
+                List.of(new CallArgExpression("value", new DataTypeImpl("Any", true), true)),
                 List.of(
                         new IfStatement(
                                 new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "==", OperatorType.INFIX),
@@ -994,7 +996,7 @@ public final class AddonParsingFunctions {
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new ReturnStatement(equalsExpression)),
-                new DataType("Boolean", false)
+                new DataTypeImpl("Boolean", false)
         ));
 
         return body;
