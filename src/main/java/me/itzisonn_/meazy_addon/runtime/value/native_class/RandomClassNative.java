@@ -11,7 +11,7 @@ import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 import java.util.Random;
 
-@MeazyNativeClass("datagen/random.mea")
+@MeazyNativeClass("data/program/random.mea")
 public class RandomClassNative {
     public static InnerRandomValue getNativeRandom(FunctionEnvironment functionEnvironment) {
         return new InnerRandomValue(new Random());

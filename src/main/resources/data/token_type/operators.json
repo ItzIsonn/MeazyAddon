@@ -1,0 +1,27 @@
+[
+  { "id": "assign", "regex": "=" },
+  { "id": "plus", "regex": "\\+" },
+  { "id": "minus", "regex": "-" },
+  { "id": "multiply", "regex": "\\*" },
+  { "id": "divide", "regex": "\\/" },
+  { "id": "percent", "regex": "%" },
+  { "id": "power", "regex": "\\^" },
+  { "id": "plus_assign", "regex": "\\+=" },
+  { "id": "minus_assign", "regex": "-=" },
+  { "id": "multiply_assign", "regex": "\\*=" },
+  { "id": "divide_assign", "regex": "\\/=" },
+  { "id": "percent_assign", "regex": "%=" },
+  { "id": "power_assign", "regex": "\\^=" },
+  { "id": "double_plus", "regex": "\\+\\+" },
+  { "id": "double_minus", "regex": "--" },
+
+  { "id": "and", "regex": "&&" },
+  { "id": "or", "regex": "\\|\\|" },
+  { "id": "inversion", "regex": "!" },
+  { "id": "equals", "regex": "==" },
+  { "id": "not_equals", "regex": "!=" },
+  { "id": "greater", "regex": ">" },
+  { "id": "greater_or_equals", "regex": ">=" },
+  { "id": "less", "regex": "<" },
+  { "id": "less_or_equals", "regex": "<=" }
+]

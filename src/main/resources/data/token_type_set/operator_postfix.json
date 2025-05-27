@@ -1,0 +1,7 @@
+{
+  "id": "operator_postfix",
+  "token_types": [
+    "double_plus",
+    "double_minus"
+  ]
+}

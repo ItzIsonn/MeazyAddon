@@ -14,7 +14,7 @@ import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClass
 import java.util.ArrayList;
 import java.util.List;
 
-@MeazyNativeClass("datagen/meazy/meazy.mea")
+@MeazyNativeClass("data/program/meazy/meazy.mea")
 public class MeazyClassNative {
     public static StringClassValue getVersion(FunctionEnvironment functionEnvironment) {
         return new StringClassValue(MeazyMain.VERSION.toString());

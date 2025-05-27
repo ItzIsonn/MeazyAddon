@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-@MeazyNativeClass("datagen/file/file_writer.mea")
+@MeazyNativeClass("data/program/file/file_writer.mea")
 public class FileWriterClassNative {
     public static InnerFileValue getNativeFile(RuntimeValue<?> file, FunctionEnvironment functionEnvironment) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {

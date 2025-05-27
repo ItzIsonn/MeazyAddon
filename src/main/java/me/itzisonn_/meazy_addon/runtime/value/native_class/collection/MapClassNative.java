@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@MeazyNativeClass("datagen/collection/list.mea")
+@MeazyNativeClass("data/program/collection/list.mea")
 public class MapClassNative {
     public static ClassValue newMap(Environment callEnvironment, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
         ClassValue classValue = AddonEvaluationFunctions.callClassValue(callEnvironment.getGlobalEnvironment().getClass("Map"), callEnvironment, new ArrayList<>());

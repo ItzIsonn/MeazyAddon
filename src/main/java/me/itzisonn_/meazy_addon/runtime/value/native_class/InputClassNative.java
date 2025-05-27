@@ -8,7 +8,7 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.Scanner;
 
-@MeazyNativeClass("datagen/input.mea")
+@MeazyNativeClass("data/program/input.mea")
 public class InputClassNative {
     private static final Scanner SCANNER = new Scanner(System.in);
 

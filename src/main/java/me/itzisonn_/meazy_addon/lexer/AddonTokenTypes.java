@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy_addon.lexer;
 
-import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy_addon.AddonMain;
@@ -11,8 +10,6 @@ import me.itzisonn_.meazy_addon.AddonMain;
  * @see Registries#TOKEN_TYPES
  */
 public final class AddonTokenTypes {
-    private static boolean isInit = false;
-
     private AddonTokenTypes() {}
 
 
@@ -279,98 +276,10 @@ public final class AddonTokenTypes {
 
 
 
-    private static void register(TokenType tokenType) {
-        Registries.TOKEN_TYPES.register(AddonMain.getIdentifier(tokenType.getId()), tokenType);
-    }
-
-    /**
-     * Initializes {@link Registries#TOKEN_TYPES} registry
-     * <p>
-     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
-     *
-     * @throws IllegalStateException If {@link Registries#TOKEN_TYPES} registry has already been initialized
-     */
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("TokenTypes have already been initialized");
-        isInit = true;
-
-        register(new TokenType("require", "require", false));
-        register(new TokenType("import", "import", false));
-        register(new TokenType("using", "using", false));
-        register(new TokenType("variable", "var|val", false));
-        register(new TokenType("function", "function|fun", false));
-        register(new TokenType("class", "class", false));
-        register(new TokenType("constructor", "constructor", false));
-        register(new TokenType("base", "base", false));
-        register(new TokenType("new", "new", false));
-        register(new TokenType("if", "if", false));
-        register(new TokenType("else", "else", false));
-        register(new TokenType("for", "for", false));
-        register(new TokenType("in", "in", false));
-        register(new TokenType("while", "while", false));
-        register(new TokenType("return", "return", false));
-        register(new TokenType("continue", "continue", false));
-        register(new TokenType("break", "break", false));
-        register(new TokenType("is", "is", false));
-        register(new TokenType("is_like", "isLike", false));
-
-        register(new TokenType("comment", "\\/\\/[^\n]*", true));
-        register(new TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", true));
-
-        register(new TokenType("left_paren", "\\(", false));
-        register(new TokenType("right_paren", "\\)", false));
-        register(new TokenType("left_brace", "\\{", false));
-        register(new TokenType("right_brace", "\\}", false));
-        register(new TokenType("left_bracket", "\\[", false));
-        register(new TokenType("right_bracket", "\\]", false));
-        register(new TokenType("colon", ":", false));
-        register(new TokenType("semicolon", ";", false));
-        register(new TokenType("comma", ",", false));
-        register(new TokenType("dot", "\\.", false));
-        register(new TokenType("question", "\\?", false));
-        register(new TokenType("question_dot", "\\?\\.", false));
-        register(new TokenType("question_colon", "\\?:", false));
-        register(new TokenType("arrow", "->", false));
-
-        register(new TokenType("assign", "=", false));
-        register(new TokenType("plus", "\\+", false));
-        register(new TokenType("minus", "-", false));
-        register(new TokenType("multiply", "\\*", false));
-        register(new TokenType("divide", "\\/", false));
-        register(new TokenType("percent", "%", false));
-        register(new TokenType("power", "\\^", false));
-        register(new TokenType("plus_assign", "\\+=", false));
-        register(new TokenType("minus_assign", "-=", false));
-        register(new TokenType("multiply_assign", "\\*=", false));
-        register(new TokenType("divide_assign", "\\/=", false));
-        register(new TokenType("percent_assign", "%=", false));
-        register(new TokenType("power_assign", "\\^=", false));
-        register(new TokenType("double_plus", "\\+\\+", false));
-        register(new TokenType("double_minus", "--", false));
-
-        register(new TokenType("and", "&&", false));
-        register(new TokenType("or", "\\|\\|", false));
-        register(new TokenType("inversion", "!", false));
-        register(new TokenType("equals", "==", false));
-        register(new TokenType("not_equals", "!=", false));
-        register(new TokenType("greater", ">", false));
-        register(new TokenType("greater_or_equals", ">=", false));
-        register(new TokenType("less", "<", false));
-        register(new TokenType("less_or_equals", "<=", false));
-
-        register(new TokenType("null", "null", false));
-        register(new TokenType("number", "(0|([1-9][0-9]*))(\\.[0-9]+)?", false));
-        register(new TokenType("string", "\"[^\"]*\"", false));
-        register(new TokenType("boolean", "true|false", false));
-        register(new TokenType("this", "this", false));
-        register(new TokenType("id", MeazyMain.IDENTIFIER_REGEX, false) {
-            @Override
-            public boolean canMatch(String string) {
-                for (TokenType tokenType : AddonTokenTypeSets.KEYWORDS().getTokenTypes()) {
-                    if (tokenType.getPattern().matcher(string).matches()) return false;
-                }
-                return true;
-            }
-        });
+    public static boolean canMatchId(String string) {
+        for (TokenType tokenType : AddonTokenTypeSets.KEYWORDS().getTokenTypes()) {
+            if (tokenType.getPattern().matcher(string).matches()) return false;
+        }
+        return true;
     }
 }

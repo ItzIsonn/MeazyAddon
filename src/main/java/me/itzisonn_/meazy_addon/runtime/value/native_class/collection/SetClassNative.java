@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-@MeazyNativeClass("datagen/collection/set.mea")
+@MeazyNativeClass("data/program/collection/set.mea")
 public class SetClassNative {
     public static ClassValue newSet(Environment callEnvironment, Set<RuntimeValue<?>> set) {
         ClassValue classValue = AddonEvaluationFunctions.callClassValue(callEnvironment.getGlobalEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());

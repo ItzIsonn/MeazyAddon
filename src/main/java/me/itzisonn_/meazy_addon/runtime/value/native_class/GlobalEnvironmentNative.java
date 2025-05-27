@@ -12,7 +12,7 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import java.util.ArrayList;
 import java.util.List;
 
-@MeazyNativeClass("datagen/global.mea")
+@MeazyNativeClass("data/program/global.mea")
 public class GlobalEnvironmentNative {
     public static void print(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         value = value.getFinalRuntimeValue();

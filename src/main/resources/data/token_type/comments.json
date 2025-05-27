@@ -1,0 +1,4 @@
+[
+  { "id": "comment", "regex": "\\/\\/[^\n]*", "should_skip": true },
+  { "id": "multi_line_comment", "regex": "\\/\\*(?:(?!\\*\\/).)*\\*\\/", "should_skip": true }
+]

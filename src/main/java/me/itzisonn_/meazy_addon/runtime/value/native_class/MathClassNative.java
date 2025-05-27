@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 
-@MeazyNativeClass("datagen/math.mea")
+@MeazyNativeClass("data/program/math.mea")
 public class MathClassNative {
     public static LongValue round(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         if (!(value.getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");

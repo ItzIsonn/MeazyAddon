@@ -1,0 +1,21 @@
+[
+  { "id": "require", "regex": "require" },
+  { "id": "import", "regex": "import" },
+  { "id": "using", "regex": "using" },
+  { "id": "variable", "regex": "var|val" },
+  { "id": "function", "regex": "function|fun" },
+  { "id": "class", "regex": "class" },
+  { "id": "constructor", "regex": "constructor" },
+  { "id": "base", "regex": "base" },
+  { "id": "new", "regex": "new" },
+  { "id": "if", "regex": "if" },
+  { "id": "else", "regex": "else" },
+  { "id": "for", "regex": "for" },
+  { "id": "in", "regex": "in" },
+  { "id": "while", "regex": "while" },
+  { "id": "return", "regex": "return" },
+  { "id": "continue", "regex": "continue" },
+  { "id": "break", "regex": "break" },
+  { "id": "is", "regex": "is" },
+  { "id": "is_like", "regex": "isLike" }
+]

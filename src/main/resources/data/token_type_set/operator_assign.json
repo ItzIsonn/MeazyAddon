@@ -1,0 +1,11 @@
+{
+  "id": "operator_assign",
+  "token_types": [
+    "plus_assign",
+    "minus_assign",
+    "multiply_assign",
+    "divide_assign",
+    "percent_assign",
+    "power_assign"
+  ]
+}

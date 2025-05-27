@@ -14,7 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@MeazyNativeClass("datagen/file/file_reader.mea")
+@MeazyNativeClass("data/program/file/file_reader.mea")
 public class FileReaderClassNative {
     public static InnerFileReaderValue getNativeFileReader(RuntimeValue<?> file, FunctionEnvironment functionEnvironment) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {

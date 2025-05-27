@@ -1,6 +1,5 @@
 plugins {
-    id("java")
-    id("io.freefair.lombok") version "8.13.1"
+    java
 }
 
 group = "me.itzisonn_.meazy_addon"

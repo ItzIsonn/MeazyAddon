@@ -1,0 +1,16 @@
+[
+  { "id": "left_paren", "regex": "\\(" },
+  { "id": "right_paren", "regex": "\\)" },
+  { "id": "left_brace", "regex": "\\{" },
+  { "id": "right_brace", "regex": "\\}" },
+  { "id": "left_bracket", "regex": "\\[" },
+  { "id": "right_bracket", "regex": "\\]" },
+  { "id": "colon", "regex": ":" },
+  { "id": "semicolon", "regex": ";" },
+  { "id": "comma", "regex": "," },
+  { "id": "dot", "regex": "\\." },
+  { "id": "question", "regex": "\\?" },
+  { "id": "question_dot", "regex": "\\?\\." },
+  { "id": "question_colon", "regex": "\\?:" },
+  { "id": "arrow", "regex": "->" }
+]

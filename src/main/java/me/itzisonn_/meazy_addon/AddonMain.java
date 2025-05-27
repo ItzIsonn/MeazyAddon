@@ -20,7 +20,6 @@ import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy.version.Version;
-import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
@@ -45,8 +44,6 @@ public class AddonMain extends Addon {
 
     @Override
     public void onInitialize() {
-        AddonTokenTypes.INIT();
-        AddonTokenTypeSets.INIT();
         AddonModifiers.INIT();
         AddonOperators.INIT();
         AddonParsingFunctions.INIT();

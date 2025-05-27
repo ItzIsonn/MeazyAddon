@@ -12,7 +12,7 @@ import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClass
 
 import java.io.*;
 
-@MeazyNativeClass("datagen/file/file.mea")
+@MeazyNativeClass("data/program/file/file.mea")
 public class FileClassNative {
     public static InnerFileValue getNativeFile(RuntimeValue<?> path, FunctionEnvironment functionEnvironment) {
         return new InnerFileValue(new File(String.valueOf(path.getFinalValue())));

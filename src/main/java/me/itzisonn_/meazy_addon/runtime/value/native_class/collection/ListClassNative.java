@@ -15,7 +15,7 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import java.util.ArrayList;
 import java.util.List;
 
-@MeazyNativeClass("datagen/collection/list.mea")
+@MeazyNativeClass("data/program/collection/list.mea")
 public class ListClassNative {
     public static ClassValue newList(Environment callEnvironment, List<RuntimeValue<?>> list) {
         ClassValue classValue = AddonEvaluationFunctions.callClassValue(callEnvironment.getGlobalEnvironment().getClass("List"), callEnvironment, new ArrayList<>());
