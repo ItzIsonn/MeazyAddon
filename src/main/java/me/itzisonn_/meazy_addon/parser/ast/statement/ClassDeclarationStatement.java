@@ -3,7 +3,7 @@ package me.itzisonn_.meazy_addon.parser.ast.statement;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.Modifier;
 
 import java.util.*;

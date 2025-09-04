@@ -4,10 +4,14 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.runtime.InvalidFileException;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.interpreter.*;
@@ -24,14 +28,10 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCreationExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.MapCreationExpression;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy_addon.parser.AddonModifiers;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
@@ -108,7 +108,8 @@ public final class AddonEvaluationFunctions {
                 throw new InvalidSyntaxException("Can't use imports in non-global environment");
             }
 
-            File file = new File(importStatement.getFile());
+            String folderPath = globalEnvironment.getParentFile().getParentFile().getAbsolutePath() + "\\";
+            File file = new File(folderPath + importStatement.getFile());
             if (file.isDirectory() || !file.exists()) {
                 throw new InvalidFileException("File '" + file.getAbsolutePath() + "' doesn't exist");
             }
@@ -772,36 +773,15 @@ public final class AddonEvaluationFunctions {
                     VariableValue variableValue = variableDeclarationEnvironment.getVariable(identifier.getId());
                     if (variableValue == null) throw new InvalidIdentifierException("Variable with id " + identifier.getId() + " doesn't exist");
 
-                    if (variableValue.getModifiers().contains(AddonModifiers.PRIVATE()) && requestEnvironment != variableDeclarationEnvironment &&
-                            !requestEnvironment.hasParent(variableDeclarationEnvironment))
-                        throw new InvalidAccessException("Can't access private variable with id " + identifier.getId());
+                    for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
+                        Modifier modifier = entry.getValue();
+                        boolean hasModifier = variableValue.getModifiers().contains(modifier);
 
-                    if (variableValue.getModifiers().contains(AddonModifiers.PROTECTED()) && requestEnvironment != variableDeclarationEnvironment &&
-                            !requestEnvironment.hasParent(variableDeclarationEnvironment) && !requestEnvironment.hasParent(parentEnv -> {
-                                if (parentEnv instanceof ClassEnvironment classEnvironment) {
-                                    ClassEnvironment declarationEnvironment = (ClassEnvironment) variableDeclarationEnvironment.getParent(env -> env instanceof ClassEnvironment);
-                                    if (declarationEnvironment == null) return false;
-                                    if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
-
-                                    ClassValue parentClassValue = parentEnv.getGlobalEnvironment().getClass(classEnvironment.getId());
-                                    if (parentClassValue == null) {
-                                        throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
-                                    }
-                                    return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
-                                }
-                                return false;
-                    })) {
-                        throw new InvalidAccessException("Can't access protected variable with id " + identifier.getId());
+                        if (!modifier.canAccess(requestEnvironment, variableDeclarationEnvironment, identifier, hasModifier)) {
+                            if (hasModifier) throw new InvalidAccessException("Can't access variable with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
+                            else throw new InvalidAccessException("Can't access variable with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
+                        }
                     }
-
-                    if (!variableValue.getModifiers().contains(AddonModifiers.OPEN()) && variableDeclarationEnvironment.getParentFile() != null &&
-                            !variableDeclarationEnvironment.getParentFile().equals(requestEnvironment.getParentFile())) {
-                        throw new InvalidAccessException("Can't access non-open variable with id " + identifier.getId() + " from different file (" + requestEnvironment.getParentFile().getName() + ")");
-                    }
-
-                    if (!variableValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() && !variableValue.isArgument() &&
-                            !(variableDeclarationEnvironment instanceof GlobalEnvironment))
-                        throw new InvalidAccessException("Can't access non-shared variable with id " + identifier.getId() + " from shared environment");
 
                     return variableValue;
                 }
@@ -820,39 +800,15 @@ public final class AddonEvaluationFunctions {
                     FunctionValue functionValue = functionDeclarationEnvironment.getFunction(identifier.getId(), args);
                     if (functionValue == null) throw new InvalidIdentifierException("Function with id " + identifier.getId() + " doesn't exist");
 
-                    if (functionValue.getModifiers().contains(AddonModifiers.PRIVATE()) && requestEnvironment != functionDeclarationEnvironment &&
-                            !requestEnvironment.hasParent(functionDeclarationEnvironment))
-                        throw new InvalidAccessException("Can't access private function with id " + identifier.getId());
+                    for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
+                        Modifier modifier = entry.getValue();
+                        boolean hasModifier = functionValue.getModifiers().contains(modifier);
 
-                    if (functionValue.getModifiers().contains(AddonModifiers.PROTECTED()) && requestEnvironment != functionDeclarationEnvironment &&
-                            !requestEnvironment.hasParent(functionDeclarationEnvironment) && !requestEnvironment.hasParent(parentEnv -> {
-                        if (parentEnv instanceof ClassEnvironment classEnvironment) {
-                            ClassEnvironment declarationEnvironment;
-                            if (functionDeclarationEnvironment instanceof ClassEnvironment env) declarationEnvironment = env;
-                            else declarationEnvironment = (ClassEnvironment) functionDeclarationEnvironment.getParent(env -> env instanceof ClassEnvironment);
-
-                            if (declarationEnvironment == null) return false;
-                            if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
-
-                            ClassValue parentClassValue = parentEnv.getGlobalEnvironment().getClass(classEnvironment.getId());
-                            if (parentClassValue == null) {
-                                throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
-                            }
-                            return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
+                        if (!modifier.canAccess(requestEnvironment, functionDeclarationEnvironment, identifier, hasModifier)) {
+                            if (hasModifier) throw new InvalidAccessException("Can't access function with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
+                            else throw new InvalidAccessException("Can't access function with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
                         }
-                        return false;
-                    })) {
-                        throw new InvalidAccessException("Can't access protected function with id " + identifier.getId());
                     }
-
-                    if (!functionValue.getModifiers().contains(AddonModifiers.OPEN()) && functionDeclarationEnvironment.getParentFile() != null &&
-                            !functionDeclarationEnvironment.getParentFile().equals(requestEnvironment.getParentFile())) {
-                        throw new InvalidAccessException("Can't access non-open function with id " + identifier.getId() + " from different file (" + requestEnvironment.getParentFile().getName() + ")");
-                    }
-
-                    if (!functionValue.getModifiers().contains(AddonModifiers.SHARED()) && environment.isShared() &&
-                            !(functionDeclarationEnvironment instanceof GlobalEnvironment))
-                        throw new InvalidAccessException("Can't access non-shared function with id " + identifier.getId() + " from shared environment");
 
                     return functionValue;
                 }
@@ -861,9 +817,14 @@ public final class AddonEvaluationFunctions {
                     ClassValue classValue = environment.getGlobalEnvironment().getClass(identifier.getId());
                     if (classValue == null) return evaluate(new VariableIdentifier(identifier.getId()), environment, extra);
 
-                    if (!classValue.getModifiers().contains(AddonModifiers.OPEN()) &&  classValue.getEnvironment().getParentFile() != null &&
-                            !classValue.getEnvironment().getParentFile().equals(requestEnvironment.getParentFile())) {
-                        throw new InvalidAccessException("Can't access non-open class with id " + identifier.getId() + " from different file (" + requestEnvironment.getParentFile().getName() + ")");
+                    for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
+                        Modifier modifier = entry.getValue();
+                        boolean hasModifier = classValue.getModifiers().contains(modifier);
+
+                        if (!modifier.canAccess(requestEnvironment, environment.getGlobalEnvironment(), identifier, hasModifier)) {
+                            if (hasModifier) throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
+                            else throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
+                        }
                     }
 
                     return classValue;

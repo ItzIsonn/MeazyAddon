@@ -1,10 +1,10 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.expression.call_expression;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 
 import java.lang.reflect.Type;

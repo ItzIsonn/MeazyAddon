@@ -21,7 +21,7 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
-import me.itzisonn_.meazy_addon.parser.AddonModifiers;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.AddonParsingFunctions;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;

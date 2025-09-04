@@ -1,13 +1,13 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
-import me.itzisonn_.meazy_addon.parser.AddonModifiers;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;

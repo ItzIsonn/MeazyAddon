@@ -3,7 +3,7 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression;
 import com.google.gson.*;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 
 import java.lang.reflect.Type;

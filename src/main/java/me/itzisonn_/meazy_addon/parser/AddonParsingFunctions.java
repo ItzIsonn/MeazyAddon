@@ -4,8 +4,8 @@ import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.*;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.version.Version;
@@ -21,14 +21,12 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallE
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCreationExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.MapCreationExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.*;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 
 import java.util.*;
 

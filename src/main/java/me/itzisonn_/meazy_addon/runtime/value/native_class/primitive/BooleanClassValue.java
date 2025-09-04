@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy_addon.parser.AddonModifiers;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;

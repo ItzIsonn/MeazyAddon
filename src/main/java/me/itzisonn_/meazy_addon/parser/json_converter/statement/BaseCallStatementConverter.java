@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.statement;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.statement.BaseCallStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;

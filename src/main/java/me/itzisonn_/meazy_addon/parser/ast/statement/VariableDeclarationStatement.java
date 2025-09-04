@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 import java.util.List;
 import java.util.Set;

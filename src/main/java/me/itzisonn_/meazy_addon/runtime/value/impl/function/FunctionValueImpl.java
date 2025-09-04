@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
@@ -49,29 +49,27 @@ public abstract class FunctionValueImpl extends RuntimeValueImpl<Object> impleme
 
     public boolean isLike(Object o) {
         if (o == this) return true;
-        else if (!(o instanceof me.itzisonn_.meazy.runtime.value.function.FunctionValue other)) return false;
-        else if (!super.equals(o)) return false;
-        else {
-            Object this$id = this.getId();
-            Object other$id = other.getId();
-            if (this$id == null) {
-                if (other$id != null) return false;
-            }
-            else if (!this$id.equals(other$id)) return false;
+        if (!(o instanceof FunctionValue other)) return false;
 
-            Object this$args = this.getArgs();
-            Object other$args = other.getArgs();
-            if (this$args == null) {
-                if (other$args != null) return false;
-            }
-            else if (!this$args.equals(other$args)) return false;
-
-            Object this$returnDataType = this.getReturnDataType();
-            Object other$returnDataType = other.getReturnDataType();
-            if (this$returnDataType == null) {
-                return other$returnDataType == null;
-            }
-            else return this$returnDataType.equals(other$returnDataType);
+        Object this$id = this.getId();
+        Object other$id = other.getId();
+        if (this$id == null) {
+            if (other$id != null) return false;
         }
+        else if (!this$id.equals(other$id)) return false;
+
+        Object this$args = this.getArgs();
+        Object other$args = other.getArgs();
+        if (this$args == null) {
+            if (other$args != null) return false;
+        }
+        else if (!this$args.equals(other$args)) return false;
+
+        Object this$returnDataType = this.getReturnDataType();
+        Object other$returnDataType = other.getReturnDataType();
+        if (this$returnDataType == null) {
+            return other$returnDataType == null;
+        }
+        else return this$returnDataType.equals(other$returnDataType);
     }
 }

@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy_addon.parser.ast.expression.call_expression;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.Expression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 
 import java.util.List;
 

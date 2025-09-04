@@ -5,8 +5,8 @@ import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy_addon.parser.AddonModifiers;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 
 import java.util.List;
 import java.util.Set;

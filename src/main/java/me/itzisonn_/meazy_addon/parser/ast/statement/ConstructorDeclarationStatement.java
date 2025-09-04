@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;
 import java.util.Set;

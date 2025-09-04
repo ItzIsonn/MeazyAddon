@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.ast.expression.literal;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 @Getter
 public class StringLiteral implements Expression {

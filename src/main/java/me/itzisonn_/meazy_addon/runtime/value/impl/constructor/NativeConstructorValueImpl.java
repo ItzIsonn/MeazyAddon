@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.value.impl.constructor;
 
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;

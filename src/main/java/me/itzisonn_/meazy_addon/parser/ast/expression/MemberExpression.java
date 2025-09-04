@@ -2,7 +2,7 @@ package me.itzisonn_.meazy_addon.parser.ast.expression;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.itzisonn_.meazy.parser.ast.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 @Getter
 @Setter
