@@ -5,8 +5,6 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
 
 import java.util.List;
@@ -27,7 +25,5 @@ public abstract class NativeFunctionValueImpl extends FunctionValueImpl implemen
     public NativeFunctionValueImpl(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(id, args, returnDataType, parentEnvironment, modifiers);
     }
-
-    public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment);
 }
 

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.file;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -41,7 +42,7 @@ public class FileReaderClassNative {
 
         try {
             String line = fileReaderValue.getValue().readLine();
-            if (line != null) return new StringClassValue(line);
+            if (line != null) return new StringClassValue(functionEnvironment.getFileEnvironment(), line);
             else return new NullValue();
         }
         catch (IOException e) {
@@ -49,15 +50,15 @@ public class FileReaderClassNative {
         }
     }
 
-    public static ClassValue readAllLines(FunctionEnvironment functionEnvironment) {
+    public static ClassValue readAllLines(RuntimeContext context, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("fileReader").getVariable("fileReader").getValue();
         if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new InvalidSyntaxException("Can't read from non-file reader value");
 
         List<RuntimeValue<?>> lines = new ArrayList<>();
         for (String line : fileReaderValue.getValue().lines().toList()) {
-            lines.add(new StringClassValue(line));
+            lines.add(new StringClassValue(functionEnvironment.getFileEnvironment(), line));
         }
-        return ListClassNative.newList(functionEnvironment, lines);
+        return ListClassNative.newList(functionEnvironment, context, lines);
     }
 
     public static void close(FunctionEnvironment functionEnvironment) {

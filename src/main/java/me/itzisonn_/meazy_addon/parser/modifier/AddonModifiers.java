@@ -3,16 +3,15 @@ package me.itzisonn_.meazy_addon.parser.modifier;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy_addon.AddonMain;
-import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.registry.RegistryEntry;
 
 /**
- * All basic Modifiers
+ * Addon modifiers registrar
  *
  * @see Registries#MODIFIERS
  */
 public final class AddonModifiers {
-    private static boolean isInit = false;
+    private static boolean hasRegistered = false;
 
     private AddonModifiers() {}
 
@@ -67,6 +66,7 @@ public final class AddonModifiers {
     }
 
 
+
     /**
      * Finds registered Modifier with given id
      *
@@ -83,10 +83,6 @@ public final class AddonModifiers {
 
 
 
-    private static void register(Modifier modifier) {
-        Registries.MODIFIERS.register(AddonMain.getIdentifier(modifier.getId()), modifier);
-    }
-
     /**
      * Initializes {@link Registries#MODIFIERS} registry
      * <p>
@@ -94,9 +90,9 @@ public final class AddonModifiers {
      *
      * @throws IllegalStateException If {@link Registries#MODIFIERS} registry has already been initialized
      */
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("Modifiers have already been initialized");
-        isInit = true;
+    public static void REGISTER() {
+        if (hasRegistered) throw new IllegalStateException("Modifiers have already been initialized");
+        hasRegistered = true;
 
         register(new PrivateModifier());
         register(new ProtectedModifier());
@@ -110,5 +106,9 @@ public final class AddonModifiers {
         register(new OperatorModifier());
         register(new EnumModifier());
         register(new NativeModifier());
+    }
+
+    private static void register(Modifier modifier) {
+        Registries.MODIFIERS.register(AddonMain.getIdentifier(modifier.getId()), modifier);
     }
 }

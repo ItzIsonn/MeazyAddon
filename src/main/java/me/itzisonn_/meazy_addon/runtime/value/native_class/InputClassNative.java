@@ -13,11 +13,11 @@ public class InputClassNative {
     private static final Scanner SCANNER = new Scanner(System.in);
 
     public static StringClassValue read(FunctionEnvironment functionEnvironment) {
-        return new StringClassValue(SCANNER.next());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), SCANNER.next());
     }
 
     public static StringClassValue readLine(FunctionEnvironment functionEnvironment) {
-        return new StringClassValue(SCANNER.nextLine());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), SCANNER.nextLine());
     }
 
     public static IntValue readInt(FunctionEnvironment functionEnvironment) {

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.collection;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -18,8 +19,8 @@ import java.util.Set;
 
 @MeazyNativeClass("data/program/collection/set.mea")
 public class SetClassNative {
-    public static ClassValue newSet(Environment callEnvironment, Set<RuntimeValue<?>> set) {
-        ClassValue classValue = AddonEvaluationFunctions.callClassValue(callEnvironment.getGlobalEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());
+    public static ClassValue newSet(Environment callEnvironment, RuntimeContext context, Set<RuntimeValue<?>> set) {
+        ClassValue classValue = AddonEvaluationFunctions.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());
 
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("collection").getVariable("collection").getValue() instanceof InnerSetValue setValue)) {
             throw new InvalidSyntaxException("Can't create set from non-set value");
@@ -80,7 +81,7 @@ public class SetClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't convert non-set value to string");
 
-        return new StringClassValue(AddonUtils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), AddonUtils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
     }
 
 

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
@@ -26,14 +27,14 @@ public class DoubleClassValue extends NativeClassValueImpl {
     public void setupEnvironment(ClassEnvironment classEnvironment) {
         classEnvironment.declareConstructor(new NativeConstructorValueImpl(List.of(), classEnvironment, Set.of(AddonModifiers.PRIVATE())) {
             @Override
-            public void run(List<RuntimeValue<?>> constructorArgs, ConstructorEnvironment constructorEnvironment) {}
+            public void run(List<RuntimeValue<?>> constructorArgs, RuntimeContext context, ConstructorEnvironment constructorEnvironment) {}
         });
 
         classEnvironment.declareFunction(new NativeFunctionValueImpl("valueOf", List.of(
                 new CallArgExpression("object", new DataTypeImpl("Any", false), true)),
                 new DataTypeImpl("Double", true), classEnvironment, Set.of(AddonModifiers.SHARED())) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, RuntimeContext context, FunctionEnvironment functionEnvironment) {
                 String value = functionArgs.getFirst().getFinalValue().toString();
                 try {
                     return new DoubleValue(Double.parseDouble(value));

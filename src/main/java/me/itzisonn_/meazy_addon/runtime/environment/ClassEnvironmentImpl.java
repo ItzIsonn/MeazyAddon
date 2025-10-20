@@ -2,7 +2,7 @@ package me.itzisonn_.meazy_addon.runtime.environment;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;

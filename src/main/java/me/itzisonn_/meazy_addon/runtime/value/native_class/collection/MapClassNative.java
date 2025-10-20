@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.collection;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -18,8 +19,8 @@ import java.util.Map;
 
 @MeazyNativeClass("data/program/collection/list.mea")
 public class MapClassNative {
-    public static ClassValue newMap(Environment callEnvironment, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        ClassValue classValue = AddonEvaluationFunctions.callClassValue(callEnvironment.getGlobalEnvironment().getClass("Map"), callEnvironment, new ArrayList<>());
+    public static ClassValue newMap(Environment callEnvironment, RuntimeContext context, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
+        ClassValue classValue = AddonEvaluationFunctions.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Map"), callEnvironment, new ArrayList<>());
 
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("map").getVariable("map").getValue() instanceof InnerMapValue mapValue)) {
             throw new InvalidSyntaxException("Can't create map from non-map value");
@@ -111,18 +112,18 @@ public class MapClassNative {
 
 
 
-    public static ClassValue getKeySet(FunctionEnvironment functionEnvironment) {
+    public static ClassValue getKeySet(RuntimeContext context, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't get key set of non-map value");
 
-        return SetClassNative.newSet(functionEnvironment, mapValue.getValue().keySet());
+        return SetClassNative.newSet(functionEnvironment, context, mapValue.getValue().keySet());
     }
 
-    public static ClassValue getValueList(FunctionEnvironment functionEnvironment) {
+    public static ClassValue getValueList(RuntimeContext context, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't get value list of non-map value");
 
-        return ListClassNative.newList(functionEnvironment, new ArrayList<>(mapValue.getValue().values()));
+        return ListClassNative.newList(functionEnvironment, context, new ArrayList<>(mapValue.getValue().values()));
     }
 
 
@@ -131,7 +132,7 @@ public class MapClassNative {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't convert non-map value to string");
 
-        return new StringClassValue(unpackRuntimeValuesMap(mapValue.getValue()).toString());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), unpackRuntimeValuesMap(mapValue.getValue()).toString());
     }
 
     

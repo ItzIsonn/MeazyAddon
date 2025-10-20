@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
@@ -29,7 +30,7 @@ public class NumberClassValue extends NativeClassValueImpl {
                 new CallArgExpression("object", new DataTypeImpl("Any", false), true)),
                 new DataTypeImpl("Number", true), classEnvironment, Set.of(AddonModifiers.SHARED())) {
             @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, RuntimeContext context, FunctionEnvironment functionEnvironment) {
                 String value = functionArgs.getFirst().getFinalValue().toString();
                 try {
                     return AddonUtils.optimalNumberValue(Double.parseDouble(value));

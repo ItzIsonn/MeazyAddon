@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.modifier;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
@@ -19,7 +20,7 @@ public class ProtectedModifier extends Modifier {
     }
 
     @Override
-    public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+    public boolean canUse(ModifierStatement modifierStatement, RuntimeContext context, Environment environment) {
         if (modifierStatement.getModifiers().contains(AddonModifiers.PRIVATE()) || modifierStatement.getModifiers().contains(AddonModifiers.OPEN())) return false;
 
         if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
@@ -30,7 +31,7 @@ public class ProtectedModifier extends Modifier {
     }
 
     @Override
-    public boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
+    public boolean canAccess(RuntimeContext context, Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
         if (!hasModifier) return true;
 
         if (identifier instanceof VariableIdentifier) return requestEnvironment == environment || requestEnvironment.hasParent(environment) ||
@@ -40,7 +41,7 @@ public class ProtectedModifier extends Modifier {
                         if (declarationEnvironment == null) return false;
                         if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                        ClassValue parentClassValue = parentEnv.getGlobalEnvironment().getClass(classEnvironment.getId());
+                        ClassValue parentClassValue = environment.getFileEnvironment().getClass(classEnvironment.getId());
                         if (parentClassValue == null) {
                             throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
                         }
@@ -59,7 +60,7 @@ public class ProtectedModifier extends Modifier {
                         if (declarationEnvironment == null) return false;
                         if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                        ClassValue parentClassValue = parentEnv.getGlobalEnvironment().getClass(classEnvironment.getId());
+                        ClassValue parentClassValue = environment.getFileEnvironment().getClass(classEnvironment.getId());
                         if (parentClassValue == null) {
                             throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
                         }

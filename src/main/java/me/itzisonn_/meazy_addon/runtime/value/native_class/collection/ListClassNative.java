@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.collection;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -17,8 +18,8 @@ import java.util.List;
 
 @MeazyNativeClass("data/program/collection/list.mea")
 public class ListClassNative {
-    public static ClassValue newList(Environment callEnvironment, List<RuntimeValue<?>> list) {
-        ClassValue classValue = AddonEvaluationFunctions.callClassValue(callEnvironment.getGlobalEnvironment().getClass("List"), callEnvironment, new ArrayList<>());
+    public static ClassValue newList(Environment callEnvironment, RuntimeContext context, List<RuntimeValue<?>> list) {
+        ClassValue classValue = AddonEvaluationFunctions.callClassValue(context, callEnvironment.getFileEnvironment().getClass("List"), callEnvironment, new ArrayList<>());
 
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("collection").getVariable("collection").getValue() instanceof InnerListValue listValue)) {
             throw new InvalidSyntaxException("Can't create list from non-list value");
@@ -103,7 +104,7 @@ public class ListClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't convert non-list value to string");
 
-        return new StringClassValue(AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
     }
     
 

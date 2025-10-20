@@ -3,6 +3,7 @@ package me.itzisonn_.meazy_addon.parser;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
@@ -14,12 +15,12 @@ import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.registry.RegistryEntry;
 
 /**
- * All basic Operators
+ * Addon operators registrar
  *
  * @see Registries#OPERATORS
  */
 public final class AddonOperators {
-    private static boolean isInit = false;
+    private static boolean hasRegistered = false;
 
     private AddonOperators() {}
 
@@ -125,10 +126,6 @@ public final class AddonOperators {
 
 
 
-    private static void register(String id, Operator operator) {
-        Registries.OPERATORS.register(AddonMain.getIdentifier(id), operator);
-    }
-
     /**
      * Initializes {@link Registries#OPERATORS} registry
      * <p>
@@ -136,22 +133,22 @@ public final class AddonOperators {
      *
      * @throws IllegalStateException If {@link Registries#OPERATORS} registry has already been initialized
      */
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("Operators have already been initialized");
-        isInit = true;
+    public static void REGISTER() {
+        if (hasRegistered) throw new IllegalStateException("Operators have already been initialized");
+        hasRegistered = true;
 
         register("plus", new Operator("+", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() + numberValue2.getValue().doubleValue());
                 }
-                return new StringClassValue(String.valueOf(value1.getValue()) + value2.getValue());
+                return new StringClassValue(environment.getFileEnvironment(), String.valueOf(value1.getValue()) + value2.getValue());
             }
         });
         register("minus", new Operator("-", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() - numberValue2.getValue().doubleValue());
                 }
@@ -160,7 +157,7 @@ public final class AddonOperators {
         });
         register("multiply", new Operator("*", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() * numberValue2.getValue().doubleValue());
                 }
@@ -180,12 +177,12 @@ public final class AddonOperators {
 
                 if (amount < 0) throw new InvalidSyntaxException("Can't multiply string by a negative int");
 
-                return new StringClassValue(new StringBuilder().repeat(string, amount).toString());
+                return new StringClassValue(environment.getFileEnvironment(), new StringBuilder().repeat(string, amount).toString());
             }
         });
         register("divide", new Operator("/", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() / numberValue2.getValue().doubleValue());
                 }
@@ -194,7 +191,7 @@ public final class AddonOperators {
         });
         register("percent", new Operator("%", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() % numberValue2.getValue().doubleValue());
                 }
@@ -203,7 +200,7 @@ public final class AddonOperators {
         });
         register("power", new Operator("^", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(Math.pow(numberValue1.getValue().doubleValue(), numberValue2.getValue().doubleValue()));
                 }
@@ -212,7 +209,7 @@ public final class AddonOperators {
         });
         register("negation", new Operator("-", OperatorType.PREFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue) {
                     return AddonUtils.optimalNumberValue(-numberValue.getValue().doubleValue());
                 }
@@ -222,7 +219,7 @@ public final class AddonOperators {
 
         register("and", new Operator("&&", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof BooleanValue booleanValue1 && value2 instanceof BooleanValue booleanValue2) {
                     return new BooleanValue(booleanValue1.getValue() && booleanValue2.getValue());
                 }
@@ -231,7 +228,7 @@ public final class AddonOperators {
         });
         register("or", new Operator("||", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof BooleanValue booleanValue1 && value2 instanceof BooleanValue booleanValue2) {
                     return new BooleanValue(booleanValue1.getValue() || booleanValue2.getValue());
                 }
@@ -240,7 +237,7 @@ public final class AddonOperators {
         });
         register("inversion", new Operator("!", OperatorType.PREFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof BooleanValue booleanValue) {
                     return new BooleanValue(!booleanValue.getValue());
                 }
@@ -249,7 +246,7 @@ public final class AddonOperators {
         });
         register("equals", new Operator("==", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NullValue) return new BooleanValue(value2 instanceof NullValue);
                 if (value1.getValue() == null) return new BooleanValue(value1.equals(value2));
                 return new BooleanValue(value1.getValue().equals(value2.getValue()));
@@ -257,14 +254,14 @@ public final class AddonOperators {
         });
         register("not_equals", new Operator("!=", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NullValue) return new BooleanValue(!(value2 instanceof NullValue));
                 return new BooleanValue(!value1.getValue().equals(value2.getValue()));
             }
         });
         register("greater", new Operator(">", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() > numberValue2.getValue().doubleValue());
                 }
@@ -276,7 +273,7 @@ public final class AddonOperators {
         });
         register("greater_or_equals", new Operator(">=", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() >= numberValue2.getValue().doubleValue());
                 }
@@ -288,7 +285,7 @@ public final class AddonOperators {
         });
         register("less", new Operator("<", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() < numberValue2.getValue().doubleValue());
                 }
@@ -300,7 +297,7 @@ public final class AddonOperators {
         });
         register("less_or_equals", new Operator("<=", OperatorType.INFIX) {
             @Override
-            public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
+            public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() <= numberValue2.getValue().doubleValue());
                 }
@@ -310,5 +307,9 @@ public final class AddonOperators {
                 return null;
             }
         });
+    }
+
+    private static void register(String id, Operator operator) {
+        Registries.OPERATORS.register(AddonMain.getIdentifier(id), operator);
     }
 }

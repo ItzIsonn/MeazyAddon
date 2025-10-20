@@ -17,24 +17,16 @@ import me.itzisonn_.meazy_addon.parser.json_converter.statement.*;
 import java.lang.reflect.ParameterizedType;
 
 /**
- * All basic Converters
+ * Addon converters registrar
  *
  * @see Registries#CONVERTERS
  */
 public final class AddonConverters {
-    private static boolean isInit = false;
+    private static boolean hasRegistered = false;
 
     private AddonConverters() {}
 
 
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Statement> void register(Converter<T> converter) {
-        Registries.CONVERTERS.register(
-                converter.getId(),
-                (Class<T>) ((ParameterizedType) converter.getClass().getGenericSuperclass()).getActualTypeArguments()[0],
-                converter);
-    }
 
     /**
      * Initializes {@link Registries#CONVERTERS} registry
@@ -43,9 +35,9 @@ public final class AddonConverters {
      *
      * @throws IllegalStateException If {@link Registries#CONVERTERS} registry has already been initialized
      */
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("Converters have already been initialized");
-        isInit = true;
+    public static void REGISTER() {
+        if (hasRegistered) throw new IllegalStateException("Converters have already been initialized");
+        hasRegistered = true;
 
         register(new ImportStatementConverter());
         register(new UsingStatementConverter());
@@ -82,5 +74,13 @@ public final class AddonConverters {
         register(new ThisLiteralConverter());
 
         Registries.updateGson();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Statement> void register(Converter<T> converter) {
+        Registries.CONVERTERS.register(
+                converter.getId(),
+                (Class<T>) ((ParameterizedType) converter.getClass().getGenericSuperclass()).getActualTypeArguments()[0],
+                converter);
     }
 }

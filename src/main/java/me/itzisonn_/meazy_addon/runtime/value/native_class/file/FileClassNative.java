@@ -24,21 +24,21 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get path of non-file value");
 
-        return new StringClassValue(fileValue.getValue().getPath());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), fileValue.getValue().getPath());
     }
 
     public static StringClassValue getName(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get name of non-file value");
 
-        return new StringClassValue(fileValue.getValue().getName());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), fileValue.getValue().getName());
     }
 
     public static StringClassValue getExtension(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get extension of non-file value");
 
-        return new StringClassValue(FileUtils.getExtension(fileValue.getValue()));
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), FileUtils.getExtension(fileValue.getValue()));
     }
 
 
@@ -47,7 +47,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get parent of non-file value");
 
-        return new StringClassValue(fileValue.getValue().getParent());
+        return new StringClassValue(functionEnvironment.getFileEnvironment(), fileValue.getValue().getParent());
     }
 
 

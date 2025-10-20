@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 
@@ -35,31 +36,24 @@ public abstract class ClassValueImpl extends RuntimeValueImpl<Object> implements
         this.environment = environment;
     }
 
-    /**
-     * Constructor with empty baseClasses
-     *
-     * @param environment Environment
-     * @throws NullPointerException If given environment is null
-     */
-    public ClassValueImpl(ClassEnvironment environment) throws NullPointerException {
-        this(new HashSet<>(), environment);
-    }
+
 
     public boolean isMatches(Object value) {
         if (value instanceof ClassValue classValue) return classValue.getId().equals(getId());
         return false;
     }
 
-    public boolean isLikeMatches(Object value) {
+    public boolean isLikeMatches(FileEnvironment fileEnvironment, Object value) {
         if (isMatches(value)) return true;
 
         if (value instanceof ClassValue classValue) {
             for (String baseClassString : classValue.getBaseClasses()) {
-                ClassValue baseClassValue = classValue.getEnvironment().getGlobalEnvironment().getClass(baseClassString);
+                ClassValue baseClassValue = fileEnvironment.getClass(baseClassString);
                 if (baseClassValue == null) continue;
-                if (isLikeMatches(baseClassValue)) return true;
+                if (isLikeMatches(fileEnvironment, baseClassValue)) return true;
             }
         }
+
         return false;
     }
 
