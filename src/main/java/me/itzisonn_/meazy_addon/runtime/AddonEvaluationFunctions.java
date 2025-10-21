@@ -38,7 +38,7 @@ import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
-import me.itzisonn_.meazy_addon.runtime.environment.GlobalEnvironmentImpl;
+import me.itzisonn_.meazy_addon.runtime.environment.FileEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;
@@ -345,8 +345,8 @@ public final class AddonEvaluationFunctions {
                         !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED()))) {
                     if ((variableDeclarationInfo.getValue() instanceof CallExpression || variableDeclarationInfo.getValue() instanceof MemberExpression) &&
                             (environment instanceof GlobalEnvironment || environment instanceof ClassEnvironment)) {
-                        if (context.getGlobalEnvironment() instanceof GlobalEnvironmentImpl globalEnvironment) {
-                            globalEnvironment.getVariableQueue().put(variableDeclarationInfo, environment);
+                        if (environment.getFileEnvironment() instanceof FileEnvironmentImpl fileEnvironment) {
+                            fileEnvironment.getVariableQueue().put(variableDeclarationInfo, environment);
                         }
                         else throw new RuntimeException("Can't place variable in queue");
                     }

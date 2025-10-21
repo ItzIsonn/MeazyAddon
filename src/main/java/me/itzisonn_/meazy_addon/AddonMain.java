@@ -13,10 +13,14 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
+import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
@@ -30,7 +34,7 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatemen
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
-import me.itzisonn_.meazy_addon.runtime.environment.GlobalEnvironmentImpl;
+import me.itzisonn_.meazy_addon.runtime.environment.FileEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 import me.itzisonn_.registry.RegistryIdentifier;
@@ -106,25 +110,33 @@ public class AddonMain extends Addon {
             FileEnvironment fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, program.getFile());
             interpreter.evaluate(program, fileEnvironment);
 
-            if (!(globalEnvironment instanceof GlobalEnvironmentImpl globalEnvironmentImpl)) throw new RuntimeException("Can't get variables from queue");
-
-            for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : globalEnvironmentImpl.getVariableQueue().keySet()) {
-                Environment environment = globalEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
-                environment.assignVariable(variableDeclarationInfo.getId(), interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
+            if (fileEnvironment instanceof FileEnvironmentImpl fileEnvironmentImpl) {
+                for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : fileEnvironmentImpl.getVariableQueue().keySet()) {
+                    Environment environment = fileEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
+                    environment.assignVariable(variableDeclarationInfo.getId(), interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
+                }
+                fileEnvironmentImpl.getVariableQueue().clear();
             }
-            globalEnvironmentImpl.getVariableQueue().clear();
 
-//            for (ClassValue classValue : fileEnvironment.getClasses()) {
-//                if (AddonEvaluationFunctions.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>(), fileEnvironment)) {
-//                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated base classes");
-//                } //TODO fix
-//                if (AddonEvaluationFunctions.hasRepeatedVariables(
-//                        classValue.getBaseClasses(),
-//                        new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()),
-//                        fileEnvironment)) {
-//                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated variables");
-//                }
-//            }
+            return fileEnvironment;
+        });
+
+        Registries.RUN_PROGRAM_FUNCTION.register(getIdentifier("run_program"), program -> {
+            RuntimeContext context = new RuntimeContext();
+            GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
+            FileEnvironment fileEnvironment = Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
+
+            for (ClassValue classValue : fileEnvironment.getClasses()) {
+                if (AddonEvaluationFunctions.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>(), fileEnvironment)) {
+                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated base classes");
+                }
+                if (AddonEvaluationFunctions.hasRepeatedVariables(
+                        classValue.getBaseClasses(),
+                        new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()),
+                        fileEnvironment)) {
+                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated variables");
+                }
+            }
 
             RuntimeValue<?> runtimeValue = fileEnvironment.getFunction("main", new ArrayList<>());
             if (runtimeValue == null) {
@@ -150,7 +162,7 @@ public class AddonMain extends Addon {
                     break;
                 }
 
-                RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
+                RuntimeValue<?> value = context.getInterpreter().evaluate(statement, functionEnvironment);
                 if (value instanceof ReturnInfoValue returnInfoValue) {
                     if (returnInfoValue.getFinalValue() != null) {
                         throw new InvalidSyntaxException("Found return statement but function must return nothing");
