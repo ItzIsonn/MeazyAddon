@@ -328,6 +328,10 @@ public final class AddonEvaluationFunctions {
         });
 
         register("variable_declaration_statement", VariableDeclarationStatement.class, (variableDeclarationStatement, context, environment, extra) -> {
+            if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
+                throw new InvalidSyntaxException("Can't declare function in this environment");
+            }
+
             for (Modifier modifier : variableDeclarationStatement.getModifiers()) {
                 if (!modifier.canUse(variableDeclarationStatement, context, environment))
                     throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
@@ -346,7 +350,7 @@ public final class AddonEvaluationFunctions {
                     if ((variableDeclarationInfo.getValue() instanceof CallExpression || variableDeclarationInfo.getValue() instanceof MemberExpression) &&
                             (environment instanceof GlobalEnvironment || environment instanceof ClassEnvironment)) {
                         if (environment.getFileEnvironment() instanceof FileEnvironmentImpl fileEnvironment) {
-                            fileEnvironment.getVariableQueue().put(variableDeclarationInfo, environment);
+                            fileEnvironment.getVariableQueue().put(variableDeclarationInfo, variableDeclarationEnvironment);
                         }
                         else throw new RuntimeException("Can't place variable in queue");
                     }
@@ -360,9 +364,9 @@ public final class AddonEvaluationFunctions {
                         variableDeclarationStatement.isConstant(),
                         modifiers,
                         false,
-                        environment
+                        variableDeclarationEnvironment
                 );
-                environment.declareVariable(variableValue);
+                variableDeclarationEnvironment.declareVariable(variableValue);
             }
 
             return null;
@@ -787,7 +791,7 @@ public final class AddonEvaluationFunctions {
                 else requestEnvironment = environment;
 
                 if (identifier instanceof VariableIdentifier) {
-                    Environment variableDeclarationEnvironment = environment.getVariableDeclarationEnvironment(identifier.getId());
+                    VariableDeclarationEnvironment variableDeclarationEnvironment = environment.getVariableDeclarationEnvironment(identifier.getId());
                     if (variableDeclarationEnvironment == null) throw new InvalidIdentifierException("Variable with id " + identifier.getId() + " doesn't exist");
 
                     VariableValue variableValue = variableDeclarationEnvironment.getVariable(identifier.getId());

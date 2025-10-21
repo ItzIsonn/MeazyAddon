@@ -6,9 +6,7 @@ import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
@@ -33,14 +31,16 @@ public class SharedModifier extends Modifier {
         if (hasModifier) return true;
 
         if (identifier instanceof VariableIdentifier) {
-            VariableValue variableValue = environment.getVariable(identifier.getId());
+            if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) return true;
+
+            VariableValue variableValue = variableDeclarationEnvironment.getVariable(identifier.getId());
             if (variableValue == null) return true;
 
-            return !environment.isShared() || variableValue.isArgument() || environment instanceof GlobalEnvironment;
+            return !environment.isShared() || variableValue.isArgument() || environment instanceof FileEnvironment || environment instanceof GlobalEnvironment;
         }
 
         if (identifier instanceof FunctionIdentifier) {
-            return !environment.isShared() || environment instanceof GlobalEnvironment;
+            return !environment.isShared() || environment instanceof FileEnvironment || environment instanceof GlobalEnvironment;
         }
 
         return true;

@@ -38,7 +38,6 @@ public class GlobalEnvironmentImpl extends EnvironmentImpl implements GlobalEnvi
 
 
 
-    @Override
     public VariableValue getVariable(String id) {
         for (FileEnvironment fileEnvironment : fileEnvironments) {
             VariableValue variableValue = fileEnvironment.getLocalVariable(id);

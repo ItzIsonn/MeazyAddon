@@ -10,10 +10,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
-import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
@@ -112,7 +109,7 @@ public class AddonMain extends Addon {
 
             if (fileEnvironment instanceof FileEnvironmentImpl fileEnvironmentImpl) {
                 for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : fileEnvironmentImpl.getVariableQueue().keySet()) {
-                    Environment environment = fileEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
+                    VariableDeclarationEnvironment environment = fileEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
                     environment.assignVariable(variableDeclarationInfo.getId(), interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
                 }
                 fileEnvironmentImpl.getVariableQueue().clear();

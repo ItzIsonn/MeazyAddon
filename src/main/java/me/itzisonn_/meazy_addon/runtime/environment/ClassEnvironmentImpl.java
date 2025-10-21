@@ -3,10 +3,7 @@ package me.itzisonn_.meazy_addon.runtime.environment;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -20,6 +17,7 @@ import java.util.Set;
 public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements ClassEnvironment {
     @Getter
     protected final String id;
+    protected final Set<VariableValue> variables;
     protected final Set<ConstructorValue> constructors;
     protected final Set<ClassEnvironment> baseClasses;
     protected final Set<Modifier> modifiers;
@@ -28,6 +26,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     public ClassEnvironmentImpl(ClassDeclarationEnvironment parent, boolean isShared, String id, Set<Modifier> modifiers) {
         super(parent, isShared);
         this.id = id;
+        variables = new HashSet<>();
         constructors = new HashSet<>();
         baseClasses = new HashSet<>();
         this.modifiers = modifiers;
@@ -46,6 +45,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         this(parent, false, id);
     }
 
+
+
     @Override
     public void declareVariable(VariableValue value) {
         if (getVariable(value.getId()) != null) throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
@@ -54,7 +55,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
     @Override
     public VariableValue getVariable(String id) {
-        VariableValue variableValue = super.getVariable(id);
+        VariableValue variableValue = ClassEnvironment.super.getVariable(id);
         if (variableValue != null) return variableValue;
 
         for (ClassEnvironment baseClass : baseClasses) {
@@ -66,8 +67,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     }
 
     @Override
-    public Environment getVariableDeclarationEnvironment(String id) {
-        if (super.getVariable(id) != null) return this;
+    public VariableDeclarationEnvironment getVariableDeclarationEnvironment(String id) {
+        if (ClassEnvironment.super.getVariable(id) != null) return this;
 
         for (ClassEnvironment baseClass : baseClasses) {
             VariableValue variable = baseClass.getVariable(id);
@@ -76,6 +77,13 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
         return super.getVariableDeclarationEnvironment(id);
     }
+
+    @Override
+    public Set<VariableValue> getVariables() {
+        return new HashSet<>(variables);
+    }
+
+
 
     @Override
     public void declareOperatorFunction(FunctionValue value) {
@@ -105,6 +113,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         return new HashSet<>(operatorFunctions);
     }
 
+
+
     @Override
     public FunctionValue getFunction(String id, List<RuntimeValue<?>> args) {
         FunctionValue functionValue = super.getFunction(id, args);
@@ -129,6 +139,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
         return super.getFunctionDeclarationEnvironment(id, args);
     }
+
+
 
     @Override
     public void declareConstructor(ConstructorValue value) {
@@ -156,6 +168,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         return new HashSet<>(constructors);
     }
 
+
+
     @Override
     public void addBaseClass(ClassEnvironment classEnvironment) {
         baseClasses.add(classEnvironment);
@@ -166,6 +180,9 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         return new HashSet<>(baseClasses);
     }
 
+
+
+    @Override
     public Set<Modifier> getModifiers() {
         return new HashSet<>(modifiers);
     }

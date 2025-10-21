@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -20,9 +20,10 @@ import java.util.Set;
 public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements FileEnvironment {
     private final File parentFile;
     private final Set<Class<?>> nativeClasses;
+    private final Set<VariableValue> variables;
     private final Set<ClassValue> classes;
     @Getter
-    private final LinkedHashMap<VariableDeclarationStatement.VariableDeclarationInfo, Environment> variableQueue = new LinkedHashMap<>();
+    private final LinkedHashMap<VariableDeclarationStatement.VariableDeclarationInfo, VariableDeclarationEnvironment> variableQueue = new LinkedHashMap<>();
 
     public FileEnvironmentImpl(GlobalEnvironment parent, File parentFile) {
         super(parent, false);
@@ -30,6 +31,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         this.parentFile = parentFile;
 
         nativeClasses = new HashSet<>();
+        variables = new HashSet<>();
         classes = new HashSet<>();
     }
 
@@ -50,6 +52,8 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         return parentFile;
     }
 
+
+
     @Override
     public void addNativeClass(Class<?> nativeClass) {
         nativeClasses.add(nativeClass);
@@ -60,9 +64,31 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         return new HashSet<>(nativeClasses);
     }
 
+
+
+    @Override
+    public void declareVariable(VariableValue value) {
+        if (value.isArgument()) {
+            if (getVariable(value.getId()) != null) {
+                throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
+            }
+        }
+        else if (getVariableDeclarationEnvironment(value.getId()) != null) {
+            throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
+        }
+        variables.add(value);
+    }
+
+    @Override
+    public Set<VariableValue> getVariables() {
+        return new HashSet<>(variables);
+    }
+
+
+
     @Override
     public VariableValue getLocalVariable(String id) throws NullPointerException {
-        return super.getVariable(id);
+        return FileEnvironment.super.getVariable(id);
     }
 
     @Override
@@ -80,6 +106,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
 
         return null;
     }
+
 
 
     @Override

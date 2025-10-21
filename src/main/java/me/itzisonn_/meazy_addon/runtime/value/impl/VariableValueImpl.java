@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
@@ -24,7 +24,7 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
     private final boolean isConstant;
     private final Set<Modifier> modifiers;
     private final boolean isArgument;
-    private final Environment parentEnvironment;
+    private final VariableDeclarationEnvironment parentEnvironment;
 
     /**
      * @param id Id
@@ -37,7 +37,7 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
      *
      * @throws NullPointerException If either id, dataType or modifiers is null
      */
-    public VariableValueImpl(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<Modifier> modifiers, boolean isArgument, Environment parentEnvironment) throws NullPointerException {
+    public VariableValueImpl(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<Modifier> modifiers, boolean isArgument, VariableDeclarationEnvironment parentEnvironment) throws NullPointerException {
         super(null);
 
         if (id == null) throw new NullPointerException("Id can't be null");
