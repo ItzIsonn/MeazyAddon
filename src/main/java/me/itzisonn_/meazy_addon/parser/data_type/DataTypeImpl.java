@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
@@ -32,14 +33,16 @@ public class DataTypeImpl implements DataType {
 
     @Override
     public boolean isMatches(RuntimeValue<?> value, FileEnvironment fileEnvironment) throws NullPointerException {
-        if (value == null) return true;
+        if (fileEnvironment == null) throw new NullPointerException("GlobalEnvironment can't be null");
+        if (value == null) return false;
 
         value = value.getFinalRuntimeValue();
         if (value instanceof NullValue) return isNullable;
 
-        if (fileEnvironment == null) throw new NullPointerException("GlobalEnvironment can't be null");
         ClassValue classValue = fileEnvironment.getClass(id);
-        return classValue != null && classValue.isLikeMatches(fileEnvironment, value);
+        if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + id);
+
+        return classValue.isLikeMatches(fileEnvironment, value);
     }
 
     @Override

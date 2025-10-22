@@ -52,14 +52,6 @@ public class GlobalEnvironmentImpl extends EnvironmentImpl implements GlobalEnvi
     public void init() {
         FileEnvironmentImpl fileEnvironment = new FileEnvironmentImpl(this, null);
 
-        fileEnvironment.declareClass(new AnyClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new BooleanClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new NumberClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new IntClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new LongClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new FloatClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new DoubleClassValue(fileEnvironment));
-        fileEnvironment.declareClass(new CharClassValue(fileEnvironment));
         fileEnvironment.declareClass(new StringClassValue(fileEnvironment));
 
         addFileEnvironment(fileEnvironment);

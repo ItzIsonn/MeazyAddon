@@ -59,7 +59,9 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
             throw new InvalidSyntaxException("Can't reassign value of constant variable " + id);
         }
 
-        if (!dataType.isMatches(value, parentEnvironment.getFileEnvironment())) throw new InvalidValueException("Variable with id " + id + " requires data type " + dataType.getId());
+        if (value != null && !dataType.isMatches(value, parentEnvironment.getFileEnvironment())) {
+            throw new InvalidValueException("Variable with id " + id + " requires data type " + dataType.getId());
+        }
         this.value = value;
     }
 }

@@ -5,7 +5,7 @@ plugins {
 group = "me.itzisonn_.meazy_addon"
 version = "2.7"
 description = "MeazyAddon"
-java.sourceCompatibility = JavaVersion.VERSION_21
+java.sourceCompatibility = JavaVersion.VERSION_25
 
 repositories {
     mavenCentral()
@@ -14,8 +14,8 @@ repositories {
 dependencies {
     compileOnly(files("..\\Meazy\\builds\\v2.7\\Meazy-v2.7.jar")) //Your Meazy jar file
 
-    compileOnly("org.projectlombok:lombok:1.18.38")
-    annotationProcessor("org.projectlombok:lombok:1.18.38")
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
 }
 
 tasks.withType<JavaCompile> {

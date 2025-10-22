@@ -1,0 +1,6 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.NumberClassNative"
+
+abstract native class Number {
+    protected constructor()
+    native shared function valueOf(val value:Any):Number?
+}

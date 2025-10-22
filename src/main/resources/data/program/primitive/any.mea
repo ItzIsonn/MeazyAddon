@@ -1,0 +1,5 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.AnyClassNative"
+
+final native class Any {
+    private constructor()
+}

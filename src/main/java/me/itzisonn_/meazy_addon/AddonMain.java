@@ -107,19 +107,13 @@ public class AddonMain extends Addon {
             FileEnvironment fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, program.getFile());
             interpreter.evaluate(program, fileEnvironment);
 
-            if (fileEnvironment instanceof FileEnvironmentImpl fileEnvironmentImpl) {
-                for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : fileEnvironmentImpl.getVariableQueue().keySet()) {
-                    VariableDeclarationEnvironment environment = fileEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
-                    environment.assignVariable(variableDeclarationInfo.getId(), interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
-                }
-                fileEnvironmentImpl.getVariableQueue().clear();
-            }
-
             return fileEnvironment;
         });
 
         Registries.RUN_PROGRAM_FUNCTION.register(getIdentifier("run_program"), program -> {
             RuntimeContext context = new RuntimeContext();
+            Interpreter interpreter = context.getInterpreter();
+
             GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
             FileEnvironment fileEnvironment = Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
 
@@ -132,6 +126,16 @@ public class AddonMain extends Addon {
                         new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()),
                         fileEnvironment)) {
                     throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated variables");
+                }
+            }
+
+            for (FileEnvironment fileEnv : globalEnvironment.getFileEnvironments()) {
+                if (fileEnv instanceof FileEnvironmentImpl fileEnvironmentImpl) {
+                    for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : fileEnvironmentImpl.getVariableQueue().keySet()) {
+                        VariableDeclarationEnvironment environment = fileEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
+                        environment.assignVariable(variableDeclarationInfo.getId(), interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
+                    }
+                    fileEnvironmentImpl.getVariableQueue().clear();
                 }
             }
 
@@ -159,7 +163,7 @@ public class AddonMain extends Addon {
                     break;
                 }
 
-                RuntimeValue<?> value = context.getInterpreter().evaluate(statement, functionEnvironment);
+                RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
                 if (value instanceof ReturnInfoValue returnInfoValue) {
                     if (returnInfoValue.getFinalValue() != null) {
                         throw new InvalidSyntaxException("Found return statement but function must return nothing");

@@ -1,0 +1,6 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.LongClassNative"
+
+final native class Long : Number {
+    private constructor()
+    native shared function valueOf(val value:Any):Long?
+}

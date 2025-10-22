@@ -5,9 +5,14 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 
+import java.lang.reflect.AccessFlag;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,6 +44,36 @@ public abstract class ClassValueImpl extends RuntimeValueImpl<Object> implements
 
 
     public boolean isMatches(Object value) {
+        if (getModifiers().contains(AddonModifiers.NATIVE())) {
+            for (Class<?> nativeClass : getEnvironment().getFileEnvironment().getNativeClasses()) {
+                Method method;
+                try {
+                    method = nativeClass.getDeclaredMethod("isMatches", Object.class, ClassEnvironment.class);
+                }
+                catch (NoSuchMethodException e) {
+                    continue;
+                }
+
+                if (!method.accessFlags().contains(AccessFlag.STATIC)) {
+                    throw new InvalidSyntaxException("Can't call non-static native method to check whether class with id " + getEnvironment().getId() + " matches value");
+                }
+                if (!method.canAccess(null)) {
+                    throw new InvalidSyntaxException("Can't call non-accessible native method to check whether class with id " + getEnvironment().getId() + " matches value");
+                }
+                if (!boolean.class.isAssignableFrom(method.getReturnType())) {
+                    throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
+                }
+
+                try {
+                    Object object = method.invoke(null, value, getEnvironment());
+                    return (boolean) object;
+                }
+                catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException("Failed to call native method", e);
+                }
+            }
+        }
+
         if (value instanceof ClassValue classValue) return classValue.getId().equals(getId());
         return false;
     }

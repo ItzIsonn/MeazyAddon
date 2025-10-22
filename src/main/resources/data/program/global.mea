@@ -2,6 +2,3 @@ using "me.itzisonn_.meazy_addon.runtime.value.native_class.GlobalEnvironmentNati
 
 native function print(val value:Any)
 native function println(val value:Any)
-
-native function range(val begin:Int, val end:Int):List
-native function range(val begin:Int, val end:Int, val step:Int):List

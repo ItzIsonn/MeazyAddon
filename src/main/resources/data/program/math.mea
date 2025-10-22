@@ -16,4 +16,7 @@ final class Math {
 
     native shared function min(val a:Double, val b:Double):Double
     native shared function max(val a:Double, val b:Double):Double
+
+    native shared function range(val begin:Int, val end:Int):List
+    native shared function range(val begin:Int, val end:Int, val step:Int):List
 }

@@ -1,0 +1,6 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.BooleanClassNative"
+
+final native class Boolean {
+    private constructor()
+    native shared function valueOf(val value:Any):Boolean?
+}
