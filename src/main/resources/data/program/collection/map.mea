@@ -1,6 +1,6 @@
 using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.MapClassNative"
 
-class Map {
+native class Map {
     private val map
     private native function getNativeMap():Any
 
@@ -27,6 +27,4 @@ class Map {
 
     native function getKeySet():Set
     native function getValueList():List
-
-    native function toString():String
 }

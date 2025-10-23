@@ -1,6 +1,6 @@
 using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative"
 
-class List : Collection {
+native class List : Collection {
     private val collection
     private native function getNativeList():Any
 
@@ -22,6 +22,4 @@ class List : Collection {
 
     native function isEmpty():Boolean
     native function contains(val element):Boolean
-
-    native function toString():String
 }

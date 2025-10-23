@@ -1,6 +1,6 @@
 using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.SetClassNative"
 
-class Set : Collection {
+native class Set : Collection {
     private val collection
     private native function getNativeSet():Any
 
@@ -19,6 +19,4 @@ class Set : Collection {
 
     native function isEmpty():Boolean
     native function contains(val element):Boolean
-
-    native function toString():String
 }

@@ -1027,7 +1027,7 @@ public final class AddonEvaluationFunctions {
 
         if (classValue instanceof RuntimeClassValue runtimeClassValue) {
             if (runtimeClassValue.getModifiers().contains(AddonModifiers.NATIVE())) {
-                for (Class<?> nativeClass : callEnvironment.getFileEnvironment().getNativeClasses()) {
+                for (Class<?> nativeClass : runtimeClassValue.getEnvironment().getFileEnvironment().getNativeClasses()) {
                     Method method;
                     try {
                         method = nativeClass.getDeclaredMethod("newInstance", Set.class, ClassEnvironment.class, List.class);
@@ -1102,7 +1102,7 @@ public final class AddonEvaluationFunctions {
                         Class<?>[] array = params.toArray(Class[]::new);
 
                         boolean hasFound = false;
-                        for (Class<?> nativeClass : callEnvironment.getFileEnvironment().getNativeClasses()) {
+                        for (Class<?> nativeClass : runtimeConstructorValue.getParentEnvironment().getFileEnvironment().getNativeClasses()) {
                             Method method;
                             try {
                                 method = nativeClass.getDeclaredMethod("constructor", array);
@@ -1453,7 +1453,6 @@ public final class AddonEvaluationFunctions {
                             return null;
                         }
                         else {
-                            System.out.println("Function " + functionValue.getId());
                             return checkReturnValue(
                                     ((RuntimeValue<?>) object).getFinalRuntimeValue(),
                                     functionValue.getReturnDataType(),

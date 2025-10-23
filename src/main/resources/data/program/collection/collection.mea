@@ -6,6 +6,4 @@ abstract class Collection {
 
     abstract function isEmpty():Boolean
     abstract function contains(val element):Boolean
-
-    abstract function toString():String
 }

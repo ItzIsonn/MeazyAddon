@@ -1,7 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.collection;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -10,12 +12,10 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
+import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @MeazyNativeClass("data/program/collection/list.mea")
 public class MapClassNative {
@@ -128,11 +128,15 @@ public class MapClassNative {
 
 
 
-    public static ClassValue toString(FunctionEnvironment functionEnvironment) {
-        RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
-        if (!(map instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't convert non-map value to string");
-
-        return StringClassNative.newString(functionEnvironment, unpackRuntimeValuesMap(mapValue.getValue()).toString());
+    public static ClassValue newInstance(Set<String> baseClasses, ClassEnvironment classEnvironment, List<Statement> body) {
+        return new RuntimeClassValueImpl(baseClasses, classEnvironment, body) {
+            @Override
+            public String toString() {
+                RuntimeValue<?> map = getEnvironment().getVariableDeclarationEnvironment("map").getVariable("map").getValue();
+                if (!(map instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't get string from non-map value");
+                return unpackRuntimeValuesMap(mapValue.getValue()).toString();
+            }
+        };
     }
 
     

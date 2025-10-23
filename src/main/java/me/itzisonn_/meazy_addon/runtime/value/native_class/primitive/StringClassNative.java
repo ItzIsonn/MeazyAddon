@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy_addon.runtime.value.native_class.primitive;
 
-import com.google.errorprone.annotations.Var;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
@@ -39,7 +38,7 @@ public class StringClassNative {
 
     public static RuntimeValue<?> valueOf(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         try {
-            return StringClassNative.newString(functionEnvironment, value.getFinalValue().toString());
+            return StringClassNative.newString(functionEnvironment, value.getFinalRuntimeValue().toString());
         }
         catch (NumberFormatException ignore) {
             return new NullValue();
@@ -189,8 +188,6 @@ public class StringClassNative {
         for (String str : splitString) {
             list.add(StringClassNative.newString(functionEnvironment, str));
         }
-
-        System.out.println("LIST " + list);
 
         return ListClassNative.newList(functionEnvironment, context, list);
     }
