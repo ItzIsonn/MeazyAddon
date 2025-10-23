@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.ArrayList;
@@ -100,13 +100,13 @@ public class ListClassNative {
 
 
 
-    public static StringClassValue toString(FunctionEnvironment functionEnvironment) {
+    public static ClassValue toString(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't convert non-list value to string");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
+        return StringClassNative.newString(functionEnvironment, AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
     }
-    
+
 
 
     public static class InnerListValue extends InnerCollectionValue<List<RuntimeValue<?>>> {

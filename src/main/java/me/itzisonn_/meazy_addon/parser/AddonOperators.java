@@ -10,7 +10,7 @@ import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.registry.RegistryEntry;
 
@@ -143,7 +143,7 @@ public final class AddonOperators {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() + numberValue2.getValue().doubleValue());
                 }
-                return new StringClassValue(environment.getFileEnvironment(), String.valueOf(value1.getValue()) + value2.getValue());
+                return StringClassNative.newString(environment, String.valueOf(value1.getValue()) + value2.getValue());
             }
         });
         register("minus", new Operator("-", OperatorType.INFIX) {
@@ -165,11 +165,11 @@ public final class AddonOperators {
                 String string;
                 int amount;
 
-                if (value1 instanceof StringClassValue stringValue && value2 instanceof IntValue numberValue) {
+                if (value1 instanceof StringClassNative.InnerStringValue stringValue && value2 instanceof IntValue numberValue) {
                     string = stringValue.getValue();
                     amount = numberValue.getValue();
                 }
-                else if (value2 instanceof StringClassValue stringValue && value1 instanceof IntValue numberValue) {
+                else if (value2 instanceof StringClassNative.InnerStringValue stringValue && value1 instanceof IntValue numberValue) {
                     string = stringValue.getValue();
                     amount = numberValue.getValue();
                 }
@@ -177,7 +177,7 @@ public final class AddonOperators {
 
                 if (amount < 0) throw new InvalidSyntaxException("Can't multiply string by a negative int");
 
-                return new StringClassValue(environment.getFileEnvironment(), new StringBuilder().repeat(string, amount).toString());
+                return StringClassNative.newString(environment, new StringBuilder().repeat(string, amount).toString());
             }
         });
         register("divide", new Operator("/", OperatorType.INFIX) {
@@ -265,7 +265,7 @@ public final class AddonOperators {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() > numberValue2.getValue().doubleValue());
                 }
-                if (value1 instanceof StringClassValue stringValue1 && value2 instanceof StringClassValue stringValue2) {
+                if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
                     return new BooleanValue(stringValue1.getValue().length() > stringValue2.getValue().length());
                 }
                 return null;
@@ -277,7 +277,7 @@ public final class AddonOperators {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() >= numberValue2.getValue().doubleValue());
                 }
-                if (value1 instanceof StringClassValue stringValue1 && value2 instanceof StringClassValue stringValue2) {
+                if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
                     return new BooleanValue(stringValue1.getValue().length() >= stringValue2.getValue().length());
                 }
                 return null;
@@ -289,7 +289,7 @@ public final class AddonOperators {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() < numberValue2.getValue().doubleValue());
                 }
-                if (value1 instanceof StringClassValue stringValue1 && value2 instanceof StringClassValue stringValue2) {
+                if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
                     return new BooleanValue(stringValue1.getValue().length() < stringValue2.getValue().length());
                 }
                 return null;
@@ -301,7 +301,7 @@ public final class AddonOperators {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
                     return new BooleanValue(numberValue1.getValue().doubleValue() <= numberValue2.getValue().doubleValue());
                 }
-                if (value1 instanceof StringClassValue stringValue1 && value2 instanceof StringClassValue stringValue2) {
+                if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
                     return new BooleanValue(stringValue1.getValue().length() <= stringValue2.getValue().length());
                 }
                 return null;

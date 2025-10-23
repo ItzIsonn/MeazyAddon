@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 
 import java.io.*;
 
@@ -20,34 +20,34 @@ public class FileClassNative {
 
 
 
-    public static StringClassValue getPath(FunctionEnvironment functionEnvironment) {
+    public static ClassValue getPath(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get path of non-file value");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), fileValue.getValue().getPath());
+        return StringClassNative.newString(functionEnvironment.getFileEnvironment(), fileValue.getValue().getPath());
     }
 
-    public static StringClassValue getName(FunctionEnvironment functionEnvironment) {
+    public static ClassValue getName(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get name of non-file value");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), fileValue.getValue().getName());
+        return StringClassNative.newString(functionEnvironment.getFileEnvironment(), fileValue.getValue().getName());
     }
 
-    public static StringClassValue getExtension(FunctionEnvironment functionEnvironment) {
+    public static ClassValue getExtension(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get extension of non-file value");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), FileUtils.getExtension(fileValue.getValue()));
+        return StringClassNative.newString(functionEnvironment.getFileEnvironment(), FileUtils.getExtension(fileValue.getValue()));
     }
 
 
 
-    public static StringClassValue getParent(FunctionEnvironment functionEnvironment) {
+    public static ClassValue getParent(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get parent of non-file value");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), fileValue.getValue().getParent());
+        return StringClassNative.newString(functionEnvironment.getFileEnvironment(), fileValue.getValue().getParent());
     }
 
 

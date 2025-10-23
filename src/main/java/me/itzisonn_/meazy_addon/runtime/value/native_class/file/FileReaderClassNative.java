@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class FileReaderClassNative {
 
         try {
             String line = fileReaderValue.getValue().readLine();
-            if (line != null) return new StringClassValue(functionEnvironment.getFileEnvironment(), line);
+            if (line != null) return StringClassNative.newString(functionEnvironment.getFileEnvironment(), line);
             else return new NullValue();
         }
         catch (IOException e) {
@@ -56,7 +56,7 @@ public class FileReaderClassNative {
 
         List<RuntimeValue<?>> lines = new ArrayList<>();
         for (String line : fileReaderValue.getValue().lines().toList()) {
-            lines.add(new StringClassValue(functionEnvironment.getFileEnvironment(), line));
+            lines.add(StringClassNative.newString(functionEnvironment.getFileEnvironment(), line));
         }
         return ListClassNative.newList(functionEnvironment, context, lines);
     }

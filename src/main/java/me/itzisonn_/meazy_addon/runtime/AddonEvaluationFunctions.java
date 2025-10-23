@@ -55,7 +55,7 @@ import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.BaseClassIdValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ContinueInfoValue;
@@ -204,7 +204,7 @@ public final class AddonEvaluationFunctions {
                 ));
             }
 
-            RuntimeClassValue runtimeClassValue = null;
+            ClassValue classValue = null;
             if (classDeclarationStatement.getModifiers().contains(AddonModifiers.NATIVE())) {
                 for (Class<?> nativeClass : environment.getFileEnvironment().getNativeClasses()) {
                     Method method;
@@ -221,13 +221,13 @@ public final class AddonEvaluationFunctions {
                     if (!method.canAccess(null)) {
                         throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
                     }
-                    if (!RuntimeClassValue.class.isAssignableFrom(method.getReturnType())) {
+                    if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
                         throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
                     }
 
                     try {
                         Object object = method.invoke(null, classDeclarationStatement.getBaseClasses(), classEnvironment, classDeclarationStatement.getBody());
-                        runtimeClassValue = (RuntimeClassValue) object;
+                        classValue = (ClassValue) object;
                     }
                     catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException("Failed to call native method", e);
@@ -235,20 +235,20 @@ public final class AddonEvaluationFunctions {
                 }
             }
 
-            if (runtimeClassValue == null) {
-                runtimeClassValue = new RuntimeClassValueImpl(
+            if (classValue == null) {
+                classValue = new RuntimeClassValueImpl(
                         classDeclarationStatement.getBaseClasses(),
                         classEnvironment,
                         classDeclarationStatement.getBody());
             }
 
-            classDeclarationEnvironment.declareClass(runtimeClassValue);
+            classDeclarationEnvironment.declareClass(classValue);
 
             int enumOrdinal = 1;
             List<ClassValue> enumValues = new ArrayList<>();
             for (String enumId : classDeclarationStatement.getEnumIds().keySet()) {
                 List<RuntimeValue<?>> args = classDeclarationStatement.getEnumIds().get(enumId).stream().map(expression -> interpreter.evaluate(expression, classEnvironment)).collect(Collectors.toList());
-                ClassEnvironment enumEnvironment = initClassEnvironment(context, runtimeClassValue, classEnvironment, args);
+                ClassEnvironment enumEnvironment = initClassEnvironment(context, classValue, classEnvironment, args);
 
                 int finalEnumOrdinal = enumOrdinal;
                 enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), new DataTypeImpl("Int", false), enumEnvironment, Set.of()) {
@@ -887,7 +887,7 @@ public final class AddonEvaluationFunctions {
                 }
             }
         });
-        register("string_literal", StringLiteral.class, (stringLiteral, _, environment, _) -> new StringClassValue(environment.getFileEnvironment(), stringLiteral.getValue()));
+        register("string_literal", StringLiteral.class, (stringLiteral, _, environment, _) -> StringClassNative.newString(environment, stringLiteral.getValue()));
         register("boolean_literal", BooleanLiteral.class, (booleanLiteral, _, _, _) -> new BooleanValue(booleanLiteral.isValue()));
 
         register("this_literal", ThisLiteral.class, (_, _, environment, _) -> {
@@ -1042,13 +1042,13 @@ public final class AddonEvaluationFunctions {
                     if (!method.canAccess(null)) {
                         throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
                     }
-                    if (!RuntimeClassValue.class.isAssignableFrom(method.getReturnType())) {
+                    if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
                         throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
                     }
 
                     try {
                         Object object = method.invoke(null, classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-                        return (RuntimeClassValue) object;
+                        return (ClassValue) object;
                     }
                     catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException("Failed to call native method", e);
@@ -1298,13 +1298,13 @@ public final class AddonEvaluationFunctions {
                     if (!method.canAccess(null)) {
                         throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
                     }
-                    if (!RuntimeClassValue.class.isAssignableFrom(method.getReturnType())) {
+                    if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
                         throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
                     }
 
                     try {
                         Object object = method.invoke(null, classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-                        return (RuntimeClassValue) object;
+                        return (ClassValue) object;
                     }
                     catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException("Failed to call native method", e);
@@ -1453,6 +1453,7 @@ public final class AddonEvaluationFunctions {
                             return null;
                         }
                         else {
+                            System.out.println("Function " + functionValue.getId());
                             return checkReturnValue(
                                     ((RuntimeValue<?>) object).getFinalRuntimeValue(),
                                     functionValue.getReturnDataType(),

@@ -16,7 +16,6 @@ public class GlobalEnvironmentImpl extends EnvironmentImpl implements GlobalEnvi
         super(null, false);
         this.context = context;
         fileEnvironments = new HashSet<>();
-        init();
     }
 
 
@@ -45,15 +44,5 @@ public class GlobalEnvironmentImpl extends EnvironmentImpl implements GlobalEnvi
         }
 
         return null;
-    }
-
-
-
-    public void init() {
-        FileEnvironmentImpl fileEnvironment = new FileEnvironmentImpl(this, null);
-
-        fileEnvironment.declareClass(new StringClassValue(fileEnvironment));
-
-        addFileEnvironment(fileEnvironment);
     }
 }

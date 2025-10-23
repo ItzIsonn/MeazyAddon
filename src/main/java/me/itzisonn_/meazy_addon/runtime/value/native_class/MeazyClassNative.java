@@ -11,15 +11,15 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @MeazyNativeClass("data/program/meazy/meazy.mea")
 public class MeazyClassNative {
-    public static StringClassValue getVersion(FunctionEnvironment functionEnvironment) {
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), MeazyMain.VERSION.toString());
+    public static ClassValue getVersion(FunctionEnvironment functionEnvironment) {
+        return StringClassNative.newString(functionEnvironment.getFileEnvironment(), MeazyMain.VERSION.toString());
     }
 
     public static ClassValue getAddons(RuntimeContext context, FunctionEnvironment functionEnvironment) {
@@ -30,12 +30,12 @@ public class MeazyClassNative {
             AddonInfo addonInfo = addon.getAddonInfo();
             ClassValue addonClassValue = AddonEvaluationFunctions.callEmptyClassValue(context, functionEnvironment.getFileEnvironment().getClass("Addon"));
 
-            addonClassValue.getEnvironment().assignVariable("id", new StringClassValue(fileEnvironment, addonInfo.getId()));
-            addonClassValue.getEnvironment().assignVariable("version", new StringClassValue(fileEnvironment, addonInfo.getVersion().toString()));
-            addonClassValue.getEnvironment().assignVariable("description", new StringClassValue(fileEnvironment, addonInfo.getDescription()));
+            addonClassValue.getEnvironment().assignVariable("id", StringClassNative.newString(fileEnvironment, addonInfo.getId()));
+            addonClassValue.getEnvironment().assignVariable("version", StringClassNative.newString(fileEnvironment, addonInfo.getVersion().toString()));
+            addonClassValue.getEnvironment().assignVariable("description", StringClassNative.newString(fileEnvironment, addonInfo.getDescription()));
             List<RuntimeValue<?>> authors = new ArrayList<>();
             for (String author : addonInfo.getAuthors()) {
-                authors.add(new StringClassValue(fileEnvironment, author));
+                authors.add(StringClassNative.newString(fileEnvironment, author));
             }
             addonClassValue.getEnvironment().assignVariable("authors", ListClassNative.newList(functionEnvironment, context, authors));
 

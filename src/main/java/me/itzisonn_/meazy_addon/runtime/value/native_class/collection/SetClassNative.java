@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.ArrayList;
@@ -77,11 +77,11 @@ public class SetClassNative {
 
 
 
-    public static StringClassValue toString(FunctionEnvironment functionEnvironment) {
+    public static ClassValue toString(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't convert non-set value to string");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), AddonUtils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
+        return StringClassNative.newString(functionEnvironment, AddonUtils.unpackRuntimeValuesCollection(setValue.getValue()).toString());
     }
 
 

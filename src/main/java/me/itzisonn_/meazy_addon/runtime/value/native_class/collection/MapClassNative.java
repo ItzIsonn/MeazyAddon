@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassValue;
+import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.ArrayList;
@@ -128,11 +128,11 @@ public class MapClassNative {
 
 
 
-    public static StringClassValue toString(FunctionEnvironment functionEnvironment) {
+    public static ClassValue toString(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new InvalidSyntaxException("Can't convert non-map value to string");
 
-        return new StringClassValue(functionEnvironment.getFileEnvironment(), unpackRuntimeValuesMap(mapValue.getValue()).toString());
+        return StringClassNative.newString(functionEnvironment, unpackRuntimeValuesMap(mapValue.getValue()).toString());
     }
 
     

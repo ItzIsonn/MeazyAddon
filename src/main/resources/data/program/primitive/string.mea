@@ -1,0 +1,32 @@
+using "me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative"
+
+final native class String {
+    private val value
+
+    private constructor()
+    native shared function valueOf(val value:Any):String?
+
+    native function getLength():Int
+    native function getCharAt(val pos:Int):Char
+    native function setCharAt(val pos:Int, val char:Char):String
+
+    native function replace(val target:String, val replacement:String):String
+    native function replaceRegex(val target:String, val replacement:String):String
+    native function replaceFirst(val target:String, val replacement:String):String
+
+    native function substring(val begin:Int, val end:Int):String
+    native function substringFrom(val begin:Int):String
+    native function substringTo(val end:Int):String
+
+    native function split(val regex:String):List
+    native function repeat(val times:Int):String
+    native function trim():String
+    native function toUpperCase():String
+    native function toLowerCase():String
+
+    native function contains(val target:String):Boolean
+    native function startsWith(val target:String):Boolean
+    native function endsWith(val target:String):Boolean
+    native function isEmpty():Boolean
+    native function isBlank():Boolean
+}
