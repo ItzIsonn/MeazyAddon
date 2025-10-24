@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
-import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
+import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
@@ -24,7 +24,7 @@ import java.util.Set;
 @MeazyNativeClass("data/program/collection/set.mea")
 public class SetClassNative {
     public static ClassValue newSet(Environment callEnvironment, RuntimeContext context, Set<RuntimeValue<?>> set) {
-        ClassValue classValue = AddonEvaluationFunctions.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());
+        ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());
 
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("collection").getVariable("collection").getValue() instanceof InnerSetValue setValue)) {
             throw new InvalidSyntaxException("Can't create set from non-set value");

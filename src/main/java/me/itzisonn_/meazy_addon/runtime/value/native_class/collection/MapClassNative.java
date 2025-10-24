@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
+import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
@@ -20,7 +20,7 @@ import java.util.*;
 @MeazyNativeClass("data/program/collection/list.mea")
 public class MapClassNative {
     public static ClassValue newMap(Environment callEnvironment, RuntimeContext context, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
-        ClassValue classValue = AddonEvaluationFunctions.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Map"), callEnvironment, new ArrayList<>());
+        ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Map"), callEnvironment, new ArrayList<>());
 
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("map").getVariable("map").getValue() instanceof InnerMapValue mapValue)) {
             throw new InvalidSyntaxException("Can't create map from non-map value");

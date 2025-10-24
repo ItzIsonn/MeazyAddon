@@ -13,7 +13,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
+import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
@@ -29,7 +29,7 @@ import java.util.Set;
 public class StringClassNative {
     public static ClassValue newString(Environment callEnvironment, String string) {
         FileEnvironment fileEnvironment = callEnvironment.getFileEnvironment();
-        ClassValue classValue = AddonEvaluationFunctions.callEmptyClassValue(fileEnvironment.getParent().getContext(), fileEnvironment.getClass("String"));
+        ClassValue classValue = EvaluationHelper.callEmptyClassValue(fileEnvironment.getParent().getContext(), fileEnvironment.getClass("String"));
         classValue.getEnvironment().assignVariable("value", new InnerStringValue(string));
         return classValue;
     }

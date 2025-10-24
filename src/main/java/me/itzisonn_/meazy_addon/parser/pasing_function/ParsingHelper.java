@@ -12,13 +12,14 @@ import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
-import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 
 import java.util.*;
 
-public class ParsingHelper {
+public final class ParsingHelper {
+    private ParsingHelper() {}
+
     public static Set<Modifier> parseModifiers(ParsingContext context) {
         Parser parser = context.getParser();
         Set<Modifier> modifiers = new HashSet<>();

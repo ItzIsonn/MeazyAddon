@@ -23,7 +23,7 @@ import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
-import me.itzisonn_.meazy_addon.parser.AddonParsingFunctions;
+import me.itzisonn_.meazy_addon.parser.pasing_function.AddonParsingFunctions;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
@@ -31,9 +31,10 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatemen
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
-import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
+import me.itzisonn_.meazy_addon.runtime.evaluation_function.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.environment.FileEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
+import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
@@ -119,10 +120,10 @@ public class AddonMain extends Addon {
             FileEnvironment fileEnvironment = Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
 
             for (ClassValue classValue : fileEnvironment.getClasses()) {
-                if (AddonEvaluationFunctions.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>(), fileEnvironment)) {
+                if (EvaluationHelper.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>(), fileEnvironment)) {
                     throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated base classes");
                 }
-                if (AddonEvaluationFunctions.hasRepeatedVariables(
+                if (EvaluationHelper.hasRepeatedVariables(
                         classValue.getBaseClasses(),
                         new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()),
                         fileEnvironment)) {

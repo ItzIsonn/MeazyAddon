@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
+import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
 
@@ -28,7 +28,7 @@ public class MeazyClassNative {
         List<RuntimeValue<?>> addons = new ArrayList<>();
         for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
             AddonInfo addonInfo = addon.getAddonInfo();
-            ClassValue addonClassValue = AddonEvaluationFunctions.callEmptyClassValue(context, functionEnvironment.getFileEnvironment().getClass("Addon"));
+            ClassValue addonClassValue = EvaluationHelper.callEmptyClassValue(context, functionEnvironment.getFileEnvironment().getClass("Addon"));
 
             addonClassValue.getEnvironment().assignVariable("id", StringClassNative.newString(fileEnvironment, addonInfo.getId()));
             addonClassValue.getEnvironment().assignVariable("version", StringClassNative.newString(fileEnvironment, addonInfo.getVersion().toString()));

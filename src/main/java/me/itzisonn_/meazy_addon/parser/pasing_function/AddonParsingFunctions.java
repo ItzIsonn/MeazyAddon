@@ -1,9 +1,8 @@
-package me.itzisonn_.meazy_addon.parser;
+package me.itzisonn_.meazy_addon.parser.pasing_function;
 
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy_addon.parser.pasing_function.expression.*;
 import me.itzisonn_.meazy_addon.parser.pasing_function.statement.*;
 
