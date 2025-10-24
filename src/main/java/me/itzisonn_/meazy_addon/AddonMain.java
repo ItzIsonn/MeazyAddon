@@ -30,6 +30,7 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
+import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 import me.itzisonn_.meazy_addon.runtime.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.environment.FileEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
@@ -62,7 +63,7 @@ public class AddonMain extends Addon {
             boolean isProgramHead = true;
 
             while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) requiredAddons = AddonParsingFunctions.parseRequiredAddons(parsingContext);
+                if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) requiredAddons = ParsingHelper.parseRequiredAddons(parsingContext);
                 else {
                     Statement statement = parser.parse(getIdentifier("global_statement"), Statement.class);
                     if (statement instanceof ImportStatement) {
