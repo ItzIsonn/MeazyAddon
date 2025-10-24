@@ -39,14 +39,23 @@ public class VariableDeclarationStatementEvaluationFunction extends AbstractEval
         Interpreter interpreter = context.getInterpreter();
         for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
             RuntimeValue<?> value = null;
+            VariableValue variableValue = null;
 
             if (variableDeclarationInfo.getValue() != null && !(environment instanceof ClassEnvironment && environment.isShared() &&
                     !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED()))) {
                 boolean placed = false;
 
                 if ((environment instanceof FileEnvironment || environment instanceof ClassEnvironment) && environment.isShared()) {
-                    if (environment.getFileEnvironment() instanceof FileEnvironmentImpl fileEnvironment) {
-                        fileEnvironment.getVariableQueue().put(variableDeclarationInfo, variableDeclarationEnvironment);
+                    if (environment.getFileEnvironment() instanceof FileEnvironmentImpl) {
+                        variableValue = new VariableValueImpl(
+                                variableDeclarationInfo.getId(),
+                                variableDeclarationInfo.getDataType(),
+                                variableDeclarationInfo.getValue(),
+                                variableDeclarationStatement.isConstant(),
+                                modifiers,
+                                false,
+                                variableDeclarationEnvironment
+                        );
                         placed = true;
                     }
                 }
@@ -54,15 +63,18 @@ public class VariableDeclarationStatementEvaluationFunction extends AbstractEval
                 if (!placed) value = interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
             }
 
-            VariableValue variableValue = new VariableValueImpl(
-                    variableDeclarationInfo.getId(),
-                    variableDeclarationInfo.getDataType(),
-                    value,
-                    variableDeclarationStatement.isConstant(),
-                    modifiers,
-                    false,
-                    variableDeclarationEnvironment
-            );
+            if (variableValue == null) {
+                variableValue = new VariableValueImpl(
+                        variableDeclarationInfo.getId(),
+                        variableDeclarationInfo.getDataType(),
+                        value,
+                        variableDeclarationStatement.isConstant(),
+                        modifiers,
+                        false,
+                        variableDeclarationEnvironment
+                );
+            }
+
             variableDeclarationEnvironment.declareVariable(variableValue);
         }
 

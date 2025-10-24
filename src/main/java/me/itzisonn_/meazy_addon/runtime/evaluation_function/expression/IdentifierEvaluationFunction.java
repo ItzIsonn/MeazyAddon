@@ -89,7 +89,7 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
                 Modifier modifier = entry.getValue();
                 boolean hasModifier = classValue.getModifiers().contains(modifier);
 
-                if (!modifier.canAccess(context, requestEnvironment, context.getGlobalEnvironment(), identifier, hasModifier)) {
+                if (!modifier.canAccess(context, requestEnvironment, classValue.getEnvironment().getParent(), identifier, hasModifier)) {
                     if (hasModifier) throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
                     else throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
                 }

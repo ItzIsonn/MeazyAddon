@@ -60,7 +60,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
             classEnvironment.declareVariable(new VariableValueImpl(
                     enumId,
                     new DataTypeImpl(classDeclarationStatement.getId(), false),
-                    null,
+                    (RuntimeValue<?>) null,
                     true,
                     Set.of(AddonModifiers.SHARED()),
                     false,

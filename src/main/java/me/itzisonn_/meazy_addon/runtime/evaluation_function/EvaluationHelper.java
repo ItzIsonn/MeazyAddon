@@ -354,7 +354,7 @@ public final class EvaluationHelper {
                         throw new InvalidCallException("Requested constructor has private access");
                     }
 
-                    if (nativeConstructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> { //TODO move to modifiers class
+                    if (nativeConstructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
                         if (env instanceof ClassEnvironment classEnv) {
                             if (classEnv.getId().equals(classValue.getId())) return true;
 

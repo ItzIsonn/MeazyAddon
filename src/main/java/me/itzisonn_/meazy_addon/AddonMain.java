@@ -27,12 +27,10 @@ import me.itzisonn_.meazy_addon.parser.pasing_function.AddonParsingFunctions;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
-import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AddonEvaluationFunctions;
-import me.itzisonn_.meazy_addon.runtime.environment.FileEnvironmentImpl;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
@@ -128,16 +126,6 @@ public class AddonMain extends Addon {
                         new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()),
                         fileEnvironment)) {
                     throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated variables");
-                }
-            }
-
-            for (FileEnvironment fileEnv : globalEnvironment.getFileEnvironments()) {
-                if (fileEnv instanceof FileEnvironmentImpl fileEnvironmentImpl) {
-                    for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : fileEnvironmentImpl.getVariableQueue().keySet()) {
-                        VariableDeclarationEnvironment environment = fileEnvironmentImpl.getVariableQueue().get(variableDeclarationInfo);
-                        environment.assignVariable(variableDeclarationInfo.getId(), interpreter.evaluate(variableDeclarationInfo.getValue(), environment));
-                    }
-                    fileEnvironmentImpl.getVariableQueue().clear();
                 }
             }
 
