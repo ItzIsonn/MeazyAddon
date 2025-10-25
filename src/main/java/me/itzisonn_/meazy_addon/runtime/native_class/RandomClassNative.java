@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy_addon.runtime.value.native_class;
+package me.itzisonn_.meazy_addon.runtime.native_class;
 
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;

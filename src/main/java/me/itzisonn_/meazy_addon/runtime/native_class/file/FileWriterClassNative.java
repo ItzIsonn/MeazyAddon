@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy_addon.runtime.value.native_class.file;
+package me.itzisonn_.meazy_addon.runtime.native_class.file;
 
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.InnerCollectionValue;
+import me.itzisonn_.meazy_addon.runtime.native_class.collection.InnerCollectionValue;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy_addon.runtime.value.native_class.collection;
+package me.itzisonn_.meazy_addon.runtime.native_class.collection;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -13,7 +13,7 @@ import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.util.ArrayList;

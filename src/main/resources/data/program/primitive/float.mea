@@ -1,4 +1,4 @@
-using "me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.FloatClassNative"
+using "me.itzisonn_.meazy_addon.runtime.native_class.primitive.FloatClassNative"
 
 final native class Float : Number {
     private constructor()

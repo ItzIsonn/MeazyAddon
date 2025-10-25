@@ -13,7 +13,7 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.InnerCollectionValue;
+import me.itzisonn_.meazy_addon.runtime.native_class.collection.InnerCollectionValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ContinueInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;

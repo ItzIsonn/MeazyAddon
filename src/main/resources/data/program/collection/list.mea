@@ -1,4 +1,4 @@
-using "me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative"
+using "me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative"
 
 native class List : Collection {
     private val collection

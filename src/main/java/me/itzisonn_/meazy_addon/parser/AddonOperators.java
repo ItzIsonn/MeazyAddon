@@ -10,7 +10,7 @@ import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.primitive.StringClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 import me.itzisonn_.registry.RegistryEntry;
 

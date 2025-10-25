@@ -18,7 +18,7 @@ import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.function.NativeFunctionValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
 import java.lang.reflect.AccessFlag;

@@ -3,7 +3,7 @@ package me.itzisonn_.meazy_addon;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lexer.TokenTypes;
@@ -43,7 +43,7 @@ public class AddonMain extends Addon {
     public static final String NAMESPACE = "meazy_addon";
 
     @Override
-    public void onInitialize() {
+    public void onEnable() {
         AddonModifiers.REGISTER();
         AddonOperators.REGISTER();
         AddonParsingFunctions.REGISTER();

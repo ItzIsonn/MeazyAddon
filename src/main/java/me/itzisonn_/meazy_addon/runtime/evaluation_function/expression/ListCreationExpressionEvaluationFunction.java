@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.collection_creation.ListCreationExpression;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative;
 
 import java.util.List;
 import java.util.stream.Collectors;

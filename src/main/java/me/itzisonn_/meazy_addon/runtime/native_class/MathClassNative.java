@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy_addon.runtime.value.native_class;
+package me.itzisonn_.meazy_addon.runtime.native_class;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.MeazyNativeClass;
@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.AddonUtils;
-import me.itzisonn_.meazy_addon.runtime.value.native_class.collection.ListClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 
 import java.util.ArrayList;
