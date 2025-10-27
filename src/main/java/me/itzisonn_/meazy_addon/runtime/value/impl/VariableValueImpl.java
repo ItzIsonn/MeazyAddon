@@ -2,14 +2,19 @@ package me.itzisonn_.meazy_addon.runtime.value.impl;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.registry.RegistryEntry;
 
 import java.util.Set;
 
@@ -17,7 +22,7 @@ import java.util.Set;
  * Implementation of {@link VariableValue}
  */
 @EqualsAndHashCode(callSuper = false, doNotUseGetters = true)
-public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> implements VariableValue {
+public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue<?>> implements VariableValue {
     @Getter
     private final String id;
     @Getter
@@ -26,8 +31,6 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
     private Expression rawValue;
     @Getter
     private final boolean isConstant;
-    @Getter
-    private final Set<Modifier> modifiers;
     @Getter
     private final boolean isArgument;
     @Getter
@@ -45,7 +48,7 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
      * @throws NullPointerException If either id, dataType or modifiers is null
      */
     public VariableValueImpl(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<Modifier> modifiers, boolean isArgument, VariableDeclarationEnvironment parentEnvironment) throws NullPointerException {
-        super(null);
+        super(null, modifiers);
 
         if (id == null) throw new NullPointerException("Id can't be null");
         if (dataType == null) throw new NullPointerException("DataType can't be null");
@@ -58,7 +61,6 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
         setValue(value);
         this.rawValue = null;
         this.isConstant = isConstant;
-        this.modifiers = modifiers;
         this.isArgument = isArgument;
     }
 
@@ -74,11 +76,10 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
      * @throws NullPointerException If either id, dataType or modifiers is null
      */
     public VariableValueImpl(String id, DataType dataType, Expression rawValue, boolean isConstant, Set<Modifier> modifiers, boolean isArgument, VariableDeclarationEnvironment parentEnvironment) throws NullPointerException {
-        super(null);
+        super(null, modifiers);
 
         if (id == null) throw new NullPointerException("Id can't be null");
         if (dataType == null) throw new NullPointerException("DataType can't be null");
-        if (modifiers == null) throw new NullPointerException("Modifiers can't be null");
         if (parentEnvironment == null) throw new NullPointerException("ParentEnvironment can't be null");
 
         this.id = id;
@@ -93,6 +94,7 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
 
 
 
+    @Override
     public RuntimeValue<?> getValue() {
         if (rawValue != null) {
             if (value != null) throw new RuntimeException("Invalid state of variable value");
@@ -103,6 +105,7 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
         return value;
     }
 
+    @Override
     public void setValue(RuntimeValue<?> value) throws InvalidSyntaxException, InvalidValueException {
         if (isConstant && this.value != null && this.value.getFinalValue() != null) {
             throw new InvalidSyntaxException("Can't reassign value of constant variable " + id);
@@ -112,5 +115,19 @@ public class VariableValueImpl extends RuntimeValueImpl<RuntimeValue<?>> impleme
             throw new InvalidValueException("Variable with id " + id + " requires data type " + dataType.getId());
         }
         this.value = value;
+    }
+
+
+
+    @Override
+    public boolean isAccessible(Environment environment) {
+        Identifier identifier = new VariableIdentifier(id);
+
+        for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
+            Modifier modifier = entry.getValue();
+            if (!modifier.canAccess(environment, getParentEnvironment(), identifier, getModifiers().contains(modifier))) return false;
+        }
+
+        return true;
     }
 }

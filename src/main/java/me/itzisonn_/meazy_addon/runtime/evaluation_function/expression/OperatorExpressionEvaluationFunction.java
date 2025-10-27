@@ -49,7 +49,7 @@ public class OperatorExpressionEvaluationFunction extends AbstractEvaluationFunc
             RegistryEntry<Operator> entry = Registries.OPERATORS.getEntry(operatorExpression.getOperator());
             if (entry != null) {
                 FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(entry.getIdentifier().getId(), args);
-                if (operatorFunction != null) return EvaluationHelper.callFunction(context, operatorFunction, args);
+                if (operatorFunction != null) return EvaluationHelper.callFunction(context, environment, operatorFunction, args);
             }
         }
 

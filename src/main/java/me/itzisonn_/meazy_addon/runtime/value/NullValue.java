@@ -1,13 +1,12 @@
 package me.itzisonn_.meazy_addon.runtime.value;
 
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 
 /**
  * Represents null value
  */
-public class NullValue implements RuntimeValue<Object> {
-    @Override
-    public Object getValue() {
-        return null;
+public class NullValue extends RuntimeValueImpl<Object> {
+    public NullValue() {
+        super(null);
     }
 }

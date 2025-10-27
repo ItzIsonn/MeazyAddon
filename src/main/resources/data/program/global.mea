@@ -1,4 +1,4 @@
 using "me.itzisonn_.meazy_addon.runtime.native_class.GlobalEnvironmentNative"
 
-native function print(val value:Any)
-native function println(val value:Any)
+native function print(val value)
+native function println(val value)

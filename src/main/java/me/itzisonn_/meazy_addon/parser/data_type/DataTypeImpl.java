@@ -24,7 +24,7 @@ public class DataTypeImpl implements DataType {
      *
      * @throws NullPointerException If given id is null
      */
-    public DataTypeImpl(String id, boolean isNullable) throws NullPointerException {
+    DataTypeImpl(String id, boolean isNullable) throws NullPointerException {
         if (id == null) throw new NullPointerException("Id can't be null");
 
         this.id = id;

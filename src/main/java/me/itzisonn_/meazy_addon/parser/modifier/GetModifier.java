@@ -19,7 +19,7 @@ public class GetModifier extends Modifier {
     }
 
     @Override
-    public boolean canAccess(RuntimeContext context, Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
+    public boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
         return true;
     }
 }

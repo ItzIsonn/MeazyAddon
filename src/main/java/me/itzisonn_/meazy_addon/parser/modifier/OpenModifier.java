@@ -35,7 +35,7 @@ public class OpenModifier extends Modifier {
     }
 
     @Override
-    public boolean canAccess(RuntimeContext context, Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
+    public boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
         if (hasModifier) return true;
         return environment.getParentFile() == null || environment.getParentFile().equals(requestEnvironment.getParentFile());
     }

@@ -41,14 +41,8 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
             VariableValue variableValue = variableDeclarationEnvironment.getVariable(identifier.getId());
             if (variableValue == null) throw new InvalidIdentifierException("Variable with id " + identifier.getId() + " doesn't exist");
 
-            for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
-                Modifier modifier = entry.getValue();
-                boolean hasModifier = variableValue.getModifiers().contains(modifier);
-
-                if (!modifier.canAccess(context, requestEnvironment, variableDeclarationEnvironment, identifier, hasModifier)) {
-                    if (hasModifier) throw new InvalidAccessException("Can't access variable with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
-                    else throw new InvalidAccessException("Can't access variable with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
-                }
+            if (!variableValue.isAccessible(requestEnvironment)) {
+                throw new InvalidAccessException("Can't access variable with id " + identifier.getId() + " because of its modifiers");
             }
 
             return variableValue;
@@ -68,14 +62,8 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
             FunctionValue functionValue = functionDeclarationEnvironment.getFunction(identifier.getId(), args);
             if (functionValue == null) throw new InvalidIdentifierException("Function with id " + identifier.getId() + " doesn't exist");
 
-            for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
-                Modifier modifier = entry.getValue();
-                boolean hasModifier = functionValue.getModifiers().contains(modifier);
-
-                if (!modifier.canAccess(context, requestEnvironment, functionDeclarationEnvironment, identifier, hasModifier)) {
-                    if (hasModifier) throw new InvalidAccessException("Can't access function with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
-                    else throw new InvalidAccessException("Can't access function with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
-                }
+            if (!functionValue.isAccessible(requestEnvironment)) {
+                throw new InvalidAccessException("Can't access function with id " + identifier.getId() + " because of its modifiers");
             }
 
             return functionValue;
@@ -89,7 +77,7 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
                 Modifier modifier = entry.getValue();
                 boolean hasModifier = classValue.getModifiers().contains(modifier);
 
-                if (!modifier.canAccess(context, requestEnvironment, classValue.getEnvironment().getParent(), identifier, hasModifier)) {
+                if (!modifier.canAccess(requestEnvironment, classValue.getEnvironment().getParent(), identifier, hasModifier)) {
                     if (hasModifier) throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because it has " + modifier.getId() + " modifier");
                     else throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because it doesn't have " + modifier.getId() + " modifier");
                 }

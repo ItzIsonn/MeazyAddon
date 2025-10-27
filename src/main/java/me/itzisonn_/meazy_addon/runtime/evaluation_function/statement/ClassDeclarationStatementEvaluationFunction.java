@@ -10,7 +10,6 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ClassDeclarationStatement;
-import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
@@ -59,7 +58,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
         for (String enumId : classDeclarationStatement.getEnumIds().keySet()) {
             classEnvironment.declareVariable(new VariableValueImpl(
                     enumId,
-                    new DataTypeImpl(classDeclarationStatement.getId(), false),
+                    Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(classDeclarationStatement.getId(), false),
                     (RuntimeValue<?>) null,
                     true,
                     Set.of(AddonModifiers.SHARED()),
@@ -115,7 +114,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
             ClassEnvironment enumEnvironment = EvaluationHelper.initClassEnvironment(context, classValue, classEnvironment, args);
 
             int finalEnumOrdinal = enumOrdinal;
-            enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), new DataTypeImpl("Int", false), enumEnvironment, Set.of()) {
+            enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("Int", false), enumEnvironment, Set.of()) {
                 @Override
                 public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, RuntimeContext context, FunctionEnvironment functionEnvironment) {
                     return new IntValue(finalEnumOrdinal);
@@ -129,7 +128,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
         }
 
         if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
-            classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), new DataTypeImpl("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
+            classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                 @Override
                 public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, RuntimeContext context, FunctionEnvironment functionEnvironment) {
                     return ListClassNative.newList(functionEnvironment, context, new ArrayList<>(enumValues));

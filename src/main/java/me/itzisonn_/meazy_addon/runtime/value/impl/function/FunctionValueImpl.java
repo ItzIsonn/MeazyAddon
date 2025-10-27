@@ -2,13 +2,18 @@ package me.itzisonn_.meazy_addon.runtime.value.impl.function;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
-import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.ModifierableRuntimeValueImpl;
+import me.itzisonn_.registry.RegistryEntry;
 
 import java.util.List;
 import java.util.Set;
@@ -18,12 +23,11 @@ import java.util.Set;
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public abstract class FunctionValueImpl extends RuntimeValueImpl<Object> implements FunctionValue {
+public abstract class FunctionValueImpl extends ModifierableRuntimeValueImpl<Object> implements FunctionValue {
     protected final String id;
     protected final List<CallArgExpression> args;
     protected final DataType returnDataType;
     protected final FunctionDeclarationEnvironment parentEnvironment;
-    protected final Set<Modifier> modifiers;
     protected boolean isOverridden = false;
 
     /**
@@ -34,19 +38,22 @@ public abstract class FunctionValueImpl extends RuntimeValueImpl<Object> impleme
      * @param modifiers Modifiers
      */
     public FunctionValueImpl(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
-        super(null);
+        super(null, modifiers);
         this.id = id;
         this.args = args;
         this.returnDataType = returnDataType;
         this.parentEnvironment = parentEnvironment;
-        this.modifiers = modifiers;
     }
 
+
+
+    @Override
     public void setOverridden() {
         if (!(parentEnvironment instanceof ClassEnvironment)) throw new RuntimeException("Can't make function overridden because it's not inside a class");
         isOverridden = true;
     }
 
+    @Override
     public boolean isLike(Object o) {
         if (o == this) return true;
         if (!(o instanceof FunctionValue other)) return false;
@@ -71,5 +78,19 @@ public abstract class FunctionValueImpl extends RuntimeValueImpl<Object> impleme
             return other$returnDataType == null;
         }
         else return this$returnDataType.equals(other$returnDataType);
+    }
+
+
+
+    @Override
+    public boolean isAccessible(Environment environment) {
+        Identifier identifier = new FunctionIdentifier(id);
+
+        for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
+            Modifier modifier = entry.getValue();
+            if (!modifier.canAccess(environment, getParentEnvironment(), identifier, getModifiers().contains(modifier))) return false;
+        }
+
+        return true;
     }
 }

@@ -106,6 +106,7 @@ public class AddonMain extends Addon {
 
             FileEnvironment fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, program.getFile());
             interpreter.evaluate(program, fileEnvironment);
+            globalEnvironment.addFileEnvironment(fileEnvironment);
 
             return fileEnvironment;
         });

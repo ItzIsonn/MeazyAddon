@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.json_converter.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
@@ -8,7 +9,6 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
-import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -48,7 +48,7 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
                 value = jsonDeserializationContext.deserialize(declarationObject.get("value"), Expression.class);
             }
 
-            return new VariableDeclarationStatement.VariableDeclarationInfo(id, new DataTypeImpl(dataTypeId, dataTypeIsNullable), value);
+            return new VariableDeclarationStatement.VariableDeclarationInfo(id, Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(dataTypeId, dataTypeIsNullable), value);
         }).toList();
 
         return new VariableDeclarationStatement(modifiers, isConstant, declarationInfos);

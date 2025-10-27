@@ -526,7 +526,7 @@ public final class EvaluationHelper {
         return classEnvironment;
     }
 
-    public static RuntimeValue<?> callFunction(RuntimeContext context, FunctionValue functionValue, List<RuntimeValue<?>> args) {
+    public static RuntimeValue<?> callFunction(RuntimeContext context, Environment callEnvironment, FunctionValue functionValue, List<RuntimeValue<?>> args) {
         if (functionValue.getArgs().size() != args.size()) {
             throw new InvalidCallException("Expected " + functionValue.getArgs().size() + " args but found " + args.size());
         }
@@ -553,6 +553,12 @@ public final class EvaluationHelper {
                 params1.add(FunctionEnvironment.class);
                 Class<?>[] array1 = params1.toArray(Class[]::new);
 
+                ArrayList<Class<?>> params3 = new ArrayList<>(Collections.nCopies(functionValue.getArgs().size(), RuntimeValue.class));
+                params3.add(RuntimeContext.class);
+                params3.add(FunctionEnvironment.class);
+                params3.add(Environment.class);
+                Class<?>[] array3 = params3.toArray(Class[]::new);
+
                 ArrayList<Class<?>> params2 = new ArrayList<>(Collections.nCopies(functionValue.getArgs().size(), RuntimeValue.class));
                 params2.add(FunctionEnvironment.class);
                 Class<?>[] array2 = params2.toArray(Class[]::new);
@@ -560,18 +566,26 @@ public final class EvaluationHelper {
                 for (Class<?> nativeClass : runtimeFunctionValue.getParentEnvironment().getFileEnvironment().getNativeClasses()) {
                     Method method;
                     boolean hasContext;
+                    boolean hasSecond = false;
 
                     try {
                         method = nativeClass.getDeclaredMethod(functionValue.getId(), array1);
                         hasContext = true;
                     }
-                    catch (NoSuchMethodException ignore) {
+                    catch (NoSuchMethodException _) {
                         try {
                             method = nativeClass.getDeclaredMethod(functionValue.getId(), array2);
                             hasContext = false;
                         }
-                        catch (NoSuchMethodException ignore1) {
-                            continue;
+                        catch (NoSuchMethodException _) {
+                            try {
+                                method = nativeClass.getDeclaredMethod(functionValue.getId(), array3);
+                                hasContext = true;
+                                hasSecond = true;
+                            }
+                            catch (NoSuchMethodException _) {
+                                continue;
+                            }
                         }
                     }
 
@@ -589,6 +603,7 @@ public final class EvaluationHelper {
                         ArrayList<Object> methodArgs = new ArrayList<>(args);
                         if (hasContext) methodArgs.add(context);
                         methodArgs.add(functionEnvironment);
+                        if (hasSecond) methodArgs.add(callEnvironment);
                         Object object = method.invoke(null, methodArgs.toArray());
 
                         if (method.getReturnType().equals(Void.TYPE)) {
@@ -597,15 +612,18 @@ public final class EvaluationHelper {
                         }
                         else {
                             return checkReturnValue(
-                                    ((RuntimeValue<?>) object).getFinalRuntimeValue(),
+                                    object == null ? null : ((RuntimeValue<?>) object).getFinalRuntimeValue(),
                                     functionValue.getReturnDataType(),
                                     functionValue.getId(),
                                     true,
                                     functionEnvironment.getFileEnvironment());
                         }
                     }
-                    catch (IllegalAccessException | InvocationTargetException e) {
+                    catch (IllegalAccessException e) {
                         throw new RuntimeException("Failed to call native method with id " + method.getName(), e);
+                    }
+                    catch (InvocationTargetException e) {
+                        throw new RuntimeException(e.getCause());
                     }
                 }
 

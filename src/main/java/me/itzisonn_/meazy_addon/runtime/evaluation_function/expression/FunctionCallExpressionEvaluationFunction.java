@@ -33,6 +33,6 @@ public class FunctionCallExpressionEvaluationFunction extends AbstractEvaluation
             throw new InvalidCallException("Can't call " + function.getValue() + " because it's not a function");
         }
 
-        return EvaluationHelper.callFunction(context, functionValue, args);
+        return EvaluationHelper.callFunction(context, extraEnvironment, functionValue, args);
     }
 }

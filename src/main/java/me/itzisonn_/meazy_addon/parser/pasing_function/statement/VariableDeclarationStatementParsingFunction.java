@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Modifier;
@@ -10,7 +11,6 @@ import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.NullLiteral;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
-import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 
@@ -52,7 +52,7 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
         String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
 
         DataType dataType = ParsingHelper.parseDataType(context);
-        if (dataType == null) dataType = new DataTypeImpl("Any", true);
+        if (dataType == null) dataType = Registries.DATA_TYPE_FACTORY.getEntry().getValue().create();
 
         if (!parser.getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
             if (canWithoutValue) {

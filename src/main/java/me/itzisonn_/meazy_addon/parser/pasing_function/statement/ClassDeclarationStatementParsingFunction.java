@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
@@ -27,7 +28,6 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.literal.NullLiteral;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.StringLiteral;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.ThisLiteral;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
-import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
@@ -189,7 +189,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 "toString",
                 List.of(),
                 List.of(new ReturnStatement(toStringExpression)),
-                new DataTypeImpl("String", false)));
+                Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("String", false)));
 
         List<Expression> copyArgs = new ArrayList<>();
         for (CallArgExpression dataVariable : dataVariables) {
@@ -200,7 +200,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 "copy",
                 List.of(),
                 List.of(new ReturnStatement(new ClassCallExpression(new ClassIdentifier(id), copyArgs))),
-                new DataTypeImpl(id, false)));
+                Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(id, false)));
 
         Expression equalsExpression;
         if (!dataVariables.isEmpty()) {
@@ -234,7 +234,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         body.add(new FunctionDeclarationStatement(
                 Set.of(AddonModifiers.OPERATOR()),
                 "equals",
-                List.of(new CallArgExpression("value", new DataTypeImpl("Any", true), true)),
+                List.of(new CallArgExpression("value", Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(), true)),
                 List.of(
                         new IfStatement(
                                 new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "==", OperatorType.INFIX),
@@ -245,7 +245,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new ReturnStatement(equalsExpression)),
-                new DataTypeImpl("Boolean", false)
+                Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("Boolean", false)
         ));
 
         return body;

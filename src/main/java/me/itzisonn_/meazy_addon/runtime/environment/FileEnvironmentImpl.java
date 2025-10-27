@@ -68,6 +68,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         else if (getVariableDeclarationEnvironment(value.getId()) != null) {
             throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
         }
+
         variables.add(value);
     }
 
@@ -107,6 +108,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         if (variableValue != null) return variableValue;
 
         for (FileEnvironment fileEnvironment : getParent().getFileEnvironments()) {
+            if (fileEnvironment == this) continue;
             variableValue = fileEnvironment.getLocalVariable(id);
             if (variableValue != null) return variableValue;
         }
@@ -120,6 +122,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         if (functionValue != null) return functionValue;
 
         for (FileEnvironment fileEnvironment : getParent().getFileEnvironments()) {
+            if (fileEnvironment == this) continue;
             functionValue = fileEnvironment.getLocalFunction(id, args);
             if (functionValue != null) return functionValue;
         }
@@ -149,6 +152,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         if (classValue != null) return classValue;
 
         for (FileEnvironment fileEnvironment : getParent().getFileEnvironments()) {
+            if (fileEnvironment == this) continue;
             classValue = fileEnvironment.getLocalClass(id);
             if (classValue != null) return classValue;
         }

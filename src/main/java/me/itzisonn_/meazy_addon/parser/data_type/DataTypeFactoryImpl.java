@@ -13,4 +13,9 @@ public class DataTypeFactoryImpl implements DataTypeFactory {
     public DataType create(String id) {
         return new DataTypeImpl(id, true);
     }
+
+    @Override
+    public DataType create() {
+        return new DataTypeImpl("Any", true);
+    }
 }

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function;
 
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
@@ -12,7 +13,6 @@ import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
-import me.itzisonn_.meazy_addon.parser.data_type.DataTypeImpl;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 
 import java.util.*;
@@ -122,9 +122,9 @@ public final class ParsingHelper {
 
             if (parser.getCurrent().getType().equals(AddonTokenTypes.QUESTION())) {
                 parser.getCurrentAndNext();
-                return new DataTypeImpl(dataTypeId, true);
+                return Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(dataTypeId, true);
             }
-            return new DataTypeImpl(dataTypeId, false);
+            return Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(dataTypeId, false);
         }
         return null;
     }
