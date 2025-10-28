@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ConstructorDeclarationStatement;
@@ -29,18 +29,18 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
         parser.getCurrentAndNext(AddonTokenTypes.CONSTRUCTOR(), "Expected constructor keyword");
 
-        List<CallArgExpression> args = ParsingHelper.parseCallArgs(context);
+        List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
 
         if (modifiers.contains(AddonModifiers.NATIVE())) {
             parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
-            return new ConstructorDeclarationStatement(modifiers, args, new ArrayList<>());
+            return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
         boolean hasNewLine = parser.getCurrent().getType().equals(TokenTypes.NEW_LINE());
         parser.moveOverOptionalNewLines();
 
         if (!parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE()) && hasNewLine) {
-            return new ConstructorDeclarationStatement(modifiers, args, new ArrayList<>());
+            return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
         parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
@@ -57,6 +57,6 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
         parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
-        return new ConstructorDeclarationStatement(modifiers, args, body);
+        return new ConstructorDeclarationStatement(modifiers, parameters, body);
     }
 }

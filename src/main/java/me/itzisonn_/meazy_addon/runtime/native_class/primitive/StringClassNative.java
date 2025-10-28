@@ -12,9 +12,10 @@ import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
+import me.itzisonn_.meazy.runtime.native_annotation.NewInstance;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
@@ -328,6 +329,7 @@ public class StringClassNative {
 
 
 
+    @NewInstance
     public static ClassValue newInstance(Set<String> baseClasses, ClassEnvironment classEnvironment, List<Statement> body) {
         return new StringClassValue(baseClasses, classEnvironment, body);
     }

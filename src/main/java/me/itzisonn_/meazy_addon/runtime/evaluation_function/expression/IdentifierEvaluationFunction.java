@@ -14,8 +14,8 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidAccessException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
 import me.itzisonn_.registry.RegistryEntry;
 

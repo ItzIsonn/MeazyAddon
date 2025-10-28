@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 
@@ -16,21 +16,12 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Implementation of {@link ClassValue}
- */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class ClassValueImpl extends RuntimeValueImpl<Object> implements ClassValue {
     protected final Set<String> baseClasses;
     protected final ClassEnvironment environment;
 
-    /**
-     * @param baseClasses Base classes
-     * @param environment Environment
-     *
-     * @throws NullPointerException If either baseClasses or environment is null
-     */
     public ClassValueImpl(Set<String> baseClasses, ClassEnvironment environment) throws NullPointerException {
         super(null);
 

@@ -5,8 +5,8 @@ import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 
 import java.io.File;
 import java.util.HashSet;

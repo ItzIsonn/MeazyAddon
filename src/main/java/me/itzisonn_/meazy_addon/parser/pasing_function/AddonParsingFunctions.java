@@ -35,7 +35,7 @@ public final class AddonParsingFunctions {
         register(new ClassDeclarationStatementParsingFunction());
         register(new ClassBodyStatementParsingFunction());
         register(new FunctionDeclarationStatementParsingFunction());
-        register(new FunctionArgExpressionParsingFunction());
+        register(new ParameterExpressionParsingFunction());
         register(new VariableDeclarationStatementParsingFunction());
         register(new ConstructorDeclarationStatementParsingFunction());
         register(new BaseCallStatementParsingFunction());

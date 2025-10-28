@@ -2,8 +2,6 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.RuntimeContext;
-import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
@@ -11,27 +9,15 @@ import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.NativeClassValue;
-import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.value.constructor.ConstructorValue;
-import me.itzisonn_.meazy.runtime.value.constructor.NativeConstructorValue;
-import me.itzisonn_.meazy.runtime.value.constructor.RuntimeConstructorValue;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
-import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
-import me.itzisonn_.meazy_addon.parser.ast.statement.BaseCallStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
-import me.itzisonn_.meazy_addon.runtime.value.BaseClassIdValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
 
-import java.lang.reflect.AccessFlag;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public final class EvaluationHelper {
@@ -68,21 +54,19 @@ public final class EvaluationHelper {
         return booleanValue.getValue();
     }
 
-    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, boolean isDefault, FileEnvironment fileEnvironment) {
-        String defaultString = isDefault ? ". It's probably an Addon's error" : "";
-
+    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, FileEnvironment fileEnvironment) {
         if (returnValue == null) {
             if (returnDataType != null) {
-                throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value" + defaultString);
+                throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value");
             }
             return null;
         }
         if (returnDataType == null) {
-            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing" + defaultString);
+            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing");
         }
 
         if (!returnDataType.isMatches(returnValue, fileEnvironment)) {
-            throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")" + defaultString);
+            throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")");
         }
 
         return returnValue;
@@ -163,44 +147,7 @@ public final class EvaluationHelper {
 
     public static ClassValue callClassValue(RuntimeContext context, ClassValue classValue, Environment callEnvironment, List<RuntimeValue<?>> args) {
         ClassEnvironment classEnvironment = initClassEnvironment(context, classValue, callEnvironment, args);
-
-        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
-            if (runtimeClassValue.getModifiers().contains(AddonModifiers.NATIVE())) {
-                for (Class<?> nativeClass : runtimeClassValue.getEnvironment().getFileEnvironment().getNativeClasses()) {
-                    Method method;
-                    try {
-                        method = nativeClass.getDeclaredMethod("newInstance", Set.class, ClassEnvironment.class, List.class);
-                    }
-                    catch (NoSuchMethodException e) {
-                        continue;
-                    }
-
-                    if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                        throw new InvalidSyntaxException("Can't call non-public static native method to create new instance of class with id " + classEnvironment.getId());
-                    }
-                    if (!method.canAccess(null)) {
-                        throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
-                    }
-                    if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
-                        throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
-                    }
-
-                    try {
-                        Object object = method.invoke(null, classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-                        return (ClassValue) object;
-                    }
-                    catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException("Failed to call native method", e);
-                    }
-                }
-            }
-
-            return new RuntimeClassValueImpl(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-        }
-
-        if (classValue instanceof NativeClassValue nativeClassValue) return nativeClassValue.newInstance(nativeClassValue.getBaseClasses(), classEnvironment);
-
-        throw new InvalidCallException("Can't call " + classValue.getClass().getName() + " because it's unknown class");
+        return classValue.newInstance(classEnvironment);
     }
 
     public static ClassEnvironment initClassEnvironment(RuntimeContext context, ClassValue classValue, Environment callEnvironment, List<RuntimeValue<?>> args) {
@@ -212,175 +159,70 @@ public final class EvaluationHelper {
         ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment);
         Interpreter interpreter = context.getInterpreter();
 
+        classValue.setupEnvironment(context, classEnvironment);
+
+        for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
+            if (functionDeclarationStatement.getClassId().equals(classValue.getId())) {
+                interpreter.evaluate(new FunctionDeclarationStatement(
+                        functionDeclarationStatement.getModifiers(),
+                        functionDeclarationStatement.getId(),
+                        null,
+                        functionDeclarationStatement.getParameters(),
+                        functionDeclarationStatement.getBody(),
+                        functionDeclarationStatement.getReturnDataType()
+                ), classEnvironment);
+            }
+        }
+
         Set<String> calledBaseClasses = new HashSet<>();
-        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
-            for (Statement statement : runtimeClassValue.getBody()) {
-                interpreter.evaluate(statement, classEnvironment);
-            }
-            for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
-                if (functionDeclarationStatement.getClassId().equals(runtimeClassValue.getId())) {
-                    interpreter.evaluate(new FunctionDeclarationStatement(
-                            functionDeclarationStatement.getModifiers(),
-                            functionDeclarationStatement.getId(),
-                            null,
-                            functionDeclarationStatement.getArgs(),
-                            functionDeclarationStatement.getBody(),
-                            functionDeclarationStatement.getReturnDataType()
-                    ), classEnvironment);
+        if (classEnvironment.hasConstructor()) {
+            ConstructorValue constructorValue = classEnvironment.getConstructor(args);
+            if (constructorValue == null) throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
+
+            if (constructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
+                if (env instanceof ClassEnvironment classEnv) {
+                    return classEnv.getId().equals(classValue.getId());
                 }
+                return false;
+            })) {
+                throw new InvalidCallException("Requested constructor has private access");
             }
 
-            if (classEnvironment.hasConstructor()) {
-                ConstructorValue rawConstructor = classEnvironment.getConstructor(args);
-                if (rawConstructor == null) throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
+            if (constructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
+                if (env instanceof ClassEnvironment classEnv) {
+                    if (classEnv.getId().equals(classValue.getId())) return true;
 
-                if (rawConstructor instanceof RuntimeConstructorValue runtimeConstructorValue) {
-                    if (runtimeConstructorValue.getModifiers().contains(AddonModifiers.NATIVE())) {
-                        ArrayList<Class<?>> params = new ArrayList<>(Collections.nCopies(runtimeConstructorValue.getArgs().size(), RuntimeValue.class));
-                        params.add(ConstructorEnvironment.class);
-                        Class<?>[] array = params.toArray(Class[]::new);
-
-                        boolean hasFound = false;
-                        for (Class<?> nativeClass : runtimeConstructorValue.getParentEnvironment().getFileEnvironment().getNativeClasses()) {
-                            Method method;
-                            try {
-                                method = nativeClass.getDeclaredMethod("constructor", array);
-                            }
-                            catch (NoSuchMethodException e) {
-                                continue;
-                            }
-
-                            if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                                throw new InvalidSyntaxException("Can't call non-public static native constructor");
-                            }
-                            if (!method.canAccess(null)) {
-                                throw new InvalidSyntaxException("Can't call non-accessible native constructor");
-                            }
-                            if (!method.getReturnType().equals(Void.TYPE)) {
-                                throw new RuntimeException("Return value of native constructor with id " + method.getName() + " is invalid");
-                            }
-
-                            try {
-                                ArrayList<Object> constructorArgs = new ArrayList<>(args);
-                                constructorArgs.add(constructorEnvironment);
-                                method.invoke(null, constructorArgs.toArray());
-                                hasFound = true;
-                            }
-                            catch (IllegalAccessException | InvocationTargetException e) {
-                                throw new RuntimeException("Failed to call native constructor", e);
-                            }
-                        }
-
-                        if (!hasFound) throw new InvalidSyntaxException("Can't find native constructor");
+                    ClassValue parentClassValue = callEnvironment.getFileEnvironment().getClass(classEnv.getId());
+                    if (parentClassValue == null) {
+                        throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
                     }
-
-                    if (runtimeConstructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
-                        if (env instanceof ClassEnvironment classEnv) {
-                            return classEnv.getId().equals(classValue.getId());
-                        }
-                        return false;
-                    })) {
-                        throw new InvalidCallException("Requested constructor has private access");
-                    }
-
-                    if (runtimeConstructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
-                        if (env instanceof ClassEnvironment classEnv) {
-                            if (classEnv.getId().equals(classValue.getId())) return true;
-
-                            ClassValue parentClassValue = callEnvironment.getFileEnvironment().getClass(classEnv.getId());
-                            if (parentClassValue == null) {
-                                throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
-                            }
-                            return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(classValue.getId()));
-                        }
-                        return false;
-                    })) {
-                        throw new InvalidCallException("Requested constructor has protected access");
-                    }
-
-                    if (!runtimeConstructorValue.getModifiers().contains(AddonModifiers.OPEN()) && classEnvironment.getParentFile() != null &&
-                            !classEnvironment.getParentFile().equals(callEnvironment.getParentFile())) {
-                        throw new InvalidAccessException("Can't access non-open constructor from different file (" + callEnvironment.getParentFile().getName() + ")");
-                    }
-
-                    for (int i = 0; i < runtimeConstructorValue.getArgs().size(); i++) {
-                        CallArgExpression callArgExpression = runtimeConstructorValue.getArgs().get(i);
-
-                        constructorEnvironment.declareVariable(new VariableValueImpl(
-                                callArgExpression.getId(),
-                                callArgExpression.getDataType(),
-                                args.get(i),
-                                callArgExpression.isConstant(),
-                                new HashSet<>(),
-                                true,
-                                constructorEnvironment
-                        ));
-                    }
-
-                    for (Statement statement : runtimeConstructorValue.getBody()) {
-                        if (statement instanceof BaseCallStatement) {
-                            RuntimeValue<?> value = interpreter.evaluate(statement, constructorEnvironment, classEnvironment);
-                            if (!(value instanceof BaseClassIdValue baseClassIdValue)) throw new RuntimeException("Unknown error occurred");
-                            if (!classValue.getBaseClasses().contains(baseClassIdValue.getValue()))
-                                throw new InvalidSyntaxException("Can't call base class " + baseClassIdValue.getValue() + " because it's not base class of class " + classValue.getId());
-                            calledBaseClasses.add(baseClassIdValue.getValue());
-                        }
-                        else interpreter.evaluate(statement, constructorEnvironment);
-                    }
+                    return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(classValue.getId()));
                 }
+                return false;
+            })) {
+                throw new InvalidCallException("Requested constructor has protected access");
             }
-            else if (!args.isEmpty()) {
-                throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
+
+            if (!constructorValue.getModifiers().contains(AddonModifiers.OPEN()) && classEnvironment.getParentFile() != null &&
+                    !classEnvironment.getParentFile().equals(callEnvironment.getParentFile())) {
+                throw new InvalidAccessException("Can't access non-open constructor from different file (" + callEnvironment.getParentFile().getName() + ")");
             }
+
+            Set<String> constructorCalled = constructorValue.run(context, constructorEnvironment, callEnvironment, args);
+            calledBaseClasses.addAll(constructorCalled);
         }
-        else if (classValue instanceof NativeClassValue nativeClassValue) {
-            nativeClassValue.setupEnvironment(classEnvironment);
-
-            if (classEnvironment.hasConstructor()) {
-                RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
-                if (rawConstructor == null) throw new InvalidCallException("Class with id " + nativeClassValue.getId() + " doesn't have requested constructor");
-
-                if (rawConstructor instanceof NativeConstructorValue nativeConstructorValue) {
-                    if (nativeConstructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
-                        if (env instanceof ClassEnvironment classEnv) {
-                            return classEnv.getId().equals(nativeClassValue.getId());
-                        }
-                        return false;
-                    })) {
-                        throw new InvalidCallException("Requested constructor has private access");
-                    }
-
-                    if (nativeConstructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
-                        if (env instanceof ClassEnvironment classEnv) {
-                            if (classEnv.getId().equals(classValue.getId())) return true;
-
-                            ClassValue parentClassValue = callEnvironment.getFileEnvironment().getClass(classEnv.getId());
-                            if (parentClassValue == null) {
-                                throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
-                            }
-                            return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(classValue.getId()));
-                        }
-                        return false;
-                    })) {
-                        throw new InvalidCallException("Requested constructor has protected access");
-                    }
-
-                    if (!nativeConstructorValue.getModifiers().contains(AddonModifiers.OPEN()) &&
-                            !classEnvironment.getParentFile().equals(callEnvironment.getParentFile())) {
-                        throw new InvalidAccessException("Can't access non-open constructor from different file (" + callEnvironment.getParentFile().getName() + ")");
-                    }
-
-                    nativeConstructorValue.run(args, context, constructorEnvironment);
-                }
-            }
-            else if (!args.isEmpty()) throw new InvalidCallException("Class with id " + nativeClassValue.getId() + " doesn't have requested constructor");
+        else if (!args.isEmpty()) {
+            throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
         }
-        else throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
 
         for (VariableValue variableValue : classEnvironment.getVariables()) {
             if (variableValue.isConstant() && variableValue.getValue() == null) {
                 throw new InvalidSyntaxException("Empty constant variable with id " + variableValue.getId() + " hasn't been initialized");
             }
+        }
+
+        for (String baseClass : calledBaseClasses) {
+            if (!classValue.getBaseClasses().contains(baseClass)) throw new InvalidSyntaxException("Can't call base class " + baseClass + " because it's not base class of class " + classValue.getId());
         }
 
         for (String baseClass : classValue.getBaseClasses()) {
@@ -419,43 +261,7 @@ public final class EvaluationHelper {
 
     public static ClassValue callEmptyClassValue(RuntimeContext context, ClassValue classValue) {
         ClassEnvironment classEnvironment = initEmptyClassEnvironment(context, classValue);
-
-        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
-            if (runtimeClassValue.getModifiers().contains(AddonModifiers.NATIVE())) {
-                for (Class<?> nativeClass : classEnvironment.getFileEnvironment().getNativeClasses()) {
-                    Method method;
-                    try {
-                        method = nativeClass.getDeclaredMethod("newInstance", Set.class, ClassEnvironment.class, List.class);
-                    }
-                    catch (NoSuchMethodException e) {
-                        continue;
-                    }
-
-                    if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                        throw new InvalidSyntaxException("Can't call non-public static native method to create new instance of class with id " + classEnvironment.getId());
-                    }
-                    if (!method.canAccess(null)) {
-                        throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
-                    }
-                    if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
-                        throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
-                    }
-
-                    try {
-                        Object object = method.invoke(null, classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-                        return (ClassValue) object;
-                    }
-                    catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException("Failed to call native method", e);
-                    }
-                }
-            }
-
-            return new RuntimeClassValueImpl(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
-        }
-        if (classValue instanceof NativeClassValue nativeClassValue) return nativeClassValue.newInstance(nativeClassValue.getBaseClasses(), classEnvironment);
-
-        throw new InvalidCallException("Can't call " + classValue.getClass().getName() + " because it's unknown class");
+        return classValue.newInstance(classEnvironment);
     }
 
     public static ClassEnvironment initEmptyClassEnvironment(RuntimeContext context, ClassValue classValue) {
@@ -467,27 +273,20 @@ public final class EvaluationHelper {
         ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment);
         Interpreter interpreter = context.getInterpreter();
 
-        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
-            for (Statement statement : runtimeClassValue.getBody()) {
-                interpreter.evaluate(statement, classEnvironment);
-            }
-            for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
-                if (functionDeclarationStatement.getClassId().equals(runtimeClassValue.getId())) {
-                    interpreter.evaluate(new FunctionDeclarationStatement(
-                            functionDeclarationStatement.getModifiers(),
-                            functionDeclarationStatement.getId(),
-                            null,
-                            functionDeclarationStatement.getArgs(),
-                            functionDeclarationStatement.getBody(),
-                            functionDeclarationStatement.getReturnDataType()
-                    ), classEnvironment);
-                }
+        classValue.setupEnvironment(context, classEnvironment);
+
+        for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
+            if (functionDeclarationStatement.getClassId().equals(classValue.getId())) {
+                interpreter.evaluate(new FunctionDeclarationStatement(
+                        functionDeclarationStatement.getModifiers(),
+                        functionDeclarationStatement.getId(),
+                        null,
+                        functionDeclarationStatement.getParameters(),
+                        functionDeclarationStatement.getBody(),
+                        functionDeclarationStatement.getReturnDataType()
+                ), classEnvironment);
             }
         }
-        else if (classValue instanceof NativeClassValue nativeClassValue) {
-            nativeClassValue.setupEnvironment(classEnvironment);
-        }
-        else throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
 
         for (String baseClass : classValue.getBaseClasses()) {
             ClassValue baseClassValue = classEnvironment.getFileEnvironment().getClass(baseClass);
@@ -523,8 +322,8 @@ public final class EvaluationHelper {
     }
 
     public static RuntimeValue<?> callFunction(RuntimeContext context, Environment callEnvironment, FunctionValue functionValue, List<RuntimeValue<?>> args) {
-        if (functionValue.getArgs().size() != args.size()) {
-            throw new InvalidCallException("Expected " + functionValue.getArgs().size() + " args but found " + args.size());
+        if (functionValue.getParameters().size() != args.size()) {
+            throw new InvalidCallException("Expected " + functionValue.getParameters().size() + " args but found " + args.size());
         }
 
         FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
@@ -538,7 +337,6 @@ public final class EvaluationHelper {
                 result,
                 functionValue.getReturnDataType(),
                 functionValue.getId(),
-                functionValue instanceof NativeFunctionValue,
                 functionEnvironment.getFileEnvironment());
     }
 }

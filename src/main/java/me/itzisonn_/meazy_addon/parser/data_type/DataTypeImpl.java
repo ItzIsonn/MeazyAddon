@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 
 /**

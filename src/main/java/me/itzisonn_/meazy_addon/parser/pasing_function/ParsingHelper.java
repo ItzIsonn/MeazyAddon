@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.version.Version;
@@ -75,23 +75,23 @@ public final class ParsingHelper {
         }
     }
 
-    public static List<CallArgExpression> parseCallArgs(ParsingContext context) {
+    public static List<ParameterExpression> parseParameters(ParsingContext context) {
         Parser parser = context.getParser();
 
-        parser.getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
-        List<CallArgExpression> args = new ArrayList<>();
+        parser.getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open parameters");
+        List<ParameterExpression> parameters = new ArrayList<>();
 
         if (!parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_PAREN())) {
-            args.add(parser.parse(AddonMain.getIdentifier("function_arg"), CallArgExpression.class));
+            parameters.add(parser.parse(AddonMain.getIdentifier("parameter_expression"), ParameterExpression.class));
 
             while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
                 parser.getCurrentAndNext();
-                args.add(parser.parse(AddonMain.getIdentifier("function_arg"), CallArgExpression.class));
+                parameters.add(parser.parse(AddonMain.getIdentifier("parameter_expression"), ParameterExpression.class));
             }
         }
 
-        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
-        return args;
+        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close parameters");
+        return parameters;
     }
 
     public static List<Expression> parseArgs(ParsingContext context) {

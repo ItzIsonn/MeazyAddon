@@ -2,13 +2,13 @@ package me.itzisonn_.meazy_addon.runtime.environment;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.constructor.ConstructorValue;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 
 import java.util.HashSet;
 import java.util.List;
@@ -87,18 +87,16 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
     @Override
     public void declareOperatorFunction(FunctionValue value) {
-        List<CallArgExpression> args = value.getArgs();
+        List<ParameterExpression> parameters = value.getParameters();
 
         main:
         for (FunctionValue functionValue : operatorFunctions) {
             if (functionValue.getId().equals(value.getId())) {
-                List<CallArgExpression> callArgExpressions = functionValue.getArgs();
+                List<ParameterExpression> otherParameters = functionValue.getParameters();
+                if (parameters.size() != otherParameters.size()) continue;
 
-                if (args.size() != callArgExpressions.size()) continue;
-
-                for (int i = 0; i < args.size(); i++) {
-                    CallArgExpression callArgExpression = callArgExpressions.get(i);
-                    if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
+                for (int i = 0; i < parameters.size(); i++) {
+                    if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
                 throw new InvalidSyntaxException("Function for operator " + value.getId() + " already exists");
@@ -144,20 +142,18 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
     @Override
     public void declareConstructor(ConstructorValue value) {
-        List<CallArgExpression> args = value.getArgs();
+        List<ParameterExpression> parameters = value.getParameters();
 
         main:
         for (ConstructorValue constructorValue : constructors) {
-            List<CallArgExpression> callArgExpressions = constructorValue.getArgs();
+            List<ParameterExpression> otherParameters = constructorValue.getParameters();
+            if (parameters.size() != otherParameters.size()) continue;
 
-            if (args.size() != callArgExpressions.size()) continue;
-
-            for (int i = 0; i < args.size(); i++) {
-                CallArgExpression callArgExpression = callArgExpressions.get(i);
-                if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
+            for (int i = 0; i < parameters.size(); i++) {
+                if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
             }
 
-            throw new InvalidSyntaxException("Constructor with these args already exists");
+            throw new InvalidSyntaxException("Constructor with these parameters already exists");
         }
 
         constructors.add(value);

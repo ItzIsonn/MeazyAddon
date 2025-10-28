@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
@@ -33,13 +33,13 @@ public class ConstructorDeclarationStatementConverter extends Converter<Construc
             return modifier;
         }).collect(Collectors.toSet());
 
-        List<CallArgExpression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
-                (CallArgExpression) jsonDeserializationContext.deserialize(arg, CallArgExpression.class)).collect(Collectors.toList());
+        List<ParameterExpression> parameters = getElement(object, "parameters").getAsJsonArray().asList().stream().map(arg ->
+                (ParameterExpression) jsonDeserializationContext.deserialize(arg, ParameterExpression.class)).collect(Collectors.toList());
 
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new ConstructorDeclarationStatement(modifiers, args, body);
+        return new ConstructorDeclarationStatement(modifiers, parameters, body);
     }
 
     @Override
@@ -52,11 +52,11 @@ public class ConstructorDeclarationStatementConverter extends Converter<Construc
         }
         result.add("modifiers", modifiers);
 
-        JsonArray args = new JsonArray();
-        for (CallArgExpression arg : constructorDeclarationStatement.getArgs()) {
-            args.add(jsonSerializationContext.serialize(arg));
+        JsonArray parameters = new JsonArray();
+        for (ParameterExpression parameter : constructorDeclarationStatement.getParameters()) {
+            parameters.add(jsonSerializationContext.serialize(parameter));
         }
-        result.add("args", args);
+        result.add("parameters", parameters);
 
         JsonArray body = new JsonArray();
         for (Statement statement : constructorDeclarationStatement.getBody()) {

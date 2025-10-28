@@ -12,20 +12,17 @@ import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AddonParsingFunctions;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
-import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
@@ -33,7 +30,6 @@ import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
-import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
@@ -130,38 +126,13 @@ public class AddonMain extends Addon {
                 }
             }
 
-            RuntimeValue<?> runtimeValue = fileEnvironment.getFunction("main", new ArrayList<>());
-            if (runtimeValue == null) {
+            FunctionValue function = fileEnvironment.getFunction("main", List.of());
+            if (function == null) {
                 MeazyMain.LOGGER.log(Level.WARN, "File doesn't contain main function");
                 return fileEnvironment;
             }
 
-            if (!(runtimeValue instanceof RuntimeFunctionValue runtimeFunctionValue)) {
-                MeazyMain.LOGGER.log(Level.WARN, "File contains invalid main function");
-                return fileEnvironment;
-            }
-            if (!runtimeFunctionValue.getArgs().isEmpty()) throw new InvalidArgumentException("Main function must have no args");
-
-            FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(fileEnvironment);
-
-            for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
-                Statement statement = runtimeFunctionValue.getBody().get(i);
-                if (statement instanceof ReturnStatement returnStatement) {
-                    if (returnStatement.getValue() != null) {
-                        throw new InvalidSyntaxException("Found return statement but function must return nothing");
-                    }
-                    if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
-                    break;
-                }
-
-                RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
-                if (value instanceof ReturnInfoValue returnInfoValue) {
-                    if (returnInfoValue.getFinalValue() != null) {
-                        throw new InvalidSyntaxException("Found return statement but function must return nothing");
-                    }
-                    break;
-                }
-            }
+            EvaluationHelper.callFunction(context, fileEnvironment, function, List.of());
 
             return fileEnvironment;
         });

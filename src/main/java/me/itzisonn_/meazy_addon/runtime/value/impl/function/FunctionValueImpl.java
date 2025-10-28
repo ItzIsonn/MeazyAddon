@@ -7,40 +7,35 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.ModifierableRuntimeValueImpl;
 import me.itzisonn_.registry.RegistryEntry;
 
 import java.util.List;
 import java.util.Set;
 
-/**
- * Implementation of {@link FunctionValue}
- */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class FunctionValueImpl extends ModifierableRuntimeValueImpl<Object> implements FunctionValue {
     protected final String id;
-    protected final List<CallArgExpression> args;
+    protected final List<ParameterExpression> parameters;
     protected final DataType returnDataType;
     protected final FunctionDeclarationEnvironment parentEnvironment;
     protected boolean isOverridden = false;
 
-    /**
-     * @param id Id
-     * @param args Args
-     * @param returnDataType Which DataType should this function return or null
-     * @param parentEnvironment Parent environment
-     * @param modifiers Modifiers
-     */
-    public FunctionValueImpl(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
+    public FunctionValueImpl(String id, List<ParameterExpression> parameters, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) throws NullPointerException {
         super(null, modifiers);
+
+        if (id == null) throw new NullPointerException("Id can't be null");
+        if (parameters == null) throw new NullPointerException("Parameters can't be null");
+        if (parentEnvironment == null) throw new NullPointerException("ParentEnvironment can't be null");
+
         this.id = id;
-        this.args = args;
+        this.parameters = parameters;
         this.returnDataType = returnDataType;
         this.parentEnvironment = parentEnvironment;
     }
@@ -65,12 +60,12 @@ public abstract class FunctionValueImpl extends ModifierableRuntimeValueImpl<Obj
         }
         else if (!this$id.equals(other$id)) return false;
 
-        Object this$args = this.getArgs();
-        Object other$args = other.getArgs();
-        if (this$args == null) {
-            if (other$args != null) return false;
+        Object this$parameters = this.getParameters();
+        Object other$parameters = other.getParameters();
+        if (this$parameters == null) {
+            if (other$parameters != null) return false;
         }
-        else if (!this$args.equals(other$args)) return false;
+        else if (!this$parameters.equals(other$parameters)) return false;
 
         Object this$returnDataType = this.getReturnDataType();
         Object other$returnDataType = other.getReturnDataType();

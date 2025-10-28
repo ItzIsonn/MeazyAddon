@@ -7,7 +7,7 @@ import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
@@ -43,8 +43,8 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         }
         else classId = null;
 
-        List<CallArgExpression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
-                (CallArgExpression) jsonDeserializationContext.deserialize(arg, CallArgExpression.class)).collect(Collectors.toList());
+        List<ParameterExpression> parameters = getElement(object, "parameters").getAsJsonArray().asList().stream().map(arg ->
+                (ParameterExpression) jsonDeserializationContext.deserialize(arg, ParameterExpression.class)).collect(Collectors.toList());
 
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
@@ -58,7 +58,7 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         }
         else dataType = null;
 
-        return new FunctionDeclarationStatement(modifiers, id, classId, args, body, dataType);
+        return new FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType);
     }
 
     @Override
@@ -75,11 +75,11 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
 
         if (functionDeclarationStatement.getClassId() != null) result.addProperty("class_id", functionDeclarationStatement.getClassId());
 
-        JsonArray args = new JsonArray();
-        for (CallArgExpression arg : functionDeclarationStatement.getArgs()) {
-            args.add(jsonSerializationContext.serialize(arg));
+        JsonArray parameters = new JsonArray();
+        for (ParameterExpression parameter : functionDeclarationStatement.getParameters()) {
+            parameters.add(jsonSerializationContext.serialize(parameter));
         }
-        result.add("args", args);
+        result.add("parameters", parameters);
 
         JsonArray body = new JsonArray();
         for (Statement statement : functionDeclarationStatement.getBody()) {

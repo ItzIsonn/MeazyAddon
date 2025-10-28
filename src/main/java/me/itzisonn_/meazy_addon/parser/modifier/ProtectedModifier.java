@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;

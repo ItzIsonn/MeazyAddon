@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
@@ -39,12 +39,12 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             id = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after function keyword").getValue();
         }
 
-        List<CallArgExpression> args = ParsingHelper.parseCallArgs(context);
+        List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (modifiers.contains(AddonModifiers.ABSTRACT()) || modifiers.contains(AddonModifiers.NATIVE())) {
             parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
-            return new FunctionDeclarationStatement(modifiers, id, args, new ArrayList<>(), dataType);
+            return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
         }
 
         List<Statement> body;
@@ -60,6 +60,6 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
         }
 
-        return new FunctionDeclarationStatement(modifiers, id, classId, args, body, dataType);
+        return new FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType);
     }
 }

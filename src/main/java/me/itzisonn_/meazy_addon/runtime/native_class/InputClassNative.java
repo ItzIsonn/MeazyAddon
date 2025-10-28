@@ -3,7 +3,7 @@ package me.itzisonn_.meazy_addon.runtime.native_class;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;

@@ -8,15 +8,15 @@ import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ClassDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.impl.classes.NativeClassValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.classes.EmptyClassValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.impl.function.NativeFunctionValueImpl;
+import me.itzisonn_.meazy_addon.runtime.value.impl.function.FunctionValueImpl;
 import me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 
@@ -114,7 +114,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
             ClassEnvironment enumEnvironment = EvaluationHelper.initClassEnvironment(context, classValue, classEnvironment, args);
 
             int finalEnumOrdinal = enumOrdinal;
-            enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("Int", false), enumEnvironment, Set.of()) {
+            enumEnvironment.declareFunction(new FunctionValueImpl("getOrdinal", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("Int", false), enumEnvironment, Set.of()) {
                 @Override
                 public RuntimeValue<?> run(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment, List<RuntimeValue<?>> functionArgs) {
                     return new IntValue(finalEnumOrdinal);
@@ -122,13 +122,13 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
             });
             enumOrdinal++;
 
-            ClassValue enumValue = new NativeClassValueImpl(enumEnvironment);
+            ClassValue enumValue = new EmptyClassValueImpl(enumEnvironment);
             classEnvironment.assignVariable(enumId, enumValue);
             enumValues.add(enumValue);
         }
 
         if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
-            classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
+            classEnvironment.declareFunction(new FunctionValueImpl("getValues", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                 @Override
                 public RuntimeValue<?> run(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment, List<RuntimeValue<?>> functionArgs) {
                     return ListClassNative.newList(functionEnvironment, context, new ArrayList<>(enumValues));

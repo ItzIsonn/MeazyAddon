@@ -8,8 +8,8 @@ import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
@@ -39,9 +39,9 @@ public class FunctionDeclarationStatementEvaluationFunction extends AbstractEval
             if (!modifier.canUse(functionDeclarationStatement, context, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
         }
 
-        RuntimeFunctionValue runtimeFunctionValue = new RuntimeFunctionValueImpl(
+        FunctionValue functionValue = new RuntimeFunctionValueImpl(
                 functionDeclarationStatement.getId(),
-                functionDeclarationStatement.getArgs(),
+                functionDeclarationStatement.getParameters(),
                 functionDeclarationStatement.getBody(),
                 functionDeclarationStatement.getReturnDataType(),
                 functionDeclarationEnvironment,
@@ -52,23 +52,23 @@ public class FunctionDeclarationStatementEvaluationFunction extends AbstractEval
                 throw new InvalidSyntaxException("Can't declare operator function not inside a class");
             }
 
-            Operator operator = AddonOperators.parseById(runtimeFunctionValue.getId());
+            Operator operator = AddonOperators.parseById(functionValue.getId());
             if (operator == null) {
-                throw new InvalidSyntaxException("Can't declare operator function because operator " + runtimeFunctionValue.getId() + " doesn't exist");
+                throw new InvalidSyntaxException("Can't declare operator function because operator " + functionValue.getId() + " doesn't exist");
             }
 
             int args = operator.getOperatorType() == OperatorType.INFIX ? 1 : 0;
-            if (runtimeFunctionValue.getArgs().size() != args) {
-                throw new InvalidSyntaxException("Function for operator " + runtimeFunctionValue.getId() + " must have " + args + " args");
+            if (functionValue.getParameters().size() != args) {
+                throw new InvalidSyntaxException("Function for operator " + functionValue.getId() + " must have " + args + " args");
             }
 
-            if (runtimeFunctionValue.getReturnDataType() == null) {
+            if (functionValue.getReturnDataType() == null) {
                 throw new InvalidSyntaxException("Operator function must return value");
             }
 
-            classEnvironment.declareOperatorFunction(runtimeFunctionValue);
+            classEnvironment.declareOperatorFunction(functionValue);
         }
-        else functionDeclarationEnvironment.declareFunction(runtimeFunctionValue);
+        else functionDeclarationEnvironment.declareFunction(functionValue);
 
         return null;
     }
