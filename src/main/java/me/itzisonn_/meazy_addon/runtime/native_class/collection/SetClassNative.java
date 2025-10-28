@@ -2,7 +2,9 @@ package me.itzisonn_.meazy_addon.runtime.native_class.collection;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Argument;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -21,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@MeazyNativeClass("data/program/collection/set.mea")
+@NativeContainer("data/program/collection/set.mea")
 public class SetClassNative {
     public static ClassValue newSet(Environment callEnvironment, RuntimeContext context, Set<RuntimeValue<?>> set) {
         ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());
@@ -34,12 +36,14 @@ public class SetClassNative {
         return classValue;
     }
 
-    public static InnerSetValue getNativeSet(FunctionEnvironment functionEnvironment) {
+    @Function
+    public static InnerSetValue getNativeSet() {
         return new InnerSetValue(new HashSet<>());
     }
 
 
 
+    @Function
     public static IntValue getSize(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't get size of non-set value");
@@ -49,14 +53,16 @@ public class SetClassNative {
 
 
 
-    public static BooleanValue add(RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static BooleanValue add(@Argument RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't add element to non-set value");
 
         return new BooleanValue(setValue.getValue().add(element.getFinalRuntimeValue()));
     }
 
-    public static BooleanValue remove(RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static BooleanValue remove(@Argument RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't remove element to non-set value");
 
@@ -65,6 +71,7 @@ public class SetClassNative {
 
 
 
+    @Function
     public static BooleanValue isEmpty(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't use non-set value");
@@ -72,7 +79,8 @@ public class SetClassNative {
         return new BooleanValue(setValue.getValue().isEmpty());
     }
 
-    public static BooleanValue contains(RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static BooleanValue contains(@Argument RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't use non-set value");
 
@@ -81,6 +89,7 @@ public class SetClassNative {
 
 
 
+    @Function
     public static ClassValue toString(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new InvalidSyntaxException("Can't convert non-set value to string");

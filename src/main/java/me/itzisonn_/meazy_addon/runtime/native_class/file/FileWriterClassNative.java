@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy_addon.runtime.native_class.file;
 
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Argument;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
@@ -13,9 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-@MeazyNativeClass("data/program/file/file_writer.mea")
+@NativeContainer("data/program/file/file_writer.mea")
 public class FileWriterClassNative {
-    public static InnerFileValue getNativeFile(RuntimeValue<?> file, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static InnerFileValue getNativeFile(@Argument RuntimeValue<?> file) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {
             throw new InvalidSyntaxException("Can't create file writer from non-file value");
         }
@@ -29,7 +32,8 @@ public class FileWriterClassNative {
 
 
 
-    public static void write(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static void write(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't write with non-file value");
 
@@ -41,7 +45,8 @@ public class FileWriterClassNative {
         }
     }
 
-    public static void writeAppend(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static void writeAppend(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't write with non-file value");
 
@@ -53,7 +58,8 @@ public class FileWriterClassNative {
         }
     }
 
-    public static void writeLines(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static void writeLines(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't write with non-file value");
 

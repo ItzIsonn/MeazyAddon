@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy_addon.runtime.native_class.primitive;
 
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Argument;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
@@ -9,9 +11,10 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 
-@MeazyNativeClass("data/program/primitive/char.mea")
+@NativeContainer("data/program/primitive/char.mea")
 public class CharClassNative {
-    public static RuntimeValue<?> valueOf(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         String stringValue = value.getFinalValue().toString();
         if (stringValue.length() == 1) return StringClassNative.newString(functionEnvironment.getFileEnvironment(), stringValue);
         return new NullValue();

@@ -2,7 +2,9 @@ package me.itzisonn_.meazy_addon.runtime.native_class.primitive;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Argument;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@MeazyNativeClass("data/program/primitive/string.mea")
+@NativeContainer("data/program/primitive/string.mea")
 public class StringClassNative {
     public static ClassValue newString(Environment callEnvironment, String string) {
         FileEnvironment fileEnvironment = callEnvironment.getFileEnvironment();
@@ -36,7 +38,8 @@ public class StringClassNative {
 
 
 
-    public static RuntimeValue<?> valueOf(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         try {
             return StringClassNative.newString(functionEnvironment, value.getFinalRuntimeValue().toString());
         }
@@ -47,6 +50,7 @@ public class StringClassNative {
 
 
 
+    @Function
     public static IntValue getLength(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get length of non-string value");
@@ -54,7 +58,8 @@ public class StringClassNative {
         return new IntValue(stringValue.getValue().length());
     }
 
-    public static RuntimeValue<?> getCharAt(RuntimeValue<?> pos, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> getCharAt(@Argument RuntimeValue<?> pos, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get char of non-string value");
 
@@ -73,7 +78,8 @@ public class StringClassNative {
         }
     }
 
-    public static RuntimeValue<?> setCharAt(RuntimeValue<?> pos, RuntimeValue<?> character, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> setCharAt(@Argument RuntimeValue<?> pos, @Argument RuntimeValue<?> character, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't change char of non-string value");
 
@@ -91,7 +97,8 @@ public class StringClassNative {
 
 
 
-    public static RuntimeValue<?> replace(RuntimeValue<?> begin, RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> replace(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't replace in non-string value");
 
@@ -103,7 +110,8 @@ public class StringClassNative {
         return StringClassNative.newString(classEnvironment, stringValue.getValue().replace(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
 
-    public static RuntimeValue<?> replaceRegex(RuntimeValue<?> begin, RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> replaceRegex(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't replace in non-string value");
 
@@ -115,7 +123,8 @@ public class StringClassNative {
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().replaceAll(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
 
-    public static RuntimeValue<?> replaceFirst(RuntimeValue<?> begin, RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> replaceFirst(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't replace in non-string value");
 
@@ -129,7 +138,8 @@ public class StringClassNative {
 
 
 
-    public static RuntimeValue<?> substring(RuntimeValue<?> begin, RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> substring(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get substring of non-string value");
 
@@ -144,7 +154,8 @@ public class StringClassNative {
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue(), endValue.getValue()));
     }
 
-    public static RuntimeValue<?> substringFrom(RuntimeValue<?> begin, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> substringFrom(@Argument RuntimeValue<?> begin, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get substring of non-string value");
 
@@ -158,7 +169,8 @@ public class StringClassNative {
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue()));
     }
 
-    public static RuntimeValue<?> substringTo(RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> substringTo(@Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get substring of non-string value");
 
@@ -174,7 +186,8 @@ public class StringClassNative {
 
 
 
-    public static RuntimeValue<?> split(RuntimeValue<?> regex, RuntimeContext context, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> split(@Argument RuntimeValue<?> regex, RuntimeContext context, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't split non-string value");
 
@@ -192,7 +205,8 @@ public class StringClassNative {
         return ListClassNative.newList(functionEnvironment, context, list);
     }
 
-    public static RuntimeValue<?> repeat(RuntimeValue<?> times, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> repeat(@Argument RuntimeValue<?> times, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't repeat non-string value");
 
@@ -206,6 +220,7 @@ public class StringClassNative {
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().repeat(intValue.getValue()));
     }
 
+    @Function
     public static RuntimeValue<?> trim(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't trim non-string value");
@@ -218,6 +233,7 @@ public class StringClassNative {
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().trim());
     }
 
+    @Function
     public static RuntimeValue<?> toUpperCase(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't make uppercase non-string value");
@@ -230,6 +246,7 @@ public class StringClassNative {
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().toUpperCase());
     }
 
+    @Function
     public static RuntimeValue<?> toLowerCase(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't make uppercase non-string value");
@@ -244,7 +261,8 @@ public class StringClassNative {
 
 
 
-    public static RuntimeValue<?> contains(RuntimeValue<?> target, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> contains(@Argument RuntimeValue<?> target, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -256,7 +274,8 @@ public class StringClassNative {
         return new BooleanValue(stringValue.getValue().contains(target.getFinalValue().toString()));
     }
 
-    public static RuntimeValue<?> startsWith(RuntimeValue<?> target, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> startsWith(@Argument RuntimeValue<?> target, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -268,7 +287,8 @@ public class StringClassNative {
         return new BooleanValue(stringValue.getValue().startsWith(target.getFinalValue().toString()));
     }
 
-    public static RuntimeValue<?> endsWith(RuntimeValue<?> target, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> endsWith(@Argument RuntimeValue<?> target, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
 
@@ -280,6 +300,7 @@ public class StringClassNative {
         return new BooleanValue(stringValue.getValue().endsWith(target.getFinalValue().toString()));
     }
 
+    @Function
     public static RuntimeValue<?> isEmpty(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
@@ -292,6 +313,7 @@ public class StringClassNative {
         return new BooleanValue(stringValue.getValue().isEmpty());
     }
 
+    @Function
     public static RuntimeValue<?> isBlank(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
         if (!(value instanceof InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");

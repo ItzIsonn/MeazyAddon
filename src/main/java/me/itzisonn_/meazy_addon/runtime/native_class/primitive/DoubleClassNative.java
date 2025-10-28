@@ -1,16 +1,18 @@
 package me.itzisonn_.meazy_addon.runtime.native_class.primitive;
 
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Argument;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
-@MeazyNativeClass("data/program/primitive/double.mea")
+@NativeContainer("data/program/primitive/double.mea")
 public class DoubleClassNative {
-    public static RuntimeValue<?> valueOf(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {
             return new DoubleValue(Double.parseDouble(value.getFinalValue().toString()));
         }

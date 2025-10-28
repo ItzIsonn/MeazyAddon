@@ -1,7 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.native_class.file;
 
 import me.itzisonn_.meazy.FileUtils;
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Argument;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
@@ -12,14 +14,16 @@ import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative
 
 import java.io.*;
 
-@MeazyNativeClass("data/program/file/file.mea")
+@NativeContainer("data/program/file/file.mea")
 public class FileClassNative {
-    public static InnerFileValue getNativeFile(RuntimeValue<?> path, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static InnerFileValue getNativeFile(@Argument RuntimeValue<?> path) {
         return new InnerFileValue(new File(String.valueOf(path.getFinalValue())));
     }
 
 
 
+    @Function
     public static ClassValue getPath(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get path of non-file value");
@@ -27,6 +31,7 @@ public class FileClassNative {
         return StringClassNative.newString(functionEnvironment.getFileEnvironment(), fileValue.getValue().getPath());
     }
 
+    @Function
     public static ClassValue getName(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get name of non-file value");
@@ -34,6 +39,7 @@ public class FileClassNative {
         return StringClassNative.newString(functionEnvironment.getFileEnvironment(), fileValue.getValue().getName());
     }
 
+    @Function
     public static ClassValue getExtension(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get extension of non-file value");
@@ -43,6 +49,7 @@ public class FileClassNative {
 
 
 
+    @Function
     public static ClassValue getParent(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get parent of non-file value");
@@ -52,6 +59,7 @@ public class FileClassNative {
 
 
 
+    @Function
     public static BooleanValue exists(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get data of non-file value");
@@ -59,6 +67,7 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().exists());
     }
 
+    @Function
     public static BooleanValue isHidden(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get data of non-file value");
@@ -66,6 +75,7 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().isHidden());
     }
 
+    @Function
     public static BooleanValue isFile(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get data of non-file value");
@@ -73,6 +83,7 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().isFile());
     }
 
+    @Function
     public static BooleanValue isDirectory(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get data of non-file value");
@@ -83,6 +94,7 @@ public class FileClassNative {
 
 
 
+    @Function
     public static BooleanValue isReadable(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get data of non-file value");
@@ -90,6 +102,7 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().canRead());
     }
 
+    @Function
     public static BooleanValue isWritable(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't get data of non-file value");
@@ -97,7 +110,8 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().canWrite());
     }
 
-    public static BooleanValue setReadable(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static BooleanValue setReadable(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't change readability of non-file value");
 
@@ -108,7 +122,8 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().setReadable(booleanValue.getValue()));
     }
 
-    public static BooleanValue setWritable(RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static BooleanValue setWritable(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't change ability to write of non-file value");
 
@@ -121,6 +136,7 @@ public class FileClassNative {
 
 
 
+    @Function
     public static BooleanValue create(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't create non-file value");
@@ -133,6 +149,7 @@ public class FileClassNative {
         }
     }
 
+    @Function
     public static BooleanValue delete(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't delete non-file value");
@@ -140,7 +157,8 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().delete());
     }
 
-    public static BooleanValue rename(RuntimeValue<?> destination, FunctionEnvironment functionEnvironment) {
+    @Function
+    public static BooleanValue rename(@Argument RuntimeValue<?> destination, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't delete non-file value");
 
@@ -155,6 +173,7 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().renameTo(destinationValue.getValue()));
     }
 
+    @Function
     public static BooleanValue createDirectory(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't create directory of non-file value");
@@ -162,6 +181,7 @@ public class FileClassNative {
         return new BooleanValue(fileValue.getValue().mkdir());
     }
 
+    @Function
     public static BooleanValue createDirectories(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't create directories of non-file value");

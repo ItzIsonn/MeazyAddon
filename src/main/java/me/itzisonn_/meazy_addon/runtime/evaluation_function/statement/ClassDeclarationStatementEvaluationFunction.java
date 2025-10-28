@@ -116,7 +116,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
             int finalEnumOrdinal = enumOrdinal;
             enumEnvironment.declareFunction(new NativeFunctionValueImpl("getOrdinal", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("Int", false), enumEnvironment, Set.of()) {
                 @Override
-                public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, RuntimeContext context, FunctionEnvironment functionEnvironment) {
+                public RuntimeValue<?> run(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment, List<RuntimeValue<?>> functionArgs) {
                     return new IntValue(finalEnumOrdinal);
                 }
             });
@@ -130,7 +130,7 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
         if (classDeclarationStatement.getModifiers().contains(AddonModifiers.ENUM())) {
             classEnvironment.declareFunction(new NativeFunctionValueImpl("getValues", List.of(), Registries.DATA_TYPE_FACTORY.getEntry().getValue().create("List", false), classEnvironment, Set.of(AddonModifiers.SHARED())) {
                 @Override
-                public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, RuntimeContext context, FunctionEnvironment functionEnvironment) {
+                public RuntimeValue<?> run(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment, List<RuntimeValue<?>> functionArgs) {
                     return ListClassNative.newList(functionEnvironment, context, new ArrayList<>(enumValues));
                 }
             });

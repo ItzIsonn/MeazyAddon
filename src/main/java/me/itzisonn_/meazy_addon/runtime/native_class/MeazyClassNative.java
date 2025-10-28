@@ -4,7 +4,8 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.RuntimeContext;
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
@@ -16,12 +17,14 @@ import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative
 import java.util.ArrayList;
 import java.util.List;
 
-@MeazyNativeClass("data/program/meazy/meazy.mea")
+@NativeContainer("data/program/meazy/meazy.mea")
 public class MeazyClassNative {
+    @Function
     public static ClassValue getVersion(FunctionEnvironment functionEnvironment) {
         return StringClassNative.newString(functionEnvironment.getFileEnvironment(), MeazyMain.VERSION.toString());
     }
 
+    @Function
     public static ClassValue getAddons(RuntimeContext context, FunctionEnvironment functionEnvironment) {
         FileEnvironment fileEnvironment = functionEnvironment.getFileEnvironment();
 

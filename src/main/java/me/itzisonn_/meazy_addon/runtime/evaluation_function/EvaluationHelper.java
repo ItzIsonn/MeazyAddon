@@ -19,19 +19,15 @@ import me.itzisonn_.meazy.runtime.value.constructor.NativeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.constructor.RuntimeConstructorValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.function.NativeFunctionValue;
-import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.BaseCallStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
-import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.value.BaseClassIdValue;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
-import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.RuntimeClassValueImpl;
-import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 
 import java.lang.reflect.AccessFlag;
 import java.lang.reflect.InvocationTargetException;
@@ -534,156 +530,15 @@ public final class EvaluationHelper {
         FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                 functionValue.getParentEnvironment(),
                 functionValue.getModifiers().contains(AddonModifiers.SHARED()));
-        Interpreter interpreter = context.getInterpreter();
 
-        if (functionValue instanceof NativeFunctionValue nativeFunctionValue) {
-            RuntimeValue<?> returnValue = nativeFunctionValue.run(args, context, functionEnvironment);
-            if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
-            return checkReturnValue(
-                    returnValue,
-                    nativeFunctionValue.getReturnDataType(),
-                    nativeFunctionValue.getId(),
-                    true,
-                    functionEnvironment.getFileEnvironment());
-        }
-        if (functionValue instanceof RuntimeFunctionValue runtimeFunctionValue) {
-            if (runtimeFunctionValue.getModifiers().contains(AddonModifiers.NATIVE())) {
-                ArrayList<Class<?>> params1 = new ArrayList<>(Collections.nCopies(functionValue.getArgs().size(), RuntimeValue.class));
-                params1.add(RuntimeContext.class);
-                params1.add(FunctionEnvironment.class);
-                Class<?>[] array1 = params1.toArray(Class[]::new);
+        RuntimeValue<?> result = functionValue.run(context, functionEnvironment, callEnvironment, args);
+        if (result != null) result = result.getFinalRuntimeValue();
 
-                ArrayList<Class<?>> params3 = new ArrayList<>(Collections.nCopies(functionValue.getArgs().size(), RuntimeValue.class));
-                params3.add(RuntimeContext.class);
-                params3.add(FunctionEnvironment.class);
-                params3.add(Environment.class);
-                Class<?>[] array3 = params3.toArray(Class[]::new);
-
-                ArrayList<Class<?>> params2 = new ArrayList<>(Collections.nCopies(functionValue.getArgs().size(), RuntimeValue.class));
-                params2.add(FunctionEnvironment.class);
-                Class<?>[] array2 = params2.toArray(Class[]::new);
-
-                for (Class<?> nativeClass : runtimeFunctionValue.getParentEnvironment().getFileEnvironment().getNativeClasses()) {
-                    Method method;
-                    boolean hasContext;
-                    boolean hasSecond = false;
-
-                    try {
-                        method = nativeClass.getDeclaredMethod(functionValue.getId(), array1);
-                        hasContext = true;
-                    }
-                    catch (NoSuchMethodException _) {
-                        try {
-                            method = nativeClass.getDeclaredMethod(functionValue.getId(), array2);
-                            hasContext = false;
-                        }
-                        catch (NoSuchMethodException _) {
-                            try {
-                                method = nativeClass.getDeclaredMethod(functionValue.getId(), array3);
-                                hasContext = true;
-                                hasSecond = true;
-                            }
-                            catch (NoSuchMethodException _) {
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                        throw new InvalidSyntaxException("Can't call non-public static native method with id " + method.getName());
-                    }
-                    if (!method.canAccess(null)) {
-                        throw new InvalidSyntaxException("Can't call non-accessible native method with id " + method.getName());
-                    }
-                    if (!method.getReturnType().equals(Void.TYPE) && !RuntimeValue.class.isAssignableFrom(method.getReturnType())) {
-                        throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
-                    }
-
-                    try {
-                        ArrayList<Object> methodArgs = new ArrayList<>(args);
-                        if (hasContext) methodArgs.add(context);
-                        methodArgs.add(functionEnvironment);
-                        if (hasSecond) methodArgs.add(callEnvironment);
-                        Object object = method.invoke(null, methodArgs.toArray());
-
-                        if (method.getReturnType().equals(Void.TYPE)) {
-                            if (functionValue.getReturnDataType() != null) throw new RuntimeException("Can't get return value for native method with id " + method.getName());
-                            return null;
-                        }
-                        else {
-                            return checkReturnValue(
-                                    object == null ? null : ((RuntimeValue<?>) object).getFinalRuntimeValue(),
-                                    functionValue.getReturnDataType(),
-                                    functionValue.getId(),
-                                    true,
-                                    functionEnvironment.getFileEnvironment());
-                        }
-                    }
-                    catch (IllegalAccessException e) {
-                        throw new RuntimeException("Failed to call native method with id " + method.getName(), e);
-                    }
-                    catch (InvocationTargetException e) {
-                        throw new RuntimeException(e.getCause());
-                    }
-                }
-
-                throw new InvalidSyntaxException("Can't find native method with id " + functionValue.getId());
-            }
-
-            for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
-                CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
-
-                functionEnvironment.declareVariable(new VariableValueImpl(
-                        callArgExpression.getId(),
-                        callArgExpression.getDataType(),
-                        args.get(i),
-                        callArgExpression.isConstant(),
-                        new HashSet<>(),
-                        true,
-                        functionEnvironment
-                ));
-            }
-
-            RuntimeValue<?> result = null;
-            boolean hasReturnStatement = false;
-            for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
-                Statement statement = runtimeFunctionValue.getBody().get(i);
-                if (statement instanceof ReturnStatement) {
-                    hasReturnStatement = true;
-                    result = interpreter.evaluate(statement, functionEnvironment);
-                    if (result != null) {
-                        checkReturnValue(
-                                result.getFinalRuntimeValue(),
-                                runtimeFunctionValue.getReturnDataType(),
-                                runtimeFunctionValue.getId(),
-                                false,
-                                functionEnvironment.getFileEnvironment());
-                    }
-                    if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
-                    break;
-                }
-                RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
-                if (value instanceof ReturnInfoValue returnInfoValue) {
-                    hasReturnStatement = true;
-                    result = returnInfoValue.getFinalRuntimeValue();
-                    if (result.getFinalValue() != null) {
-                        checkReturnValue(
-                                result.getFinalRuntimeValue(),
-                                runtimeFunctionValue.getReturnDataType(),
-                                runtimeFunctionValue.getId(),
-                                false,
-                                functionEnvironment.getFileEnvironment());
-                    }
-                    break;
-                }
-            }
-            if ((result == null || result instanceof NullValue) && runtimeFunctionValue.getReturnDataType() != null) {
-                throw new InvalidSyntaxException(hasReturnStatement ?
-                        "Function specified return value's data type but return statement is empty" : "Missing return statement");
-            }
-            return result;
-        }
-
-        throw new InvalidCallException("Can't call " + functionValue.getValue() + " because it's not a function");
+        return checkReturnValue(
+                result,
+                functionValue.getReturnDataType(),
+                functionValue.getId(),
+                functionValue instanceof NativeFunctionValue,
+                functionEnvironment.getFileEnvironment());
     }
 }
