@@ -28,8 +28,17 @@ public class OperatorExpressionEvaluationFunction extends AbstractEvaluationFunc
         RuntimeValue<?> left = interpreter.evaluate(operatorExpression.getLeft(), environment).getFinalRuntimeValue();
         RuntimeValue<?> right = operatorExpression.getRight() != null ? interpreter.evaluate(operatorExpression.getRight(), environment).getFinalRuntimeValue() : null;
 
-        if (operatorExpression.getType() == OperatorType.INFIX && right == null) throw new RuntimeException("Infix expression must contain both parts");
-        if (operatorExpression.getType() != OperatorType.INFIX && right != null) throw new RuntimeException("Prefix and suffix expression must contain only one part");
+        if (operatorExpression.getType() == OperatorType.INFIX && (left == null || right == null)) {
+            throw new RuntimeException("Infix expression must contain both parts");
+        }
+        if (operatorExpression.getType() != OperatorType.INFIX) {
+            if (left == null) {
+                if (right == null) throw new RuntimeException("Prefix and suffix expression must contain only one part");
+                left = right;
+                right = null;
+            }
+            else if (right != null) throw new RuntimeException("Prefix and suffix expression must contain only one part");
+        }
 
         ClassValue classValue;
         List<RuntimeValue<?>> args;

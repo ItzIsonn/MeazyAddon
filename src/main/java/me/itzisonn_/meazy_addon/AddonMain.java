@@ -109,7 +109,6 @@ public class AddonMain extends Addon {
 
         Registries.RUN_PROGRAM_FUNCTION.register(getIdentifier("run_program"), program -> {
             RuntimeContext context = new RuntimeContext();
-            Interpreter interpreter = context.getInterpreter();
 
             GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
             FileEnvironment fileEnvironment = Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);

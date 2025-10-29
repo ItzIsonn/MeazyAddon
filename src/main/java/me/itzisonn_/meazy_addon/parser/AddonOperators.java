@@ -26,26 +26,6 @@ public final class AddonOperators {
 
 
 
-    public static Operator PLUS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("plus")).getValue();
-    }
-
-    public static Operator MINUS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("minus")).getValue();
-    }
-
-    public static Operator MULTIPLY() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("multiply")).getValue();
-    }
-
-    public static Operator DIVIDE() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("divide")).getValue();
-    }
-
-    public static Operator PERCENT() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("percent")).getValue();
-    }
-
     public static Operator POWER() {
         return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("power")).getValue();
     }
@@ -54,42 +34,8 @@ public final class AddonOperators {
         return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("negation")).getValue();
     }
 
-
-
-    public static Operator AND() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("and")).getValue();
-    }
-
-    public static Operator OR() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("or")).getValue();
-    }
-
     public static Operator INVERSION() {
         return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("inversion")).getValue();
-    }
-
-    public static Operator EQUALS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("equals")).getValue();
-    }
-
-    public static Operator NOT_EQUALS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("not_equals")).getValue();
-    }
-
-    public static Operator GREATER() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("greater")).getValue();
-    }
-
-    public static Operator GREATER_OR_EQUALS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("greater_or_equals")).getValue();
-    }
-
-    public static Operator LESS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("less")).getValue();
-    }
-
-    public static Operator LESS_OR_EQUALS() {
-        return Registries.OPERATORS.getEntry(AddonMain.getIdentifier("less_or_equals")).getValue();
     }
 
 

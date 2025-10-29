@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy_addon.lexer;
 
+import me.itzisonn_.meazy.lexer.NativeCanMatch;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy_addon.AddonMain;
@@ -178,38 +179,6 @@ public final class AddonTokenTypes {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("power")).getValue();
     }
 
-    public static TokenType PLUS_ASSIGN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("plus_assign")).getValue();
-    }
-
-    public static TokenType MINUS_ASSIGN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("minus_assign")).getValue();
-    }
-
-    public static TokenType MULTIPLY_ASSIGN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("multiply_assign")).getValue();
-    }
-
-    public static TokenType DIVIDE_ASSIGN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("divide_assign")).getValue();
-    }
-
-    public static TokenType PERCENT_ASSIGN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("percent_assign")).getValue();
-    }
-
-    public static TokenType POWER_ASSIGN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("power_assign")).getValue();
-    }
-
-    public static TokenType DOUBLE_PLUS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("double_plus")).getValue();
-    }
-
-    public static TokenType DOUBLE_MINUS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("double_minus")).getValue();
-    }
-
 
 
     public static TokenType AND() {
@@ -276,6 +245,7 @@ public final class AddonTokenTypes {
 
 
 
+    @NativeCanMatch
     public static boolean canMatchId(String string) {
         for (TokenType tokenType : AddonTokenTypeSets.KEYWORDS().getTokenTypes()) {
             if (tokenType.getPattern().matcher(string).matches()) return false;

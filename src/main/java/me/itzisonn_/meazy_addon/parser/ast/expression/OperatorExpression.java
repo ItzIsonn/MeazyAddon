@@ -14,10 +14,10 @@ public class OperatorExpression implements Expression, ParenthesisExpression {
     private final Operator operator;
 
     public OperatorExpression(Expression left, Expression right, Operator operator) {
+        if (operator == null) throw new NullPointerException("Operator can't be null");
+
         this.left = left;
         this.right = right;
-
-        if (operator == null) throw new NullPointerException("Operator can't be null");
         this.operator = operator;
     }
 

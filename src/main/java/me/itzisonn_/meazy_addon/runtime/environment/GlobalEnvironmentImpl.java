@@ -2,7 +2,6 @@ package me.itzisonn_.meazy_addon.runtime.environment;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
-import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 
 import java.util.*;
@@ -32,16 +31,5 @@ public class GlobalEnvironmentImpl extends EnvironmentImpl implements GlobalEnvi
     @Override
     public Set<FileEnvironment> getFileEnvironments() {
         return new HashSet<>(fileEnvironments);
-    }
-
-
-
-    public VariableValue getVariable(String id) {
-        for (FileEnvironment fileEnvironment : fileEnvironments) {
-            VariableValue variableValue = fileEnvironment.getLocalVariable(id);
-            if (variableValue != null) return variableValue;
-        }
-
-        return null;
     }
 }

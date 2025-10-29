@@ -3,9 +3,9 @@ package me.itzisonn_.meazy_addon.parser.pasing_function.expression;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
+import me.itzisonn_.meazy_addon.parser.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.ast.expression.OperatorExpression;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 
@@ -21,9 +21,9 @@ public class PowerExpressionParsingFunction extends AbstractParsingFunction<Expr
         Expression left = parser.parseAfter(AddonMain.getIdentifier("power_expression"), Expression.class);
 
         while (parser.getCurrent().getType().equals(AddonTokenTypes.POWER())) {
-            String operator = parser.getCurrentAndNext().getValue();
+            parser.getCurrentAndNext();
             Expression right = parser.parseAfter(AddonMain.getIdentifier("power_expression"), Expression.class);
-            left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
+            left = new OperatorExpression(left, right, AddonOperators.POWER());
         }
 
         return left;
