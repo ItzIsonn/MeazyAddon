@@ -5,8 +5,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
@@ -14,6 +13,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.registry.RegistryEntry;
 
 import java.util.Set;

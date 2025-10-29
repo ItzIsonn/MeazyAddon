@@ -2,8 +2,8 @@ package me.itzisonn_.meazy_addon.runtime.native_class.primitive;
 
 import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.IsMatches;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
@@ -21,7 +21,8 @@ public class DoubleClassNative {
         }
     }
 
-    public static boolean isMatches(Object value, ClassEnvironment classEnvironment) {
+    @IsMatches
+    public static boolean isMatches(Object value) {
         if (value == null) return false;
         if (value instanceof Double || value instanceof DoubleValue) return true;
 

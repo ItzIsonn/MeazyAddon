@@ -3,13 +3,14 @@ package me.itzisonn_.meazy_addon.parser.modifier;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ConstructorClassIdentifier;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
@@ -68,6 +69,19 @@ public class ProtectedModifier extends Modifier {
                     }
                     return false;
                 });
+
+        if (identifier instanceof ConstructorClassIdentifier) return requestEnvironment.hasParent(env -> {
+            if (env instanceof ClassEnvironment classEnv) {
+                if (classEnv.getId().equals(identifier.getId())) return true;
+
+                ClassValue parentClassValue = requestEnvironment.getFileEnvironment().getClass(classEnv.getId());
+                if (parentClassValue == null) {
+                    throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
+                }
+                return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(identifier.getId()));
+            }
+            return false;
+        });
 
         return true;
     }

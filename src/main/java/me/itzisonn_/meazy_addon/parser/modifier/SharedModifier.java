@@ -3,11 +3,11 @@ package me.itzisonn_.meazy_addon.parser.modifier;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 

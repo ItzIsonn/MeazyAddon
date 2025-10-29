@@ -4,8 +4,8 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.List;

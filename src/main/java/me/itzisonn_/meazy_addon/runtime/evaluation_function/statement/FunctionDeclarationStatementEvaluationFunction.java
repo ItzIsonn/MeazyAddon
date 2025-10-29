@@ -31,6 +31,7 @@ public class FunctionDeclarationStatementEvaluationFunction extends AbstractEval
             if (!EvaluationHelper.extensionFunctions.contains(functionDeclarationStatement)) EvaluationHelper.extensionFunctions.add(functionDeclarationStatement);
             return null;
         }
+
         if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
             throw new InvalidSyntaxException("Can't declare function in this environment");
         }

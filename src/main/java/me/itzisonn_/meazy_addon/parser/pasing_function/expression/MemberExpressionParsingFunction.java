@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;

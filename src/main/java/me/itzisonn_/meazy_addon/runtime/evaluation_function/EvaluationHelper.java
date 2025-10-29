@@ -3,7 +3,6 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.*;
@@ -14,6 +13,7 @@ import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
@@ -150,6 +150,10 @@ public final class EvaluationHelper {
         return classValue.newInstance(classEnvironment);
     }
 
+    public static ClassValue callUninitializedClassValue(RuntimeContext context, ClassValue classValue, Environment callEnvironment) {
+        return callClassValue(context, classValue, callEnvironment, null);
+    }
+
     public static ClassEnvironment initClassEnvironment(RuntimeContext context, ClassValue classValue, Environment callEnvironment, List<RuntimeValue<?>> args) {
         ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                 classValue.getEnvironment().getFileEnvironment(),
@@ -175,49 +179,27 @@ public final class EvaluationHelper {
         }
 
         Set<String> calledBaseClasses = new HashSet<>();
-        if (classEnvironment.hasConstructor()) {
-            ConstructorValue constructorValue = classEnvironment.getConstructor(args);
-            if (constructorValue == null) throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
 
-            if (constructorValue.getModifiers().contains(AddonModifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
-                if (env instanceof ClassEnvironment classEnv) {
-                    return classEnv.getId().equals(classValue.getId());
+        if (args != null) {
+            if (classEnvironment.hasConstructor()) {
+                ConstructorValue constructorValue = classEnvironment.getConstructor(args);
+                if (constructorValue == null) throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
+
+                if (!constructorValue.isAccessible(callEnvironment)) {
+                    throw new InvalidAccessException("Can't access requested constructor because of its modifiers");
                 }
-                return false;
-            })) {
-                throw new InvalidCallException("Requested constructor has private access");
+
+                Set<String> constructorCalled = constructorValue.run(context, constructorEnvironment, callEnvironment, args);
+                calledBaseClasses.addAll(constructorCalled);
+            }
+            else if (!args.isEmpty()) {
+                throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
             }
 
-            if (constructorValue.getModifiers().contains(AddonModifiers.PROTECTED()) && !callEnvironment.hasParent(env -> {
-                if (env instanceof ClassEnvironment classEnv) {
-                    if (classEnv.getId().equals(classValue.getId())) return true;
-
-                    ClassValue parentClassValue = callEnvironment.getFileEnvironment().getClass(classEnv.getId());
-                    if (parentClassValue == null) {
-                        throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
-                    }
-                    return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(classValue.getId()));
+            for (VariableValue variableValue : classEnvironment.getVariables()) {
+                if (variableValue.isConstant() && variableValue.getValue() == null) {
+                    throw new InvalidSyntaxException("Empty constant variable with id " + variableValue.getId() + " hasn't been initialized");
                 }
-                return false;
-            })) {
-                throw new InvalidCallException("Requested constructor has protected access");
-            }
-
-            if (!constructorValue.getModifiers().contains(AddonModifiers.OPEN()) && classEnvironment.getParentFile() != null &&
-                    !classEnvironment.getParentFile().equals(callEnvironment.getParentFile())) {
-                throw new InvalidAccessException("Can't access non-open constructor from different file (" + callEnvironment.getParentFile().getName() + ")");
-            }
-
-            Set<String> constructorCalled = constructorValue.run(context, constructorEnvironment, callEnvironment, args);
-            calledBaseClasses.addAll(constructorCalled);
-        }
-        else if (!args.isEmpty()) {
-            throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
-        }
-
-        for (VariableValue variableValue : classEnvironment.getVariables()) {
-            if (variableValue.isConstant() && variableValue.getValue() == null) {
-                throw new InvalidSyntaxException("Empty constant variable with id " + variableValue.getId() + " hasn't been initialized");
             }
         }
 
@@ -228,68 +210,6 @@ public final class EvaluationHelper {
         for (String baseClass : classValue.getBaseClasses()) {
             if (calledBaseClasses.contains(baseClass)) continue;
             ClassValue baseClassValue = callEnvironment.getFileEnvironment().getClass(baseClass);
-            classEnvironment.addBaseClass(initClassEnvironment(context, baseClassValue, constructorEnvironment, new ArrayList<>()));
-        }
-
-        for (FunctionValue value : classEnvironment.getFunctions()) {
-            for (ClassEnvironment baseClass : classEnvironment.getDeepBaseClasses()) {
-                for (FunctionValue baseClassFunction : baseClass.getFunctions()) {
-                    if (baseClassFunction.isLike(value) && !baseClassFunction.getModifiers().contains(AddonModifiers.PRIVATE())) {
-                        if (baseClassFunction.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidAccessException("Can't override final function with id " + baseClassFunction.getId());
-                        baseClassFunction.setOverridden();
-                    }
-                }
-            }
-        }
-
-        if (hasRepeatedFunctions(classEnvironment.getBaseClasses(), new ArrayList<>(classEnvironment.getFunctions()))) {
-            throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " has repeated functions");
-        }
-
-        if (!classEnvironment.getModifiers().contains(AddonModifiers.ABSTRACT())) {
-            for (ClassEnvironment baseClass : classEnvironment.getBaseClasses()) {
-                for (FunctionValue functionValue : getFinalFunctions(baseClass)) {
-                    if (functionValue.getModifiers().contains(AddonModifiers.ABSTRACT())) {
-                        throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " in class with id " + classEnvironment.getId() + " hasn't been initialized");
-                    }
-                }
-            }
-        }
-
-        return classEnvironment;
-    }
-
-    public static ClassValue callEmptyClassValue(RuntimeContext context, ClassValue classValue) {
-        ClassEnvironment classEnvironment = initEmptyClassEnvironment(context, classValue);
-        return classValue.newInstance(classEnvironment);
-    }
-
-    public static ClassEnvironment initEmptyClassEnvironment(RuntimeContext context, ClassValue classValue) {
-        ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                classValue.getEnvironment().getFileEnvironment(),
-                classValue.getId(),
-                classValue.getModifiers());
-
-        ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment);
-        Interpreter interpreter = context.getInterpreter();
-
-        classValue.setupEnvironment(context, classEnvironment);
-
-        for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
-            if (functionDeclarationStatement.getClassId().equals(classValue.getId())) {
-                interpreter.evaluate(new FunctionDeclarationStatement(
-                        functionDeclarationStatement.getModifiers(),
-                        functionDeclarationStatement.getId(),
-                        null,
-                        functionDeclarationStatement.getParameters(),
-                        functionDeclarationStatement.getBody(),
-                        functionDeclarationStatement.getReturnDataType()
-                ), classEnvironment);
-            }
-        }
-
-        for (String baseClass : classValue.getBaseClasses()) {
-            ClassValue baseClassValue = classEnvironment.getFileEnvironment().getClass(baseClass);
             classEnvironment.addBaseClass(initClassEnvironment(context, baseClassValue, constructorEnvironment, new ArrayList<>()));
         }
 

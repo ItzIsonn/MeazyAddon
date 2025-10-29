@@ -4,14 +4,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy_addon.runtime.value.impl.ModifierableRuntimeValueImpl;
 import me.itzisonn_.registry.RegistryEntry;
 

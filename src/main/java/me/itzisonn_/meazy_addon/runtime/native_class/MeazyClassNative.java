@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
@@ -25,13 +26,13 @@ public class MeazyClassNative {
     }
 
     @Function
-    public static ClassValue getAddons(RuntimeContext context, FunctionEnvironment functionEnvironment) {
+    public static ClassValue getAddons(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment) {
         FileEnvironment fileEnvironment = functionEnvironment.getFileEnvironment();
 
         List<RuntimeValue<?>> addons = new ArrayList<>();
         for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
             AddonInfo addonInfo = addon.getAddonInfo();
-            ClassValue addonClassValue = EvaluationHelper.callEmptyClassValue(context, functionEnvironment.getFileEnvironment().getClass("Addon"));
+            ClassValue addonClassValue = EvaluationHelper.callUninitializedClassValue(context, functionEnvironment.getFileEnvironment().getClass("Addon"), callEnvironment);
 
             addonClassValue.getEnvironment().assignVariable("id", StringClassNative.newString(fileEnvironment, addonInfo.getId()));
             addonClassValue.getEnvironment().assignVariable("version", StringClassNative.newString(fileEnvironment, addonInfo.getVersion().toString()));

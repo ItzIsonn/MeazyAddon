@@ -5,11 +5,11 @@ import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 

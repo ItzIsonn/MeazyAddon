@@ -2,6 +2,7 @@ package me.itzisonn_.meazy_addon.runtime.native_class.primitive;
 
 import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
+import me.itzisonn_.meazy.runtime.native_annotation.IsMatches;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -20,7 +21,8 @@ public class CharClassNative {
         return new NullValue();
     }
 
-    public static boolean isMatches(Object value, ClassEnvironment classEnvironment) {
+    @IsMatches
+    public static boolean isMatches(Object value) {
         return switch (value) {
             case Character _ -> true;
             case ClassValue classValue -> fromClassValue(classValue);

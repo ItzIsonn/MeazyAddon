@@ -32,7 +32,7 @@ import java.util.Set;
 public class StringClassNative {
     public static ClassValue newString(Environment callEnvironment, String string) {
         FileEnvironment fileEnvironment = callEnvironment.getFileEnvironment();
-        ClassValue classValue = EvaluationHelper.callEmptyClassValue(fileEnvironment.getParent().getContext(), fileEnvironment.getClass("String"));
+        ClassValue classValue = EvaluationHelper.callUninitializedClassValue(fileEnvironment.getParent().getContext(), fileEnvironment.getClass("String"), callEnvironment);
         classValue.getEnvironment().assignVariable("value", new InnerStringValue(string));
         return classValue;
     }

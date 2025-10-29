@@ -2,8 +2,8 @@ package me.itzisonn_.meazy_addon.parser.json_converter.expression.identifier;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy_addon.AddonMain;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
+import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 
 import java.lang.reflect.Type;
 
