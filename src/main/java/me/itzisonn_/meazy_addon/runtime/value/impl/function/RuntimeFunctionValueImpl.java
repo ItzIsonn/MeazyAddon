@@ -10,7 +10,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
@@ -55,10 +54,10 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
                 if (!method.getName().equals(getId())) continue;
 
                 if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                    throw new InvalidSyntaxException("Can't call non-public static native method with id " + method.getName());
+                    throw new RuntimeException("Can't call non-public static native method with id " + method.getName());
                 }
                 if (!method.canAccess(null)) {
-                    throw new InvalidSyntaxException("Can't call non-accessible native method with id " + method.getName());
+                    throw new RuntimeException("Can't call non-accessible native method with id " + method.getName());
                 }
                 if (!method.getReturnType().equals(Void.TYPE) && !RuntimeValue.class.isAssignableFrom(method.getReturnType())) {
                     throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
@@ -82,7 +81,7 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
             }
         }
 
-        throw new InvalidSyntaxException("Can't find native method with id " + getId());
+        throw new RuntimeException("Can't find native method with id " + getId());
     }
 
 
@@ -99,7 +98,7 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
                 if (RuntimeContext.class.isAssignableFrom(parameter.getType())) methodArgs.add(context);
                 else if (FunctionEnvironment.class.isAssignableFrom(parameter.getType())) methodArgs.add(functionEnvironment);
                 else if (Environment.class.isAssignableFrom(parameter.getType())) methodArgs.add(callEnvironment);
-                else throw new InvalidSyntaxException("Failed to call native method with id " + getId());
+                else throw new RuntimeException("Failed to call native method with id " + getId());
             }
 
             try {
@@ -142,7 +141,7 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
             if (statement instanceof ReturnStatement) {
                 hasReturnStatement = true;
                 result = interpreter.evaluate(statement, functionEnvironment);
-                if (i + 1 < body.size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                if (i + 1 < body.size()) throw new RuntimeException("Return statement must be last in body");
                 break;
             }
             RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
@@ -154,7 +153,7 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
         }
 
         if ((result == null || result instanceof NullValue) && getReturnDataType() != null) {
-            throw new InvalidSyntaxException(hasReturnStatement ?
+            throw new RuntimeException(hasReturnStatement ?
                     "Function specified return value's data type but return statement is empty" : "Missing return statement");
         }
 

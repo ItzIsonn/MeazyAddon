@@ -18,7 +18,6 @@ public class LogicalExpressionParsingFunction extends AbstractParsingFunction<Ex
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression left = parser.parseAfter(AddonMain.getIdentifier("logical_expression"), Expression.class);
 
         TokenType current = parser.getCurrent().getType();

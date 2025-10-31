@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
@@ -27,12 +28,12 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         Parser parser = context.getParser();
 
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
-        parser.getCurrentAndNext(AddonTokenTypes.CONSTRUCTOR(), "Expected constructor keyword");
+        parser.next(AddonTokenTypes.CONSTRUCTOR(), Text.translatable("meazy_addon:parser.expected.keyword", "constructor"));
 
         List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
 
         if (modifiers.contains(AddonModifiers.NATIVE())) {
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "constructor_declaration"));
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
@@ -43,8 +44,8 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
-        parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
+        parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "constructor_body"));
+        parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy_addon:parser.expected", "new_line"));
         parser.moveOverOptionalNewLines();
 
         List<Statement> body = new ArrayList<>();
@@ -54,8 +55,8 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
             parser.moveOverOptionalNewLines();
         }
 
-        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
+        parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "constructor_body"));
+        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "constructor_declaration"));
 
         return new ConstructorDeclarationStatement(modifiers, parameters, body);
     }

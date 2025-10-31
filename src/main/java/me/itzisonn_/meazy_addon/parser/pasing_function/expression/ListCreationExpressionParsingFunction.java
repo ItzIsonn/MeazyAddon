@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
@@ -21,14 +22,18 @@ public class ListCreationExpressionParsingFunction extends AbstractParsingFuncti
         Parser parser = context.getParser();
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACKET())) {
-            parser.getCurrentAndNext();
-
+            parser.next();
             List<Expression> list = new ArrayList<>();
+
             while (!parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACKET())) {
                 list.add(parser.parse(AddonMain.getIdentifier("expression"), Expression.class));
-                if (!parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACKET())) parser.getCurrentAndNext(AddonTokenTypes.COMMA(), "Expected comma as a separator between list elements");
+
+                if (!parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACKET())) {
+                    parser.getCurrentAndNext(AddonTokenTypes.COMMA(), Text.translatable("meazy_addon:parser.expected.separator_expression", "comma", "list_creation"));
+                }
             }
-            parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACKET(), "Expected right bracket to close list creation");
+
+            parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACKET(), Text.translatable("meazy_addon:parser.expected.end_expression", "right_bracket", "list_creation"));
 
             return new ListCreationExpression(list);
         }

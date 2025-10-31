@@ -20,11 +20,10 @@ public class AssignmentExpressionParsingFunction extends AbstractParsingFunction
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression left = parser.parseAfter(AddonMain.getIdentifier("assignment_expression"), Expression.class);
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
-            parser.getCurrentAndNext();
+            parser.next();
             Expression value = parser.parse(AddonMain.getIdentifier("assignment_expression"), Expression.class);
             return new AssignmentExpression(left, value);
         }

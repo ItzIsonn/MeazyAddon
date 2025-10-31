@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.native_annotation.NewInstance;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -28,7 +27,7 @@ public class ListClassNative {
         ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("List"), callEnvironment, new ArrayList<>());
 
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("collection").getVariable("collection").getValue() instanceof InnerListValue listValue)) {
-            throw new InvalidSyntaxException("Can't create list from non-list value");
+            throw new RuntimeException("Can't create list from non-list value");
         }
         listValue.getValue().addAll(list);
 
@@ -45,7 +44,7 @@ public class ListClassNative {
     @Function
     public static IntValue getSize(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't get size of non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't get size of non-list value");
 
         return new IntValue(listValue.getValue().size());
     }
@@ -55,7 +54,7 @@ public class ListClassNative {
     @Function
     public static BooleanValue add(@Argument RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't add element to non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't add element to non-list value");
 
         return new BooleanValue(listValue.getValue().add(element.getFinalRuntimeValue()));
     }
@@ -63,16 +62,16 @@ public class ListClassNative {
     @Function
     public static void add(@Argument RuntimeValue<?> element, @Argument RuntimeValue<?> pos, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't add element to non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't add element to non-list value");
 
-        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidSyntaxException("Can't add element to non-int pos");
+        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't add element to non-int pos");
         listValue.getValue().add(intValue.getValue(), element.getFinalRuntimeValue());
     }
 
     @Function
     public static BooleanValue remove(@Argument RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't remove element to non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't remove element to non-list value");
 
         return new BooleanValue(listValue.getValue().remove(element.getFinalRuntimeValue()));
     }
@@ -80,18 +79,18 @@ public class ListClassNative {
     @Function
     public static RuntimeValue<?> removeFromPos(@Argument RuntimeValue<?> pos, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't remove element from non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't remove element from non-list value");
 
-        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidSyntaxException("Can't remove element from non-int pos");
+        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't remove element from non-int pos");
         return listValue.getValue().remove(intValue.getValue().intValue());
     }
 
     @Function
     public static RuntimeValue<?> get(@Argument RuntimeValue<?> pos, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't get element from non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't get element from non-list value");
 
-        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidSyntaxException("Can't get element from non-int pos");
+        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't get element from non-int pos");
         return listValue.getValue().get(intValue.getValue());
     }
 
@@ -100,7 +99,7 @@ public class ListClassNative {
     @Function
     public static BooleanValue isEmpty(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't use non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't use non-list value");
 
         return new BooleanValue(listValue.getValue().isEmpty());
     }
@@ -108,7 +107,7 @@ public class ListClassNative {
     @Function
     public static BooleanValue contains(@Argument RuntimeValue<?> element, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-        if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't use non-list value");
+        if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't use non-list value");
 
         return new BooleanValue(listValue.getValue().contains(element.getFinalRuntimeValue()));
     }
@@ -121,7 +120,7 @@ public class ListClassNative {
             @Override
             public String toString() {
                 RuntimeValue<?> value = getEnvironment().getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
-                if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't get string from non-list value");
+                if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't get string from non-list value");
                 return AddonUtils.unpackRuntimeValuesCollection(listValue.getValue()).toString();
             }
         };

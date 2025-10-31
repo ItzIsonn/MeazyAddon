@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ClassDeclarationStatement;
@@ -36,12 +35,12 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
     @Override
     public RuntimeValue<?> evaluate(ClassDeclarationStatement classDeclarationStatement, RuntimeContext context, Environment environment, Object... extra) {
         if (!(environment instanceof ClassDeclarationEnvironment classDeclarationEnvironment)) {
-            throw new InvalidSyntaxException("Can't declare class in this environment");
+            throw new RuntimeException("Can't declare class in this environment");
         }
 
         for (Modifier modifier : classDeclarationStatement.getModifiers()) {
             if (!modifier.canUse(classDeclarationStatement, context, environment))
-                throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
+                throw new RuntimeException("Can't use '" + modifier.getId() + "' Modifier");
         }
 
         ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
@@ -79,10 +78,10 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
                 }
 
                 if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                    throw new InvalidSyntaxException("Can't call non-static native method to create new instance of class with id " + classEnvironment.getId());
+                    throw new RuntimeException("Can't call non-static native method to create new instance of class with id " + classEnvironment.getId());
                 }
                 if (!method.canAccess(null)) {
-                    throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
+                    throw new RuntimeException("Can't call non-accessible native method to create new instance of class with id " + classEnvironment.getId());
                 }
                 if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
                     throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");

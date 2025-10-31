@@ -16,11 +16,10 @@ public class NullCheckExpressionParsingFunction extends AbstractParsingFunction<
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression checkExpression = parser.parseAfter(AddonMain.getIdentifier("null_check_expression"), Expression.class);
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.QUESTION_COLON())) {
-            parser.getCurrentAndNext();
+            parser.next();
             Expression nullExpression = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
             return new NullCheckExpression(checkExpression, nullExpression);
         }

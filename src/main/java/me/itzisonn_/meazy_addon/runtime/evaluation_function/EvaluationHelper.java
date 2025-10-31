@@ -41,10 +41,10 @@ public final class EvaluationHelper {
                 variableValue.setValue(value);
                 return value;
             }
-            throw new InvalidSyntaxException("Can't assign value to not variable " + memberExpressionValue);
+            throw new RuntimeException("Can't assign value to not variable " + memberExpressionValue);
         }
 
-        throw new InvalidSyntaxException("Can't assign value to " + assignmentExpression.getId().getClass().getName());
+        throw new RuntimeException("Can't assign value to " + assignmentExpression.getId().getClass().getName());
     }
 
     public static boolean parseCondition(RuntimeContext context, Expression rawCondition, Environment environment) {
@@ -57,16 +57,16 @@ public final class EvaluationHelper {
     private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, FileEnvironment fileEnvironment) {
         if (returnValue == null) {
             if (returnDataType != null) {
-                throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value");
+                throw new RuntimeException("Didn't find return value but function with id " + functionId + " must return value");
             }
             return null;
         }
         if (returnDataType == null) {
-            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing");
+            throw new RuntimeException("Found return value but function with id " + functionId + " must return nothing");
         }
 
         if (!returnDataType.isMatches(returnValue, fileEnvironment)) {
-            throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")");
+            throw new RuntimeException("Returned value's data type is different from specified (" + returnDataType.getId() + ")");
         }
 
         return returnValue;
@@ -198,13 +198,13 @@ public final class EvaluationHelper {
 
             for (VariableValue variableValue : classEnvironment.getVariables()) {
                 if (variableValue.isConstant() && variableValue.getValue() == null) {
-                    throw new InvalidSyntaxException("Empty constant variable with id " + variableValue.getId() + " hasn't been initialized");
+                    throw new RuntimeException("Empty constant variable with id " + variableValue.getId() + " hasn't been initialized");
                 }
             }
         }
 
         for (String baseClass : calledBaseClasses) {
-            if (!classValue.getBaseClasses().contains(baseClass)) throw new InvalidSyntaxException("Can't call base class " + baseClass + " because it's not base class of class " + classValue.getId());
+            if (!classValue.getBaseClasses().contains(baseClass)) throw new RuntimeException("Can't call base class " + baseClass + " because it's not base class of class " + classValue.getId());
         }
 
         for (String baseClass : classValue.getBaseClasses()) {
@@ -232,7 +232,7 @@ public final class EvaluationHelper {
             for (ClassEnvironment baseClass : classEnvironment.getBaseClasses()) {
                 for (FunctionValue functionValue : getFinalFunctions(baseClass)) {
                     if (functionValue.getModifiers().contains(AddonModifiers.ABSTRACT())) {
-                        throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " in class with id " + classEnvironment.getId() + " hasn't been initialized");
+                        throw new RuntimeException("Abstract function with id " + functionValue.getId() + " in class with id " + classEnvironment.getId() + " hasn't been initialized");
                     }
                 }
             }

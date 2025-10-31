@@ -19,7 +19,7 @@ public class NegationExpressionParsingFunction extends AbstractParsingFunction<E
         Parser parser = context.getParser();
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.MINUS())) {
-            parser.getCurrentAndNext();
+            parser.next();
             Expression expression = parser.parseAfter(AddonMain.getIdentifier("negation_expression"), Expression.class);
             return new OperatorExpression(expression, null, AddonOperators.NEGATION());
         }

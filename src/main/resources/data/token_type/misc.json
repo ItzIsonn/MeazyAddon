@@ -1,6 +1,6 @@
 [
-  { "id": "left_paren", "regex": "\\(" },
-  { "id": "right_paren", "regex": "\\)" },
+  { "id": "left_parenthesis", "regex": "\\(" },
+  { "id": "right_parenthesis", "regex": "\\)" },
   { "id": "left_brace", "regex": "\\{" },
   { "id": "right_brace", "regex": "\\}" },
   { "id": "left_bracket", "regex": "\\[" },

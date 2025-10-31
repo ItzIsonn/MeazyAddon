@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -17,14 +18,13 @@ public class ReturnStatementParsingFunction extends AbstractParsingFunction<Retu
     @Override
     public ReturnStatement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
-        parser.getCurrentAndNext(AddonTokenTypes.RETURN(), "Expected return keyword");
+        parser.next(AddonTokenTypes.RETURN(), Text.translatable("meazy_addon:parser.expected.keyword", "return"));
 
         Expression expression = null;
         if (!parser.getCurrent().getType().equals(TokenTypes.NEW_LINE())) {
             expression = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
         }
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the return statement");
+        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "return"));
 
         return new ReturnStatement(expression);
     }

@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Parser;
@@ -21,13 +23,14 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-        TokenType tokenType = parser.getCurrent().getType();
+        Token token = parser.getCurrent();
+        TokenType tokenType = token.getType();
 
         if (tokenType.equals(AddonTokenTypes.ID())) {
             if ((parser.getPos() != 0 && parser.getTokens().get(parser.getPos() - 1).getType().equals(AddonTokenTypes.NEW())) ||
                     (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(AddonTokenTypes.DOT()) && parser.getPos() != 0 && !parser.getTokens().get(parser.getPos() - 1).getType().equals(AddonTokenTypes.DOT())))
                 return new ClassIdentifier(parser.getCurrentAndNext().getValue());
-            else if (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(AddonTokenTypes.LEFT_PAREN())) {
+            else if (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(AddonTokenTypes.LEFT_PARENTHESIS())) {
                 return new FunctionIdentifier(parser.getCurrentAndNext().getValue());
             }
             else return new VariableIdentifier(parser.getCurrentAndNext().getValue());
@@ -46,13 +49,13 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
             parser.getCurrentAndNext();
             return new ThisLiteral();
         }
-        if (tokenType.equals(AddonTokenTypes.LEFT_PAREN())) {
+        if (tokenType.equals(AddonTokenTypes.LEFT_PARENTHESIS())) {
             parser.getCurrentAndNext();
             Expression value = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
-            parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
+            parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected", "right_parenthesis"));
             return value;
         }
 
-        throw new InvalidStatementException("Can't parse token with type " + tokenType.getId());
+        throw new InvalidStatementException(token.getLine(), Text.translatable("meazy_addon:parser.exception.cant_parse", tokenType.getId()));
     }
 }

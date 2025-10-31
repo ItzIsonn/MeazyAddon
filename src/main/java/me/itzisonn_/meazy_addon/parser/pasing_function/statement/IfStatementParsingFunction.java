@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -23,25 +24,25 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
     public IfStatement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
 
-        parser.getCurrentAndNext(AddonTokenTypes.IF(), "Expected if keyword");
+        parser.next(AddonTokenTypes.IF(), Text.translatable("meazy_addon:parser.expected.keyword", "if"));
+        parser.next(AddonTokenTypes.LEFT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.start", "left_parenthesis", "if_condition"));
 
-        parser.getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open if condition");
         Expression condition = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
-        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close if condition");
+        parser.next(AddonTokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.end", "right_parenthesis", "if_condition"));
         parser.moveOverOptionalNewLines();
 
         List<Statement> body = new ArrayList<>();
         if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
-            parser.getCurrentAndNext();
+            parser.next();
             body = ParsingHelper.parseBody(context);
-            parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the if statement");
+            parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "if_body"));
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "if"));
         }
         else body.add(parser.parse(AddonMain.getIdentifier("statement")));
 
         IfStatement elseStatement = null;
         if (parser.getCurrent().getType().equals(AddonTokenTypes.ELSE())) {
-            parser.getCurrentAndNext();
+            parser.next();
             if (parser.getCurrent().getType().equals(AddonTokenTypes.IF())) {
                 elseStatement = parser.parse(AddonMain.getIdentifier("if_statement"), IfStatement.class);
             }
@@ -49,10 +50,10 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
                 List<Statement> elseBody = new ArrayList<>();
                 parser.moveOverOptionalNewLines();
                 if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
-                    parser.getCurrentAndNext();
+                    parser.next();
                     elseBody = ParsingHelper.parseBody(context);
-                    parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
-                    parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the if statement");
+                    parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "if_body"));
+                    parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "if"));
                 }
                 else {
                     elseBody.add(parser.parse(AddonMain.getIdentifier("statement")));

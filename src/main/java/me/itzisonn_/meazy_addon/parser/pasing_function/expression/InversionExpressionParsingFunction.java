@@ -19,7 +19,7 @@ public class InversionExpressionParsingFunction extends AbstractParsingFunction<
         Parser parser = context.getParser();
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.INVERSION())) {
-            parser.getCurrentAndNext();
+            parser.next();
             Expression expression = parser.parseAfter(AddonMain.getIdentifier("inversion_expression"), Expression.class);
             return new OperatorExpression(expression, null, AddonOperators.INVERSION());
         }

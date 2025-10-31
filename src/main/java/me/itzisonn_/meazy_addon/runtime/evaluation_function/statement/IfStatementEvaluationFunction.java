@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
@@ -38,7 +37,7 @@ public class IfStatementEvaluationFunction extends AbstractEvaluationFunction<If
                 RuntimeValue<?> result = interpreter.evaluate(statement, ifEnvironment);
 
                 if (statement instanceof ReturnStatement) {
-                    if (i + 1 < ifStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                    if (i + 1 < ifStatement.getBody().size()) throw new RuntimeException("Return statement must be last in body");
                     return new ReturnInfoValue(result);
                 }
                 if (result instanceof ReturnInfoValue returnInfoValue) {
@@ -46,7 +45,7 @@ public class IfStatementEvaluationFunction extends AbstractEvaluationFunction<If
                 }
 
                 if (statement instanceof ContinueStatement) {
-                    if (i + 1 < ifStatement.getBody().size()) throw new InvalidSyntaxException("Continue statement must be last in body");
+                    if (i + 1 < ifStatement.getBody().size()) throw new RuntimeException("Continue statement must be last in body");
                     return new ContinueInfoValue();
                 }
                 if (result instanceof ContinueInfoValue continueInfoValue) {
@@ -54,7 +53,7 @@ public class IfStatementEvaluationFunction extends AbstractEvaluationFunction<If
                 }
 
                 if (statement instanceof BreakStatement) {
-                    if (i + 1 < ifStatement.getBody().size()) throw new InvalidSyntaxException("Break statement must be last in body");
+                    if (i + 1 < ifStatement.getBody().size()) throw new RuntimeException("Break statement must be last in body");
                     return new BreakInfoValue();
                 }
                 if (result instanceof BreakInfoValue breakInfoValue) {

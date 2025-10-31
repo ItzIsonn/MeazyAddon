@@ -1,8 +1,10 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
+import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -33,11 +35,11 @@ public class StatementParsingFunction extends AbstractParsingFunction<Statement>
         if (parser.getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
             VariableDeclarationStatement variableDeclarationStatement =
                     parser.parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "variable_declaration"));
             parser.moveOverOptionalNewLines();
             return variableDeclarationStatement;
         }
-        if (!modifiers.isEmpty()) throw new InvalidStatementException("Unexpected Modifier found", parser.getCurrent().getLine());
+        if (!modifiers.isEmpty()) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.modifier.unexpected"));
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.IF())) return parser.parse(AddonMain.getIdentifier("if_statement"));
         if (parser.getCurrent().getType().equals(AddonTokenTypes.FOR())) return parser.parse(AddonMain.getIdentifier("for_statement"));
@@ -47,12 +49,11 @@ public class StatementParsingFunction extends AbstractParsingFunction<Statement>
         if (parser.getCurrent().getType().equals(AddonTokenTypes.BREAK())) return parser.parse(AddonMain.getIdentifier("break_statement"));
 
         Expression expression = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
-        if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression ||
-                expression instanceof AssignmentExpression || expression instanceof MemberExpression) {
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of expression");
+        if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression || expression instanceof AssignmentExpression || expression instanceof MemberExpression) {
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected", "new_line"));
             return expression;
         }
 
-        throw new InvalidStatementException("Invalid statement found", parser.getCurrent().getLine());
+        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.exception.statement"));
     }
 }

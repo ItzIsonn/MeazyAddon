@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -20,15 +21,16 @@ public class MemberExpressionParsingFunction extends AbstractParsingFunction<Exp
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression object = parser.parseAfter(AddonMain.getIdentifier("member_expression"), Expression.class);
 
         while (AddonTokenTypeSets.MEMBER_ACCESS().contains(parser.getCurrent().getType())) {
             boolean isNullSafe = parser.getCurrentAndNext().getType().equals(AddonTokenTypes.QUESTION_DOT());
             Expression member = parser.parseAfter(AddonMain.getIdentifier("member_expression"), Expression.class);
+
             if (!(member instanceof Identifier) && !(member instanceof CallExpression)) {
-                throw new UnexpectedTokenException("Right side must be either Identifier or Call", parser.getCurrent().getLine());
+                throw new UnexpectedTokenException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.exception.member_expression"));
             }
+
             object = new MemberExpression(object, member, isNullSafe);
         }
 

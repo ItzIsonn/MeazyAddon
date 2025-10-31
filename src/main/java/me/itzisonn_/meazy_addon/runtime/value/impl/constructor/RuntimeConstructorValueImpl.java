@@ -43,10 +43,10 @@ public class RuntimeConstructorValueImpl extends ConstructorValueImpl {
                 if (!method.isAnnotationPresent(Constructor.class)) continue;
 
                 if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                    throw new InvalidSyntaxException("Can't call non-public static native constructor");
+                    throw new RuntimeException("Can't call non-public static native constructor");
                 }
                 if (!method.canAccess(null)) {
-                    throw new InvalidSyntaxException("Can't call non-accessible native constructor");
+                    throw new RuntimeException("Can't call non-accessible native constructor");
                 }
                 if (!method.getReturnType().equals(Void.TYPE)) {
                     throw new RuntimeException("Return value of native constructor with id " + method.getName() + " is invalid");
@@ -70,7 +70,7 @@ public class RuntimeConstructorValueImpl extends ConstructorValueImpl {
             }
         }
 
-        throw new InvalidSyntaxException("Can't find native constructor with parameters " + parameters);
+        throw new RuntimeException("Can't find native constructor with parameters " + parameters);
     }
 
 
@@ -87,7 +87,7 @@ public class RuntimeConstructorValueImpl extends ConstructorValueImpl {
                 if (RuntimeContext.class.isAssignableFrom(parameter.getType())) methodArgs.add(context);
                 else if (ConstructorEnvironment.class.isAssignableFrom(parameter.getType())) methodArgs.add(constructorEnvironment);
                 else if (Environment.class.isAssignableFrom(parameter.getType())) methodArgs.add(callEnvironment);
-                else throw new InvalidSyntaxException("Failed to call native constructor with parameters " + getParameters());
+                else throw new RuntimeException("Failed to call native constructor with parameters " + getParameters());
             }
 
             try {

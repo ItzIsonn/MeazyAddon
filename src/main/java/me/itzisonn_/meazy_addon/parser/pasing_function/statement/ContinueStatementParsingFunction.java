@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
@@ -16,8 +17,9 @@ public class ContinueStatementParsingFunction extends AbstractParsingFunction<Co
     public ContinueStatement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
 
-        parser.getCurrentAndNext(AddonTokenTypes.CONTINUE(), "Expected continue keyword");
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the continue statement");
+        parser.next(AddonTokenTypes.CONTINUE(), Text.translatable("meazy_addon:parser.expected.keyword", "continue"));
+        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "continue"));
+
         return new ContinueStatement();
     }
 }

@@ -93,12 +93,12 @@ public final class AddonTokenTypes {
 
 
 
-    public static TokenType LEFT_PAREN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("left_paren")).getValue();
+    public static TokenType LEFT_PARENTHESIS() {
+        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("left_parenthesis")).getValue();
     }
 
-    public static TokenType RIGHT_PAREN() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("right_paren")).getValue();
+    public static TokenType RIGHT_PARENTHESIS() {
+        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("right_parenthesis")).getValue();
     }
 
     public static TokenType LEFT_BRACE() {
@@ -155,24 +155,8 @@ public final class AddonTokenTypes {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("assign")).getValue();
     }
 
-    public static TokenType PLUS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("plus")).getValue();
-    }
-
     public static TokenType MINUS() {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("minus")).getValue();
-    }
-
-    public static TokenType MULTIPLY() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("multiply")).getValue();
-    }
-
-    public static TokenType DIVIDE() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("divide")).getValue();
-    }
-
-    public static TokenType PERCENT() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("percent")).getValue();
     }
 
     public static TokenType POWER() {
@@ -191,30 +175,6 @@ public final class AddonTokenTypes {
 
     public static TokenType INVERSION() {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("inversion")).getValue();
-    }
-
-    public static TokenType EQUALS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("equals")).getValue();
-    }
-
-    public static TokenType NOT_EQUALS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("not_equals")).getValue();
-    }
-
-    public static TokenType GREATER() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("greater")).getValue();
-    }
-
-    public static TokenType GREATER_OR_EQUALS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("greater_or_equals")).getValue();
-    }
-
-    public static TokenType LESS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("less")).getValue();
-    }
-
-    public static TokenType LESS_OR_EQUALS() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("less_or_equals")).getValue();
     }
 
 

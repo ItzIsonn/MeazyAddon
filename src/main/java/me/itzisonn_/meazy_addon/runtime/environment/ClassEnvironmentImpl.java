@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
@@ -49,7 +48,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
     @Override
     public void declareVariable(VariableValue value) {
-        if (getVariable(value.getId()) != null) throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists");
+        if (getVariable(value.getId()) != null) throw new RuntimeException("Variable with id " + value.getId() + " already exists");
         variables.add(value);
     }
 
@@ -99,7 +98,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
                     if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
-                throw new InvalidSyntaxException("Function for operator " + value.getId() + " already exists");
+                throw new RuntimeException("Function for operator " + value.getId() + " already exists");
             }
         }
 
@@ -153,7 +152,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
                 if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
             }
 
-            throw new InvalidSyntaxException("Constructor with these parameters already exists");
+            throw new RuntimeException("Constructor with these parameters already exists");
         }
 
         constructors.add(value);

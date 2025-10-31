@@ -20,7 +20,6 @@ public class PostfixExpressionParsingFunction extends AbstractParsingFunction<Ex
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression id = parser.parseAfter(AddonMain.getIdentifier("postfix_expression"), Expression.class);
 
         if (AddonTokenTypeSets.OPERATOR_POSTFIX().contains(parser.getCurrent().getType())) {

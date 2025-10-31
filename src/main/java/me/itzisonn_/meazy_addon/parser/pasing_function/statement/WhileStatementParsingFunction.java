@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -22,18 +23,18 @@ public class WhileStatementParsingFunction extends AbstractParsingFunction<While
     public WhileStatement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
 
-        parser.getCurrentAndNext(AddonTokenTypes.WHILE(), "Expected while keyword");
+        parser.getCurrentAndNext(AddonTokenTypes.WHILE(), Text.translatable("meazy_addon:parser.expected.keyword", "while"));
 
-        parser.getCurrentAndNext(AddonTokenTypes.LEFT_PAREN(), "Expected left parenthesis to open while condition");
+        parser.getCurrentAndNext(AddonTokenTypes.LEFT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.start", "left_parenthesis", "while_condition"));
         Expression condition = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
-        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close while condition");
+        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.end", "right_parenthesis", "while_condition"));
 
         parser.moveOverOptionalNewLines();
-        parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open while body");
+        parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "while_body"));
         List<Statement> body = ParsingHelper.parseBody(context);
-        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close while body");
+        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "while_body"));
 
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the while statement");
+        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "while"));
 
         return new WhileStatement(condition, body);
     }

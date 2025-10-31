@@ -3,7 +3,6 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function.expression;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
@@ -22,13 +21,13 @@ public class MemberExpressionEvaluationFunction extends AbstractEvaluationFuncti
 
         if (value instanceof NullValue) {
             if (memberExpression.isNullSafe()) return value;
-            else throw new InvalidSyntaxException("Can't get member of null value");
+            else throw new RuntimeException("Can't get member of null value");
         }
 
         if (value instanceof ClassValue classValue) {
             return interpreter.evaluate(memberExpression.getMember(), classValue.getEnvironment(), environment);
         }
 
-        throw new InvalidSyntaxException("Can't get member of " + value + " because it's not a class");
+        throw new RuntimeException("Can't get member of " + value + " because it's not a class");
     }
 }

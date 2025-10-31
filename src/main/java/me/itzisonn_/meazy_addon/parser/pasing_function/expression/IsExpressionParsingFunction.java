@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
@@ -16,12 +17,12 @@ public class IsExpressionParsingFunction extends AbstractParsingFunction<Express
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression value = parser.parseAfter(AddonMain.getIdentifier("is_expression"), Expression.class);
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.IS()) || parser.getCurrent().getType().equals(AddonTokenTypes.IS_LIKE())) {
             boolean isLike = parser.getCurrentAndNext().getType().equals(AddonTokenTypes.IS_LIKE());
-            return new IsExpression(value, parser.getCurrentAndNext(AddonTokenTypes.ID(), "Must specify data type after is keyword").getValue(), isLike);
+            String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected.after_keyword", "id", "is")).getValue();
+            return new IsExpression(value, id, isLike);
         }
 
         return value;

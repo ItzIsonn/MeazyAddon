@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
@@ -22,11 +21,11 @@ public class FileReaderClassNative {
     @Function
     public static InnerFileReaderValue getNativeFileReader(@Argument RuntimeValue<?> file) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {
-            throw new InvalidSyntaxException("Can't create file reader from non-file value");
+            throw new RuntimeException("Can't create file reader from non-file value");
         }
-        if (!classValue.getId().equals("File")) throw new InvalidSyntaxException("Can't create file reader from non-file value");
+        if (!classValue.getId().equals("File")) throw new RuntimeException("Can't create file reader from non-file value");
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("file").getVariable("file").getValue() instanceof FileClassNative.InnerFileValue fileValue)) {
-            throw new InvalidSyntaxException("Can't create file reader from non-file value");
+            throw new RuntimeException("Can't create file reader from non-file value");
         }
 
         try {
@@ -42,7 +41,7 @@ public class FileReaderClassNative {
     @Function
     public static RuntimeValue<?> readLine(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("fileReader").getVariable("fileReader").getValue();
-        if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new InvalidSyntaxException("Can't read from non-file reader value");
+        if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new RuntimeException("Can't read from non-file reader value");
 
         try {
             String line = fileReaderValue.getValue().readLine();
@@ -57,7 +56,7 @@ public class FileReaderClassNative {
     @Function
     public static ClassValue readAllLines(RuntimeContext context, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("fileReader").getVariable("fileReader").getValue();
-        if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new InvalidSyntaxException("Can't read from non-file reader value");
+        if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new RuntimeException("Can't read from non-file reader value");
 
         List<RuntimeValue<?>> lines = new ArrayList<>();
         for (String line : fileReaderValue.getValue().lines().toList()) {
@@ -69,7 +68,7 @@ public class FileReaderClassNative {
     @Function
     public static void close(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("fileReader").getVariable("fileReader").getValue();
-        if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new InvalidSyntaxException("Can't close non-file reader value");
+        if (!(value instanceof InnerFileReaderValue fileReaderValue)) throw new RuntimeException("Can't close non-file reader value");
 
         try {
             fileReaderValue.getValue().close();

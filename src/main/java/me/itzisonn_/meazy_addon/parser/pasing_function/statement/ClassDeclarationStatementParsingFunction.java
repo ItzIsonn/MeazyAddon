@@ -2,7 +2,9 @@ package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -10,7 +12,6 @@ import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
@@ -42,11 +43,10 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
     @Override
     public ClassDeclarationStatement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
 
-        parser.getCurrentAndNext(AddonTokenTypes.CLASS(), "Expected class keyword");
-        String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected id after class keyword").getValue();
+        parser.getCurrentAndNext(AddonTokenTypes.CLASS(), Text.translatable("meazy_addon:parser.expected.keyword", "class"));
+        String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected.after_keyword", "id", "class")).getValue();
 
         List<Statement> generatedBody = new ArrayList<>();
         if (modifiers.contains(AddonModifiers.DATA())) {
@@ -55,14 +55,15 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         }
 
         Set<String> baseClasses = new HashSet<>();
-        if (parser.getCurrent().getType().equals(AddonTokenTypes.COLON())) {
-            parser.getCurrentAndNext();
-            baseClasses.add(parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected id as base class").getValue());
+        int baseClassesLineNumber = -1;
 
-            while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
-                parser.getCurrentAndNext();
-                baseClasses.add(parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected id as base class after comma").getValue());
+        if (parser.getCurrent().getType().equals(AddonTokenTypes.COLON())) {
+            baseClassesLineNumber = parser.getCurrent().getLine();
+            do {
+                parser.next();
+                baseClasses.add(parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected", "id")).getValue());
             }
+            while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA()));
         }
 
         boolean hasNewLine = parser.getCurrent().getType().equals(TokenTypes.NEW_LINE());
@@ -72,35 +73,37 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 
-        parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
+        parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "class_body"));
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
-            parser.getCurrentAndNext();
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
+            parser.next();
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
             return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
+        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected", "new_line"));
         parser.moveOverOptionalNewLines();
 
         LinkedHashMap<String, List<Expression>> enumIds = new LinkedHashMap<>();
         if (modifiers.contains(AddonModifiers.ENUM())) {
-            if (!baseClasses.isEmpty()) throw new InvalidSyntaxException("Enum class can't have base classes");
+            if (!baseClasses.isEmpty()) throw new InvalidSyntaxException(baseClassesLineNumber, Text.translatable("meazy_addon:parser.exception.enums.base_classes"));
 
-            String enumId = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected enum member id").getValue();
+            String enumId = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected", "id")).getValue();
             List<Expression> args;
-            if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_PAREN())) args = ParsingHelper.parseArgs(context);
+            if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_PARENTHESIS())) args = ParsingHelper.parseArgs(context);
             else args = new ArrayList<>();
             enumIds.put(enumId, args);
 
             while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
-                parser.getCurrentAndNext();
+                parser.next();
                 parser.moveOverOptionalNewLines();
 
-                enumId = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected enum member id").getValue();
-                if (enumIds.containsKey(enumId)) throw new InvalidSyntaxException("Enum class can't have duplicated entries");
-                if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_PAREN())) args = ParsingHelper.parseArgs(context);
+                int lineNumber = parser.getCurrent().getLine();
+                enumId = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected", "id")).getValue();
+                if (enumIds.containsKey(enumId)) throw new InvalidSyntaxException(lineNumber, Text.translatable("meazy_addon:parser.exception.enums.duplicated_entries"));
+
+                if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_PARENTHESIS())) args = ParsingHelper.parseArgs(context);
                 else args = new ArrayList<>();
                 enumIds.put(enumId, args);
             }
@@ -131,8 +134,8 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             parser.moveOverOptionalNewLines();
         }
 
-        parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
+        parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "class_body"));
+        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "class_declaration"));
 
         return new ClassDeclarationStatement(modifiers, id, baseClasses, body, enumIds);
     }

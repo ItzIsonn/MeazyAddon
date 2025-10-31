@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
+import me.itzisonn_.meazy.runtime.interpreter.UnsupportedOperatorException;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
@@ -119,9 +119,9 @@ public final class AddonOperators {
                     string = stringValue.getValue();
                     amount = numberValue.getValue();
                 }
-                else throw new InvalidSyntaxException("Can't multiply values " + value1 + " and " + value2);
+                else throw new UnsupportedOperatorException("Can't multiply values " + value1 + " and " + value2);
 
-                if (amount < 0) throw new InvalidSyntaxException("Can't multiply string by a negative int");
+                if (amount < 0) throw new UnsupportedOperatorException("Can't multiply string by a negative int");
 
                 return StringClassNative.newString(environment, new StringBuilder().repeat(string, amount).toString());
             }

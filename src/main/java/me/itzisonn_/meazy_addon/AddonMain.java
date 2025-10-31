@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
@@ -13,7 +14,6 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -62,10 +62,10 @@ public class AddonMain extends Addon {
                 else {
                     Statement statement = parser.parse(getIdentifier("global_statement"), Statement.class);
                     if (statement instanceof ImportStatement) {
-                        if (!isProgramHead) throw new InvalidSyntaxException("Imports must be at file's beginning");
+                        if (!isProgramHead) throw new RuntimeException("Imports must be at file's beginning");
                     }
                     else if (statement instanceof UsingStatement) {
-                        if (!isProgramHead) throw new InvalidSyntaxException("Using statements must be at file's beginning");
+                        if (!isProgramHead) throw new RuntimeException("Using statements must be at file's beginning");
                     }
                     else isProgramHead = false;
                     body.add(statement);
@@ -127,7 +127,7 @@ public class AddonMain extends Addon {
 
             FunctionValue function = fileEnvironment.getFunction("main", List.of());
             if (function == null) {
-                MeazyMain.LOGGER.log(Level.WARN, "File doesn't contain main function");
+                MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy_addon:runtime.file_doesnt_contain_main_function"));
                 return fileEnvironment;
             }
 
@@ -144,8 +144,6 @@ public class AddonMain extends Addon {
         Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.register(getIdentifier("constructor_environment_factory"), new ConstructorEnvironmentFactoryImpl());
         Registries.LOOP_ENVIRONMENT_FACTORY.register(getIdentifier("loop_environment_factory"), new LoopEnvironmentFactoryImpl());
         Registries.ENVIRONMENT_FACTORY.register(getIdentifier("environment_factory"), new EnvironmentFactoryImpl());
-
-        getLogger().log(Level.INFO, "Successfully initialized");
     }
 
     public static RegistryIdentifier getIdentifier(String id) {

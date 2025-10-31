@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Modifier;
@@ -40,11 +41,11 @@ public class GlobalStatementParsingFunction extends AbstractParsingFunction<Stat
         if (parser.getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
             VariableDeclarationStatement variableDeclarationStatement =
                     parser.parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
+            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "variable_declaration"));
             parser.moveOverOptionalNewLines();
             return variableDeclarationStatement;
         }
 
-        throw new InvalidStatementException("At global environment you only can declare variable, function or class", parser.getCurrent().getLine());
+        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.exception.global_statement"));
     }
 }

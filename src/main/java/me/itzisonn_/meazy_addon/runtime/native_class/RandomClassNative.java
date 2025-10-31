@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
@@ -23,28 +22,28 @@ public class RandomClassNative {
     @Function
     public static void setSeed(@Argument RuntimeValue<?> seed, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> rawRandom = functionEnvironment.getVariableDeclarationEnvironment("random").getVariable("random").getValue();
-        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Invalid random value");
+        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new RuntimeException("Invalid random value");
 
-        if (!(seed.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidSyntaxException("Can't set seed to non-int value");
+        if (!(seed.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't set seed to non-int value");
         randomValue.getValue().setSeed(intValue.getValue());
     }
 
     @Function
     public static IntValue randomInt(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> rawRandom = functionEnvironment.getVariableDeclarationEnvironment("random").getVariable("random").getValue();
-        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Invalid random value");
+        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new RuntimeException("Invalid random value");
 
-        if (!(value.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidSyntaxException("Can't get random of non-int value");
+        if (!(value.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't get random of non-int value");
         return new IntValue(randomValue.getValue().nextInt(intValue.getValue()));
     }
 
     @Function
     public static IntValue randomInt(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> rawRandom = functionEnvironment.getVariableDeclarationEnvironment("random").getVariable("random").getValue();
-        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Invalid random value");
+        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new RuntimeException("Invalid random value");
 
         if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue) || !(end.getFinalRuntimeValue() instanceof IntValue endValue)) {
-            throw new InvalidSyntaxException("Can't get random of non-int values");
+            throw new RuntimeException("Can't get random of non-int values");
         }
         return new IntValue(randomValue.getValue().nextInt(beginValue.getValue(), endValue.getValue()));
     }
@@ -52,7 +51,7 @@ public class RandomClassNative {
     @Function
     public static DoubleValue randomDouble(FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> rawRandom = functionEnvironment.getVariableDeclarationEnvironment("random").getVariable("random").getValue();
-        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Invalid random value");
+        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new RuntimeException("Invalid random value");
 
         return new DoubleValue(randomValue.getValue().nextDouble());
     }
@@ -60,19 +59,19 @@ public class RandomClassNative {
     @Function
     public static DoubleValue randomDouble(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> rawRandom = functionEnvironment.getVariableDeclarationEnvironment("random").getVariable("random").getValue();
-        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Invalid random value");
+        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new RuntimeException("Invalid random value");
 
-        if (!(value.getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't get random of non-number value");
+        if (!(value.getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new RuntimeException("Can't get random of non-number value");
         return new DoubleValue(randomValue.getValue().nextDouble(numberValue.getValue().doubleValue()));
     }
 
     @Function
     public static DoubleValue randomDouble(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> rawRandom = functionEnvironment.getVariableDeclarationEnvironment("random").getVariable("random").getValue();
-        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Invalid random value");
+        if (!(rawRandom instanceof InnerRandomValue randomValue)) throw new RuntimeException("Invalid random value");
 
         if (!(begin.getFinalRuntimeValue() instanceof DoubleValue beginValue) || !(end.getFinalRuntimeValue() instanceof DoubleValue endValue)) {
-            throw new InvalidSyntaxException("Can't get random of non-number values");
+            throw new RuntimeException("Can't get random of non-number values");
         }
         return new DoubleValue(randomValue.getValue().nextDouble(beginValue.getValue(), endValue.getValue()));
     }

@@ -3,7 +3,6 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
@@ -24,6 +23,6 @@ public class ReturnStatementEvaluationFunction extends AbstractEvaluationFunctio
             return null;
         }
 
-        throw new InvalidSyntaxException("Can't return value not inside a function");
+        throw new RuntimeException("Can't return value not inside a function");
     }
 }

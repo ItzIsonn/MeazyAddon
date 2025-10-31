@@ -2,7 +2,8 @@ package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
-import me.itzisonn_.meazy.parser.InvalidStatementException;
+import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -26,19 +27,18 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
     @Override
     public VariableDeclarationStatement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
 
         if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
         if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
-        boolean isConstant = parser.getCurrentAndNext(AddonTokenTypes.VARIABLE(), "Expected variable keyword").getValue().equals("val");
+        boolean isConstant = parser.getCurrentAndNext(AddonTokenTypes.VARIABLE(), Text.translatable("meazy_addon:parser.expected.keyword", "variable")).getValue().equals("val");
 
         List<VariableDeclarationStatement.VariableDeclarationInfo> declarations = new ArrayList<>();
         declarations.add(parseVariableDeclarationInfo(context, isConstant, canWithoutValue));
 
         while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
-            parser.getCurrentAndNext();
+            parser.next();
             declarations.add(parseVariableDeclarationInfo(context, isConstant, canWithoutValue));
         }
 
@@ -49,7 +49,7 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
 
     private static VariableDeclarationStatement.VariableDeclarationInfo parseVariableDeclarationInfo(ParsingContext context, boolean isConstant, boolean canWithoutValue) {
         Parser parser = context.getParser();
-        String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
+        String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected", "id")).getValue();
 
         DataType dataType = ParsingHelper.parseDataType(context);
         if (dataType == null) dataType = Registries.DATA_TYPE_FACTORY.getEntry().getValue().create();
@@ -58,11 +58,11 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
             if (canWithoutValue) {
                 return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, null);
             }
-            if (isConstant) throw new InvalidStatementException("Can't declare a constant variable without a value", parser.getCurrent().getLine());
+            if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.exception.constant_without_value"));
             return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, new NullLiteral());
         }
 
-        parser.getCurrentAndNext(AddonTokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
+        parser.next(AddonTokenTypes.ASSIGN(), Text.translatable("meazy_addon:parser.expected.after", "assign", "id"));
 
         return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, parser.parse(AddonMain.getIdentifier("expression"), Expression.class));
     }

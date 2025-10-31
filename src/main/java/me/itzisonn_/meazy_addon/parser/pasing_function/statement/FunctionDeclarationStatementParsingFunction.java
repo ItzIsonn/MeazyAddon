@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
@@ -28,36 +29,35 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
         Parser parser = context.getParser();
 
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
-
-        parser.getCurrentAndNext(AddonTokenTypes.FUNCTION(), "Expected function keyword");
+        parser.next(AddonTokenTypes.FUNCTION(), Text.translatable("meazy_addon:parser.expected.keyword", "function"));
 
         String classId = null;
-        String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after function keyword").getValue();
+        String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected.after_keyword", "id", "function")).getValue();
         if (parser.getCurrent().getType().equals(AddonTokenTypes.DOT())) {
-            parser.getCurrentAndNext();
+            parser.next();
             classId = id;
-            id = parser.getCurrentAndNext(AddonTokenTypes.ID(), "Expected identifier after function keyword").getValue();
+            id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected", "id")).getValue();
         }
 
         List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (modifiers.contains(AddonModifiers.ABSTRACT()) || modifiers.contains(AddonModifiers.NATIVE())) {
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
+            parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "function_declaration"));
             return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
         }
 
         List<Statement> body;
         if (parser.getCurrent().getType().equals(AddonTokenTypes.ARROW())) {
-            parser.getCurrentAndNext();
+            parser.next();
             body = new ArrayList<>(List.of(parser.parse(AddonMain.getIdentifier("statement"))));
         }
         else {
             parser.moveOverOptionalNewLines();
-            parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), "Expected left brace to open function body");
+            parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "function_body"));
             body = ParsingHelper.parseBody(context);
-            parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
+            parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "function_body"));
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "function_declaration"));
         }
 
         return new FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType);

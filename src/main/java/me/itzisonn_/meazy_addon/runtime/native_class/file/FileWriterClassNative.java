@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
@@ -20,11 +19,11 @@ public class FileWriterClassNative {
     @Function
     public static InnerFileValue getNativeFile(@Argument RuntimeValue<?> file) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {
-            throw new InvalidSyntaxException("Can't create file writer from non-file value");
+            throw new RuntimeException("Can't create file writer from non-file value");
         }
-        if (!classValue.getId().equals("File")) throw new InvalidSyntaxException("Can't create file writer from non-file value");
+        if (!classValue.getId().equals("File")) throw new RuntimeException("Can't create file writer from non-file value");
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("file").getVariable("file").getValue() instanceof FileClassNative.InnerFileValue fileValue)) {
-            throw new InvalidSyntaxException("Can't create file writer from non-file value");
+            throw new RuntimeException("Can't create file writer from non-file value");
         }
 
         return new InnerFileValue(fileValue.getValue());
@@ -35,7 +34,7 @@ public class FileWriterClassNative {
     @Function
     public static void write(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
-        if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't write with non-file value");
+        if (!(file instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't write with non-file value");
 
         try {
             Files.write(fileValue.getValue().toPath(), String.valueOf(value.getFinalValue()).getBytes());
@@ -48,7 +47,7 @@ public class FileWriterClassNative {
     @Function
     public static void writeAppend(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
-        if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't write with non-file value");
+        if (!(file instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't write with non-file value");
 
         try {
             Files.write(fileValue.getValue().toPath(), String.valueOf(value.getFinalValue()).getBytes(), StandardOpenOption.APPEND);
@@ -61,14 +60,14 @@ public class FileWriterClassNative {
     @Function
     public static void writeLines(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         RuntimeValue<?> file = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
-        if (!(file instanceof InnerFileValue fileValue)) throw new InvalidSyntaxException("Can't write with non-file value");
+        if (!(file instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't write with non-file value");
 
         if (!(value.getFinalRuntimeValue() instanceof ClassValue classValue)) {
-            throw new InvalidSyntaxException("Can't write non-collection value");
+            throw new RuntimeException("Can't write non-collection value");
         }
-        if (!classValue.getBaseClasses().contains("Collection")) throw new InvalidSyntaxException("Can't write non-collection value");
+        if (!classValue.getBaseClasses().contains("Collection")) throw new RuntimeException("Can't write non-collection value");
         if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("collection").getVariable("collection").getValue() instanceof InnerCollectionValue<?> collectionValue)) {
-            throw new InvalidSyntaxException("Can't write non-collection value");
+            throw new RuntimeException("Can't write non-collection value");
         }
 
         try {

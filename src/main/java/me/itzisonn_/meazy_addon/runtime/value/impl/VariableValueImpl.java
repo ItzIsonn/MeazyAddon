@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
+import me.itzisonn_.meazy.runtime.interpreter.InvalidActionException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -106,9 +106,9 @@ public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue
     }
 
     @Override
-    public void setValue(RuntimeValue<?> value) throws InvalidSyntaxException, InvalidValueException {
+    public void setValue(RuntimeValue<?> value) throws InvalidActionException, InvalidValueException {
         if (isConstant && this.value != null && this.value.getFinalValue() != null) {
-            throw new InvalidSyntaxException("Can't reassign value of constant variable " + id);
+            throw new InvalidActionException("Can't reassign value of constant variable " + id);
         }
 
         if (value != null && !dataType.isMatches(value, parentEnvironment.getFileEnvironment())) {

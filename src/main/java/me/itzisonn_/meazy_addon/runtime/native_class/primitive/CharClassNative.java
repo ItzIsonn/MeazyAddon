@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
@@ -41,7 +40,7 @@ public class CharClassNative {
         if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
 
         RuntimeValue<?> runtimeValue = classEnvironment.getVariable("value").getValue();
-        if (!(runtimeValue instanceof StringClassNative.InnerStringValue stringValue)) throw new InvalidSyntaxException("Can't get data of non-string value");
+        if (!(runtimeValue instanceof StringClassNative.InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");
 
         return stringValue.getValue().length() == 1;
     }

@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.native_annotation.IsMatches;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
@@ -52,10 +51,10 @@ public abstract class ClassValueImpl extends ModifierableRuntimeValueImpl<Object
                 if (!method.isAnnotationPresent(IsMatches.class)) continue;
 
                 if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                    throw new InvalidSyntaxException("Can't call non-static native method to check whether class with id " + getEnvironment().getId() + " matches value");
+                    throw new RuntimeException("Can't call non-static native method to check whether class with id " + getEnvironment().getId() + " matches value");
                 }
                 if (!method.canAccess(null)) {
-                    throw new InvalidSyntaxException("Can't call non-accessible native method to check whether class with id " + getEnvironment().getId() + " matches value");
+                    throw new RuntimeException("Can't call non-accessible native method to check whether class with id " + getEnvironment().getId() + " matches value");
                 }
                 if (!boolean.class.isAssignableFrom(method.getReturnType())) {
                     throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
@@ -85,7 +84,7 @@ public abstract class ClassValueImpl extends ModifierableRuntimeValueImpl<Object
 
                 if (Object.class.equals(parameter.getType())) methodArgs.add(value);
                 else if (ClassEnvironment.class.isAssignableFrom(parameter.getType())) methodArgs.add(getEnvironment());
-                else throw new InvalidSyntaxException("Failed to call native method with id " + nativeMethod.getName());
+                else throw new RuntimeException("Failed to call native method with id " + nativeMethod.getName());
             }
 
             try {

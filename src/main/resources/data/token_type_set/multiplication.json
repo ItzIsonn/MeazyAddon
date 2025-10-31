@@ -1,0 +1,8 @@
+{
+  "id": "multiplication",
+  "token_types": [
+    "multiply",
+    "divide",
+    "percent"
+  ]
+}

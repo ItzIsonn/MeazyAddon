@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.native_annotation.NewInstance;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
@@ -40,10 +39,10 @@ public class RuntimeClassValueImpl extends ClassValueImpl {
                 if (!method.isAnnotationPresent(NewInstance.class)) continue;
 
                 if (!method.accessFlags().contains(AccessFlag.STATIC)) {
-                    throw new InvalidSyntaxException("Can't call non-public static native method to create new instance of class with id " + getEnvironment().getId());
+                    throw new RuntimeException("Can't call non-public static native method to create new instance of class with id " + getEnvironment().getId());
                 }
                 if (!method.canAccess(null)) {
-                    throw new InvalidSyntaxException("Can't call non-accessible native method to create new instance of class with id " + getEnvironment().getId());
+                    throw new RuntimeException("Can't call non-accessible native method to create new instance of class with id " + getEnvironment().getId());
                 }
                 if (!ClassValue.class.isAssignableFrom(method.getReturnType())) {
                     throw new RuntimeException("Return value of native method with id " + method.getName() + " is invalid");
@@ -87,7 +86,7 @@ public class RuntimeClassValueImpl extends ClassValueImpl {
                 if (Set.class.isAssignableFrom(parameter.getType())) methodArgs.add(getBaseClasses());
                 else if (ClassEnvironment.class.isAssignableFrom(parameter.getType())) methodArgs.add(classEnvironment);
                 else if (List.class.isAssignableFrom(parameter.getType())) methodArgs.add(body);
-                else throw new InvalidSyntaxException("Failed to call native method with id " + getId());
+                else throw new RuntimeException("Failed to call native method with id " + getId());
             }
 
             try {

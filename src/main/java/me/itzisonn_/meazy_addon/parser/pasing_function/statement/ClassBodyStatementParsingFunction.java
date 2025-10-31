@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Modifier;
@@ -33,7 +34,8 @@ public class ClassBodyStatementParsingFunction extends AbstractParsingFunction<S
         if (parser.getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
             VariableDeclarationStatement variableDeclarationStatement =
                     parser.parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
+
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "variable_declaration"));
             parser.moveOverOptionalNewLines();
             return variableDeclarationStatement;
         }
@@ -41,6 +43,6 @@ public class ClassBodyStatementParsingFunction extends AbstractParsingFunction<S
             return parser.parse(AddonMain.getIdentifier("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
         }
 
-        throw new InvalidStatementException("Invalid statement found", parser.getCurrent().getLine());
+        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.expected.statement", "class_body"));
     }
 }

@@ -24,4 +24,16 @@ public final class AddonTokenTypeSets {
     public static TokenTypeSet MEMBER_ACCESS() {
         return Registries.TOKEN_TYPE_SETS.getEntry(AddonMain.getIdentifier("member_access")).getValue();
     }
+
+    public static TokenTypeSet COMPARISON() {
+        return Registries.TOKEN_TYPE_SETS.getEntry(AddonMain.getIdentifier("comparison")).getValue();
+    }
+
+    public static TokenTypeSet MULTIPLICATION() {
+        return Registries.TOKEN_TYPE_SETS.getEntry(AddonMain.getIdentifier("multiplication")).getValue();
+    }
+
+    public static TokenTypeSet ADDITION() {
+        return Registries.TOKEN_TYPE_SETS.getEntry(AddonMain.getIdentifier("addition")).getValue();
+    }
 }

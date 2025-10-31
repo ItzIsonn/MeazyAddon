@@ -3,7 +3,6 @@ package me.itzisonn_.meazy_addon.runtime.environment;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 
 import java.util.HashSet;
@@ -32,7 +31,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
                     if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
-                throw new InvalidSyntaxException("Function with id " + value.getId() + " already exists");
+                throw new RuntimeException("Function with id " + value.getId() + " already exists");
             }
         }
 

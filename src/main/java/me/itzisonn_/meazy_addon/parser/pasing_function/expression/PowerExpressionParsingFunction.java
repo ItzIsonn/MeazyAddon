@@ -17,11 +17,10 @@ public class PowerExpressionParsingFunction extends AbstractParsingFunction<Expr
     @Override
     public Expression parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
-
         Expression left = parser.parseAfter(AddonMain.getIdentifier("power_expression"), Expression.class);
 
         while (parser.getCurrent().getType().equals(AddonTokenTypes.POWER())) {
-            parser.getCurrentAndNext();
+            parser.next();
             Expression right = parser.parseAfter(AddonMain.getIdentifier("power_expression"), Expression.class);
             left = new OperatorExpression(left, right, AddonOperators.POWER());
         }
