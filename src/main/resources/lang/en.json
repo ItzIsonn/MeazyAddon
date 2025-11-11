@@ -1,4 +1,9 @@
 {
+  "addons.cant_find": "Can't find required addon with id '{0}'",
+  "addons.cant_find_version": "Can't find required addon with id '{0}' of version {1} (found version {2})",
+
+
+
   "parser.expected": "Expected '{0}'",
   "parser.expected.keyword": "Expected '{0}' keyword",
   "parser.expected.statement": "Expected '{0}' statement",
@@ -14,8 +19,10 @@
   "parser.expected.end_expression": "Expected '{0}' at the end of the '{1}' expression",
   "parser.expected.separator": "Expected '{0}' as a separator between parts of '{1}'",
   "parser.expected.separator_expression": "Expected '{0}' as a separator between parts of '{1}' expression",
+
   "parser.modifier.doesnt_exist": "Modifier with id '{0}' doesn't exist",
   "parser.modifier.unexpected": "Found unexpected modifier",
+
   "parser.exception.class_creation": "Class creation must be call expression",
   "parser.exception.call_not_identifier": "Can't call non-identifier as function",
   "parser.exception.member_expression": "Right side of 'member' expression must be either ID or 'call' expression",
@@ -26,7 +33,66 @@
   "parser.exception.global_statement": "Expected 'variable_declaration', 'function_declaration' or 'class_declaration' statement",
   "parser.exception.statement": "Expected 'function_call', 'class_call', 'assignment' or 'member' expression",
   "parser.exception.constant_without_value": "Can't declare a constant variable without a value",
+  "parser.exception.not_at_beginning": "'{0}' statement must be at the beginning of the file",
+
+
 
   "runtime.file_doesnt_contain_main_function": "File doesn't contain main function",
-  "runtime.unsafe": "It's unsafe to run file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})"
+  "runtime.invalid_identifier": "Invalid identifier '{0}'",
+  "runtime.number_too_big": "Number {0} is too big",
+  "runtime.cant_use_statement": "Can't use '{0}' statement in this environment",
+  "runtime.cant_use_modifier": "Can't use '{0}' modifier",
+  "runtime.cant_apply_foreach": "Can't apply foreach to non-collection",
+  "runtime.statement_must_be_last": "'{0}' statement must be last in body",
+  "runtime.cant_run_program": "Can't run program in non-file environment",
+  "runtime.cant_assign_value": "Can't assign value to {0}",
+  "runtime.condition_must_be_boolean": "Condition must be boolean value",
+  "runtime.value_out_of_bounds": "Resulted value {0} is out of bounds",
+
+  "runtime.class.doesnt_exist": "Class with id '{0}' doesn't exist",
+  "runtime.class.already_exists": "Class with id '{0}' already exists",
+  "runtime.class.cant_access": "Can't access class with id '{0}'",
+  "runtime.class.cant_call": "Can't create new instance of '{0}' because it's not a class",
+  "runtime.class.cant_call_base": "Can't call base class with id '{0}' because it's not the base class of class with id '{1}'",
+  "runtime.class.cant_inherit": "Can't inherit final class with id '{0}'",
+  "runtime.class.cant_extend": "Can't extend final class with id '{0}'",
+  "runtime.class.repeated.base_classes": "Class with id '{0}' has repeated base classes",
+  "runtime.class.repeated.functions": "Class with id '{0}' has repeated functions",
+  "runtime.class.repeated.variables": "Class with id '{0}' has repeated variables",
+  "runtime.class.instance.abstract": "Can't create instance of an abstract class with id '{0}'",
+  "runtime.class.instance.enum": "Can't create instance of an enum class with id '{0}'",
+
+  "runtime.function.doesnt_exist": "Function with id '{0}' doesn't exist",
+  "runtime.function.already_exists": "Function with id '{0}' already exists",
+  "runtime.function.cant_access": "Can't access function with id '{0}'",
+  "runtime.function.cant_call": "Can't call '{0}' because it's not a function",
+  "runtime.function.cant_override": "Can't override final function with id '{0}'",
+  "runtime.function.parameters_dont_match": "Can't call function with id '{0}': expected {1} parameters but found {2}",
+  "runtime.function.abstract_not_initialized": "Abstract function with id '{0}' in class with id '{1}' hasn't been initialized",
+  "runtime.function.operator.already_exists": "Function for operator with id '{0}' already exists",
+  "runtime.function.operator.outside_class": "Can't declare operator function with id '{0}' outside a class",
+  "runtime.function.operator.doesnt_exist": "Can't declare operator function because operator with id '{0}' doesn't exist",
+  "runtime.function.operator.parameters_dont_match": "Function for operator with id '{0}' must have {1} parameters",
+  "runtime.function.operator.no_return_value": "Operator function must have return value",
+
+  "runtime.constructor.doesnt_exist": "Requested constructor for class with id '{0}' doesn't exist",
+  "runtime.constructor.already_exists": "Constructor with these parameters already exists",
+  "runtime.constructor.cant_access": "Can't access requested constructor for class with id '{0}'",
+
+  "runtime.variable.doesnt_exist": "Variable with id '{0}' doesn't exist",
+  "runtime.variable.already_exists": "Variable with id '{0}' already exists",
+  "runtime.variable.cant_access": "Can't access variable with id '{0}'",
+  "runtime.variable.not_initialized": "Constant variable with id '{0}' hasn't been initialized",
+  "runtime.variable.cant_reassign": "Can't reassign value of constant variable with id '{0}'",
+  "runtime.variable.invalid_data_type": "Variable with id '{0}' requires data type '{1}'",
+
+  "runtime.member.null": "Can't get member of 'null'",
+  "runtime.member.not_class": "Can't get member of '{0}' because it's not a class",
+
+  "runtime.this.not_inside_class": "Can't use 'this' keyword not inside a class",
+  "runtime.this.shared": "Can't use 'this' keyword inside a shared environment",
+
+  "runtime.return_value.must_return": "Function with id '{0}' must return value but haven't",
+  "runtime.return_value.must_not_return": "Function with id '{0}' must not return value but have",
+  "runtime.return_value.different_data_type": "Function with id '{0}' returned value of different data type (expected {1})"
 }

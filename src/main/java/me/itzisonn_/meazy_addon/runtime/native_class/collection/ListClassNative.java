@@ -56,7 +56,7 @@ public class ListClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't add element to non-list value");
 
-        return new BooleanValue(listValue.getValue().add(element.getFinalRuntimeValue()));
+        return BooleanValue.of(listValue.getValue().add(element.getFinalRuntimeValue()));
     }
 
     @Function
@@ -73,7 +73,7 @@ public class ListClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't remove element to non-list value");
 
-        return new BooleanValue(listValue.getValue().remove(element.getFinalRuntimeValue()));
+        return BooleanValue.of(listValue.getValue().remove(element.getFinalRuntimeValue()));
     }
 
     @Function
@@ -101,7 +101,7 @@ public class ListClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't use non-list value");
 
-        return new BooleanValue(listValue.getValue().isEmpty());
+        return BooleanValue.of(listValue.getValue().isEmpty());
     }
 
     @Function
@@ -109,7 +109,7 @@ public class ListClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerListValue listValue)) throw new RuntimeException("Can't use non-list value");
 
-        return new BooleanValue(listValue.getValue().contains(element.getFinalRuntimeValue()));
+        return BooleanValue.of(listValue.getValue().contains(element.getFinalRuntimeValue()));
     }
 
 

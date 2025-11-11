@@ -58,7 +58,7 @@ public class SetClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new RuntimeException("Can't add element to non-set value");
 
-        return new BooleanValue(setValue.getValue().add(element.getFinalRuntimeValue()));
+        return BooleanValue.of(setValue.getValue().add(element.getFinalRuntimeValue()));
     }
 
     @Function
@@ -66,7 +66,7 @@ public class SetClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new RuntimeException("Can't remove element to non-set value");
 
-        return new BooleanValue(setValue.getValue().remove(element.getFinalRuntimeValue()));
+        return BooleanValue.of(setValue.getValue().remove(element.getFinalRuntimeValue()));
     }
 
 
@@ -76,7 +76,7 @@ public class SetClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new RuntimeException("Can't use non-set value");
 
-        return new BooleanValue(setValue.getValue().isEmpty());
+        return BooleanValue.of(setValue.getValue().isEmpty());
     }
 
     @Function
@@ -84,7 +84,7 @@ public class SetClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("collection").getVariable("collection").getValue();
         if (!(value instanceof InnerSetValue setValue)) throw new RuntimeException("Can't use non-set value");
 
-        return new BooleanValue(setValue.getValue().contains(element.getFinalRuntimeValue()));
+        return BooleanValue.of(setValue.getValue().contains(element.getFinalRuntimeValue()));
     }
 
 

@@ -13,9 +13,9 @@ public class BooleanClassNative {
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         return switch (value.getFinalValue().toString()) {
-            case "0", "false" -> new BooleanValue(false);
-            case "1", "true" -> new BooleanValue(true);
-            default -> new NullValue();
+            case "0", "false" -> BooleanValue.FALSE;
+            case "1", "true" -> BooleanValue.TRUE;
+            default -> NullValue.INSTANCE;
         };
     }
 

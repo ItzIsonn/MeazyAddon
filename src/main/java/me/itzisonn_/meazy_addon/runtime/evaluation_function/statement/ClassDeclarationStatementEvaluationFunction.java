@@ -2,9 +2,11 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -35,12 +37,13 @@ public class ClassDeclarationStatementEvaluationFunction extends AbstractEvaluat
     @Override
     public RuntimeValue<?> evaluate(ClassDeclarationStatement classDeclarationStatement, RuntimeContext context, Environment environment, Object... extra) {
         if (!(environment instanceof ClassDeclarationEnvironment classDeclarationEnvironment)) {
-            throw new RuntimeException("Can't declare class in this environment");
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_statement", "class_declaration"));
         }
 
         for (Modifier modifier : classDeclarationStatement.getModifiers()) {
-            if (!modifier.canUse(classDeclarationStatement, context, environment))
-                throw new RuntimeException("Can't use '" + modifier.getId() + "' Modifier");
+            if (!modifier.canUse(classDeclarationStatement, context, environment)) {
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_modifier", modifier.getId()));
+            }
         }
 
         ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(

@@ -3,6 +3,7 @@ package me.itzisonn_.meazy_addon.runtime.value.impl;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.Identifier;
@@ -97,7 +98,7 @@ public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue
     @Override
     public RuntimeValue<?> getValue() {
         if (rawValue != null) {
-            if (value != null) throw new RuntimeException("Invalid state of variable value");
+            if (value != null) throw new RuntimeException("Unexpected error: invalid state of variable value");
             setValue(parentEnvironment.getFileEnvironment().getParent().getContext().getInterpreter().evaluate(rawValue, parentEnvironment));
             rawValue = null;
         }
@@ -108,11 +109,11 @@ public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue
     @Override
     public void setValue(RuntimeValue<?> value) throws InvalidActionException, InvalidValueException {
         if (isConstant && this.value != null && this.value.getFinalValue() != null) {
-            throw new InvalidActionException("Can't reassign value of constant variable " + id);
+            throw new InvalidActionException(Text.translatable("meazy_addon:runtime.variable.cant_reassign", id));
         }
 
         if (value != null && !dataType.isMatches(value, parentEnvironment.getFileEnvironment())) {
-            throw new InvalidValueException("Variable with id " + id + " requires data type " + dataType.getId());
+            throw new InvalidActionException(Text.translatable("meazy_addon:runtime.variable.invalid_data_type", id, dataType.toString()));
         }
         this.value = value;
     }

@@ -1,8 +1,6 @@
 package me.itzisonn_.meazy_addon;
 
-import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy_addon.runtime.value.number.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,17 +37,5 @@ public final class AddonUtils {
     public static String generatePrefixedName(String prefix, String name) {
         if (name.equals(name.toUpperCase())) return prefix.toUpperCase() + "_" + name;
         return prefix + name.substring(0, 1).toUpperCase() + name.substring(1);
-    }
-
-    public static NumberValue<?> optimalNumberValue(double value) {
-        if (value % 1 == 0) {
-            if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) return new IntValue((int) value);
-            if (value >= Long.MIN_VALUE && value <= Long.MAX_VALUE) return new LongValue((long) value);
-        }
-        else {
-            if (value >= -Float.MAX_VALUE && value <= Float.MAX_VALUE) return new FloatValue((float) value);
-            if (value >= -Double.MAX_VALUE && value <= Double.MAX_VALUE) return new DoubleValue(value);
-        }
-        throw new InvalidValueException("Resulted value " + value + " is out of bounds");
     }
 }

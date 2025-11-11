@@ -46,7 +46,7 @@ public class FileReaderClassNative {
         try {
             String line = fileReaderValue.getValue().readLine();
             if (line != null) return StringClassNative.newString(functionEnvironment.getFileEnvironment(), line);
-            else return new NullValue();
+            else return NullValue.INSTANCE;
         }
         catch (IOException e) {
             throw new RuntimeException("Can't read file", e);

@@ -1,10 +1,12 @@
 package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -25,18 +27,28 @@ public class FunctionDeclarationStatementEvaluationFunction extends AbstractEval
     public RuntimeValue<?> evaluate(FunctionDeclarationStatement functionDeclarationStatement, RuntimeContext context, Environment environment, Object... extra) {
         if (functionDeclarationStatement.getClassId() != null) {
             ClassValue classValue = environment.getFileEnvironment().getClass(functionDeclarationStatement.getClassId());
-            if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + functionDeclarationStatement.getClassId());
-            if (classValue.getModifiers().contains(AddonModifiers.FINAL())) throw new InvalidIdentifierException("Can't extend final class with id " + functionDeclarationStatement.getClassId());
-            if (!EvaluationHelper.extensionFunctions.contains(functionDeclarationStatement)) EvaluationHelper.extensionFunctions.add(functionDeclarationStatement);
+            if (classValue == null) {
+                throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.class.doesnt_exist", functionDeclarationStatement.getClassId()));
+            }
+
+            if (classValue.getModifiers().contains(AddonModifiers.FINAL())) {
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.class.cant_extend", functionDeclarationStatement.getClassId()));
+            }
+
+            if (!EvaluationHelper.extensionFunctions.contains(functionDeclarationStatement)) {
+                EvaluationHelper.extensionFunctions.add(functionDeclarationStatement);
+            }
             return null;
         }
 
         if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
-            throw new RuntimeException("Can't declare function in this environment");
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_statement", "function_declaration"));
         }
 
         for (Modifier modifier : functionDeclarationStatement.getModifiers()) {
-            if (!modifier.canUse(functionDeclarationStatement, context, environment)) throw new RuntimeException("Can't use '" + modifier.getId() + "' Modifier");
+            if (!modifier.canUse(functionDeclarationStatement, context, environment)) {
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_modifier", modifier.getId()));
+            }
         }
 
         FunctionValue functionValue = new RuntimeFunctionValueImpl(
@@ -49,21 +61,21 @@ public class FunctionDeclarationStatementEvaluationFunction extends AbstractEval
 
         if (functionDeclarationStatement.getModifiers().contains(AddonModifiers.OPERATOR())) {
             if (!(environment instanceof ClassEnvironment classEnvironment)) {
-                throw new RuntimeException("Can't declare operator function not inside a class");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.function.operator.outside_class", functionValue.getId()));
             }
 
             Operator operator = AddonOperators.parseById(functionValue.getId());
             if (operator == null) {
-                throw new RuntimeException("Can't declare operator function because operator " + functionValue.getId() + " doesn't exist");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.function.operator.doesnt_exist", functionValue.getId()));
             }
 
             int args = operator.getOperatorType() == OperatorType.INFIX ? 1 : 0;
             if (functionValue.getParameters().size() != args) {
-                throw new RuntimeException("Function for operator " + functionValue.getId() + " must have " + args + " args");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.function.operator.parameters_dont_match", functionValue.getId(), args));
             }
 
             if (functionValue.getReturnDataType() == null) {
-                throw new RuntimeException("Operator function must return value");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.function.operator.no_return_value"));
             }
 
             classEnvironment.declareOperatorFunction(functionValue);

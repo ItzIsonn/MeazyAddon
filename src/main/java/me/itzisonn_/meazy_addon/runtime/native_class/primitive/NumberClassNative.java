@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.IsMatches;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
@@ -14,10 +13,10 @@ public class NumberClassNative {
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {
-            return AddonUtils.optimalNumberValue(Double.parseDouble(value.getFinalValue().toString()));
+            return NumberValue.getOptimal(Double.parseDouble(value.getFinalValue().toString()));
         }
         catch (NumberFormatException ignore) {
-            return new NullValue();
+            return NullValue.INSTANCE;
         }
     }
 

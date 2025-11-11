@@ -9,8 +9,6 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.native_annotation.NewInstance;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -44,7 +42,7 @@ public class StringClassNative {
             return StringClassNative.newString(functionEnvironment, value.getFinalRuntimeValue().toString());
         }
         catch (NumberFormatException ignore) {
-            return new NullValue();
+            return NullValue.INSTANCE;
         }
     }
 
@@ -64,17 +62,17 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get char of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidArgumentException("Can't get char at non-int pos");
+        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't get char at non-int pos");
 
         try {
             return StringClassNative.newString(functionEnvironment, String.valueOf(stringValue.getValue().charAt(intValue.getValue())));
         }
         catch (IndexOutOfBoundsException ignore) {
-            throw new InvalidArgumentException("Index " + intValue.getValue() + " is out of bounds " + (stringValue.getValue().length() - 1));
+            throw new RuntimeException("Index " + intValue.getValue() + " is out of bounds " + (stringValue.getValue().length() - 1));
         }
     }
 
@@ -84,11 +82,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't change char of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidArgumentException("Can't set char at non-int pos");
+        if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't set char at non-int pos");
 
         StringBuilder stringBuilder = new StringBuilder(stringValue.getValue());
         stringBuilder.setCharAt(intValue.getValue(), character.getFinalValue().toString().charAt(0));
@@ -103,9 +101,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't replace in non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         return StringClassNative.newString(classEnvironment, stringValue.getValue().replace(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
@@ -116,9 +114,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't replace in non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().replaceAll(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
@@ -129,9 +127,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't replace in non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().replaceFirst(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
@@ -144,12 +142,12 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get substring of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new InvalidArgumentException("Can't get substring with non-int begin value");
-        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("Can't get substring with non-int end value");
+        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new RuntimeException("Can't get substring with non-int begin value");
+        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new RuntimeException("Can't get substring with non-int end value");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue(), endValue.getValue()));
     }
@@ -160,11 +158,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get substring of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new InvalidArgumentException("Can't get substring with non-int begin value");
+        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new RuntimeException("Can't get substring with non-int begin value");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue()));
     }
@@ -175,11 +173,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get substring of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("Can't get substring with non-int begin value");
+        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new RuntimeException("Can't get substring with non-int begin value");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(0, endValue.getValue()));
     }
@@ -192,9 +190,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't split non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         String[] splitString = stringValue.getValue().split(regex.getFinalValue().toString());
         List<RuntimeValue<?>> list = new ArrayList<>();
@@ -211,11 +209,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't repeat non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        if (!(times.getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidArgumentException("Can't repeat string non-int times");
+        if (!(times.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't repeat string non-int times");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().repeat(intValue.getValue()));
     }
@@ -226,9 +224,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't trim non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().trim());
     }
@@ -239,9 +237,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't make uppercase non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().toUpperCase());
     }
@@ -252,9 +250,9 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't make uppercase non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         return StringClassNative.newString(functionEnvironment, stringValue.getValue().toLowerCase());
     }
@@ -267,11 +265,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return new BooleanValue(stringValue.getValue().contains(target.getFinalValue().toString()));
+        return BooleanValue.of(stringValue.getValue().contains(target.getFinalValue().toString()));
     }
 
     @Function
@@ -280,11 +278,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return new BooleanValue(stringValue.getValue().startsWith(target.getFinalValue().toString()));
+        return BooleanValue.of(stringValue.getValue().startsWith(target.getFinalValue().toString()));
     }
 
     @Function
@@ -293,11 +291,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return new BooleanValue(stringValue.getValue().endsWith(target.getFinalValue().toString()));
+        return BooleanValue.of(stringValue.getValue().endsWith(target.getFinalValue().toString()));
     }
 
     @Function
@@ -306,11 +304,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return new BooleanValue(stringValue.getValue().isEmpty());
+        return BooleanValue.of(stringValue.getValue().isEmpty());
     }
 
     @Function
@@ -319,11 +317,11 @@ public class StringClassNative {
         if (!(value instanceof InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");
 
         if (!(functionEnvironment.getVariableDeclarationEnvironment("value") instanceof ClassEnvironment classEnvironment)) {
-            throw new InvalidCallException("Invalid function call");
+            throw new RuntimeException("Invalid function call");
         }
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return new BooleanValue(stringValue.getValue().isBlank());
+        return BooleanValue.of(stringValue.getValue().isBlank());
     }
 
 

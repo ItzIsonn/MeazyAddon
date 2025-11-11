@@ -123,8 +123,7 @@ public class RuntimeConstructorValueImpl extends ConstructorValueImpl {
         for (Statement statement : body) {
             if (statement instanceof BaseCallStatement) {
                 RuntimeValue<?> value = interpreter.evaluate(statement, constructorEnvironment, classEnvironment);
-                if (!(value instanceof BaseClassIdValue baseClassIdValue))
-                    throw new RuntimeException("Unknown error occurred");
+                if (!(value instanceof BaseClassIdValue baseClassIdValue)) throw new RuntimeException("Unknown error occurred");
                 calledBaseClasses.add(baseClassIdValue.getValue());
             }
             else interpreter.evaluate(statement, constructorEnvironment);

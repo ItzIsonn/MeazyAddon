@@ -17,7 +17,7 @@ public class IntClassNative {
             return new IntValue(Integer.parseInt(value.getFinalValue().toString().replaceAll("\\.0$", "")));
         }
         catch (NumberFormatException ignore) {
-            return new NullValue();
+            return NullValue.INSTANCE;
         }
     }
 

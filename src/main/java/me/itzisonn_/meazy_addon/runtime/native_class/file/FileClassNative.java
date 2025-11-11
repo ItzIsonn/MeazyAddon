@@ -63,7 +63,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't get data of non-file value");
 
-        return new BooleanValue(fileValue.getValue().exists());
+        return BooleanValue.of(fileValue.getValue().exists());
     }
 
     @Function
@@ -71,7 +71,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't get data of non-file value");
 
-        return new BooleanValue(fileValue.getValue().isHidden());
+        return BooleanValue.of(fileValue.getValue().isHidden());
     }
 
     @Function
@@ -79,7 +79,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't get data of non-file value");
 
-        return new BooleanValue(fileValue.getValue().isFile());
+        return BooleanValue.of(fileValue.getValue().isFile());
     }
 
     @Function
@@ -87,7 +87,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't get data of non-file value");
 
-        return new BooleanValue(fileValue.getValue().isDirectory());
+        return BooleanValue.of(fileValue.getValue().isDirectory());
     }
 
 
@@ -98,7 +98,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't get data of non-file value");
 
-        return new BooleanValue(fileValue.getValue().canRead());
+        return BooleanValue.of(fileValue.getValue().canRead());
     }
 
     @Function
@@ -106,7 +106,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't get data of non-file value");
 
-        return new BooleanValue(fileValue.getValue().canWrite());
+        return BooleanValue.of(fileValue.getValue().canWrite());
     }
 
     @Function
@@ -118,7 +118,7 @@ public class FileClassNative {
             throw new RuntimeException("Can't change readability to non-boolean value");
         }
 
-        return new BooleanValue(fileValue.getValue().setReadable(booleanValue.getValue()));
+        return BooleanValue.of(fileValue.getValue().setReadable(booleanValue.getValue()));
     }
 
     @Function
@@ -130,7 +130,7 @@ public class FileClassNative {
             throw new RuntimeException("Can't change ability to write to non-boolean value");
         }
 
-        return new BooleanValue(fileValue.getValue().setWritable(booleanValue.getValue()));
+        return BooleanValue.of(fileValue.getValue().setWritable(booleanValue.getValue()));
     }
 
 
@@ -141,7 +141,7 @@ public class FileClassNative {
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't create non-file value");
 
         try {
-            return new BooleanValue(fileValue.getValue().createNewFile());
+            return BooleanValue.of(fileValue.getValue().createNewFile());
         }
         catch (IOException e) {
             throw new RuntimeException("Can't create new file", e);
@@ -153,7 +153,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't delete non-file value");
 
-        return new BooleanValue(fileValue.getValue().delete());
+        return BooleanValue.of(fileValue.getValue().delete());
     }
 
     @Function
@@ -169,7 +169,7 @@ public class FileClassNative {
             throw new RuntimeException("Can't rename file to non-file value");
         }
 
-        return new BooleanValue(fileValue.getValue().renameTo(destinationValue.getValue()));
+        return BooleanValue.of(fileValue.getValue().renameTo(destinationValue.getValue()));
     }
 
     @Function
@@ -177,7 +177,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't create directory of non-file value");
 
-        return new BooleanValue(fileValue.getValue().mkdir());
+        return BooleanValue.of(fileValue.getValue().mkdir());
     }
 
     @Function
@@ -185,7 +185,7 @@ public class FileClassNative {
         RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("file").getVariable("file").getValue();
         if (!(value instanceof InnerFileValue fileValue)) throw new RuntimeException("Can't create directories of non-file value");
 
-        return new BooleanValue(fileValue.getValue().mkdirs());
+        return BooleanValue.of(fileValue.getValue().mkdirs());
     }
 
 

@@ -1,10 +1,12 @@
 package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
@@ -16,7 +18,10 @@ public class ProgramEvaluationFunction extends AbstractEvaluationFunction<Progra
 
     @Override
     public RuntimeValue<?> evaluate(Program program, RuntimeContext context, Environment environment, Object... extra) {
-        if (!(environment instanceof FileEnvironment)) throw new RuntimeException("Can't run program in non-file environment");
+        if (!(environment instanceof FileEnvironment)) {
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_run_program"));
+        }
+
         Interpreter interpreter = context.getInterpreter();
 
         for (Statement statement : program.getBody()) {

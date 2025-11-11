@@ -17,7 +17,7 @@ public class FloatClassNative {
             return new FloatValue(Float.parseFloat(value.getFinalValue().toString()));
         }
         catch (NumberFormatException ignore) {
-            return new NullValue();
+            return NullValue.INSTANCE;
         }
     }
 

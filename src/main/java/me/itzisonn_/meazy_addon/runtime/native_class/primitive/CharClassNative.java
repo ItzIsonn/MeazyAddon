@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.runtime.native_annotation.IsMatches;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
@@ -17,7 +16,7 @@ public class CharClassNative {
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         String stringValue = value.getFinalValue().toString();
         if (stringValue.length() == 1) return StringClassNative.newString(functionEnvironment.getFileEnvironment(), stringValue);
-        return new NullValue();
+        return NullValue.INSTANCE;
     }
 
     @IsMatches
@@ -37,7 +36,7 @@ public class CharClassNative {
 
     private static boolean fromClassValue(ClassValue classValue) {
         ClassEnvironment classEnvironment = classValue.getEnvironment();
-        if (!classEnvironment.getId().equals("String")) throw new InvalidCallException("Invalid function call");
+        if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
         RuntimeValue<?> runtimeValue = classEnvironment.getVariable("value").getValue();
         if (!(runtimeValue instanceof StringClassNative.InnerStringValue stringValue)) throw new RuntimeException("Can't get data of non-string value");

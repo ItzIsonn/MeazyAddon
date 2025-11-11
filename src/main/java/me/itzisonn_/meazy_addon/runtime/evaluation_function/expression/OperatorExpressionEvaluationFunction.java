@@ -54,6 +54,7 @@ public class OperatorExpressionEvaluationFunction extends AbstractEvaluationFunc
             classValue = null;
             args = null;
         }
+
         if (classValue != null) {
             RegistryEntry<Operator> entry = Registries.OPERATORS.getEntry(operatorExpression.getOperator());
             if (entry != null) {

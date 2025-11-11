@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.evaluation_function.expression;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
@@ -21,19 +22,19 @@ public class ClassCallExpressionEvaluationFunction extends AbstractEvaluationFun
 
     @Override
     public RuntimeValue<?> evaluate(ClassCallExpression classCallExpression, RuntimeContext context, Environment environment, Object... extra) {
-        Environment extraEnvironment;
-        if (extra.length == 0) extraEnvironment = environment;
-        else if (extra[0] instanceof Environment extraEnv) extraEnvironment = extraEnv;
-        else extraEnvironment = environment;
+        Environment callEnvironment;
+        if (extra.length == 0) callEnvironment = environment;
+        else if (extra[0] instanceof Environment extraEnv) callEnvironment = extraEnv;
+        else callEnvironment = environment;
 
         Interpreter interpreter = context.getInterpreter();
-        List<RuntimeValue<?>> args = classCallExpression.getArgs().stream().map(expression -> interpreter.evaluate(expression, extraEnvironment)).collect(Collectors.toList());
+        List<RuntimeValue<?>> args = classCallExpression.getArgs().stream().map(expression -> interpreter.evaluate(expression, callEnvironment)).collect(Collectors.toList());
         RuntimeValue<?> rawClass = interpreter.evaluate(classCallExpression.getCaller(), environment);
 
-        if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException("Can't call " + rawClass.getClass().getName() + " because it's not a class");
-        if (classValue.getModifiers().contains(AddonModifiers.ABSTRACT())) throw new InvalidCallException("Can't create instance of an abstract class " + classValue.getId());
-        if (classValue.getModifiers().contains(AddonModifiers.ENUM())) throw new InvalidCallException("Can't create instance of an enum class " + classValue.getId());
+        if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.cant_call", rawClass.getClass().getName()));
+        if (classValue.getModifiers().contains(AddonModifiers.ABSTRACT())) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.instance.abstract", classValue.getId()));
+        if (classValue.getModifiers().contains(AddonModifiers.ENUM())) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.instance.enum", classValue.getId()));
 
-        return EvaluationHelper.callClassValue(context, classValue, extraEnvironment, args);
+        return EvaluationHelper.callClassValue(context, classValue, callEnvironment, args);
     }
 }

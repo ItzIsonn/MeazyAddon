@@ -5,10 +5,8 @@ import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
-import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.value.number.*;
 
@@ -42,13 +40,13 @@ public class MathClassNative {
         if (!(number.getFinalRuntimeValue() instanceof NumberValue<?> numberValue) || !(power.getFinalRuntimeValue() instanceof NumberValue<?> degreeValue)) {
             throw new RuntimeException("Can't get power non-number values");
         }
-        return AddonUtils.optimalNumberValue(Math.pow(numberValue.getValue().doubleValue(), degreeValue.getValue().doubleValue()));
+        return NumberValue.getOptimal(Math.pow(numberValue.getValue().doubleValue(), degreeValue.getValue().doubleValue()));
     }
 
     @Function
     public static NumberValue<?> abs(@Argument RuntimeValue<?> value) {
         if (!(value.getFinalRuntimeValue() instanceof NumberValue<?> number)) throw new RuntimeException("Can't get abs of non-number value");
-        return AddonUtils.optimalNumberValue(Math.abs(number.getValue().doubleValue()));
+        return NumberValue.getOptimal(Math.abs(number.getValue().doubleValue()));
     }
 
     @Function
@@ -68,7 +66,7 @@ public class MathClassNative {
         if (!(a.getFinalRuntimeValue() instanceof NumberValue<?> aValue) || !(b.getFinalRuntimeValue() instanceof NumberValue<?> bValue)) {
             throw new RuntimeException("Can't get min of non-number values");
         }
-        return AddonUtils.optimalNumberValue(Math.min(aValue.getValue().doubleValue(), bValue.getValue().doubleValue()));
+        return NumberValue.getOptimal(Math.min(aValue.getValue().doubleValue(), bValue.getValue().doubleValue()));
     }
 
     @Function
@@ -76,15 +74,15 @@ public class MathClassNative {
         if (!(a.getFinalRuntimeValue() instanceof NumberValue<?> aValue) || !(b.getFinalRuntimeValue() instanceof NumberValue<?> bValue)) {
             throw new RuntimeException("Can't get max of non-number values");
         }
-        return AddonUtils.optimalNumberValue(Math.max(aValue.getValue().doubleValue(), bValue.getValue().doubleValue()));
+        return NumberValue.getOptimal(Math.max(aValue.getValue().doubleValue(), bValue.getValue().doubleValue()));
     }
 
 
 
     @Function
     public static ClassValue range(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, RuntimeContext context, FunctionEnvironment functionEnvironment) {
-        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new InvalidArgumentException("Begin must be int");
-        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("End must be int");
+        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new RuntimeException("Begin must be int");
+        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new RuntimeException("End must be int");
 
         List<RuntimeValue<?>> list = range(beginValue.getValue(), endValue.getValue(), 1);
         return ListClassNative.newList(functionEnvironment, context, list);
@@ -92,11 +90,11 @@ public class MathClassNative {
 
     @Function
     public static ClassValue range(@Argument RuntimeValue<?> begin, @Argument RuntimeValue<?> end, @Argument RuntimeValue<?> step, RuntimeContext context, FunctionEnvironment functionEnvironment) {
-        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new InvalidArgumentException("Begin must be int");
-        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("End must be int");
-        if (!(step.getFinalRuntimeValue() instanceof IntValue stepValue)) throw new InvalidArgumentException("Step must be int");
+        if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new RuntimeException("Begin must be int");
+        if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new RuntimeException("End must be int");
+        if (!(step.getFinalRuntimeValue() instanceof IntValue stepValue)) throw new RuntimeException("Step must be int");
 
-        if (stepValue.getValue() <= 0) throw new InvalidArgumentException("Step must be positive int");
+        if (stepValue.getValue() <= 0) throw new RuntimeException("Step must be positive int");
 
         List<RuntimeValue<?>> list = range(beginValue.getValue(),  endValue.getValue(), stepValue.getValue());
         return ListClassNative.newList(functionEnvironment, context, list);

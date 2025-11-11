@@ -1,7 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -61,11 +63,11 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     public void declareVariable(VariableValue value) {
         if (value.isArgument()) {
             if (getVariable(value.getId()) != null) {
-                throw new RuntimeException("Variable with id " + value.getId() + " already exists");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.variable.already_exists", value.getId()));
             }
         }
         else if (getVariableDeclarationEnvironment(value.getId()) != null) {
-            throw new RuntimeException("Variable with id " + value.getId() + " already exists");
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.variable.already_exists", value.getId()));
         }
 
         variables.add(value);
@@ -134,7 +136,9 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     @Override
     public void declareClass(ClassValue value) {
         for (ClassValue classValue : getClasses()) {
-            if (classValue.getId().equals(value.getId())) throw new RuntimeException("Class with id " + value.getId() + " already exists");
+            if (classValue.getId().equals(value.getId())) {
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.class.already_exists", value.getId()));
+            }
         }
 
         classes.add(value);

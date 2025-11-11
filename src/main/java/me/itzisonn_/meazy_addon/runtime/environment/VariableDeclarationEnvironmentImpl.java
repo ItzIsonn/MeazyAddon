@@ -1,8 +1,10 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 
 import java.util.HashSet;
@@ -35,11 +37,11 @@ public class VariableDeclarationEnvironmentImpl implements VariableDeclarationEn
     public void declareVariable(VariableValue value) {
         if (value.isArgument()) {
             if (getVariable(value.getId()) != null) {
-                throw new RuntimeException("Variable with id " + value.getId() + " already exists");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.variable.already_exists", value.getId()));
             }
         }
         else if (getVariableDeclarationEnvironment(value.getId()) != null) {
-            throw new RuntimeException("Variable with id " + value.getId() + " already exists");
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.variable.already_exists", value.getId()));
         }
         variables.add(value);
     }

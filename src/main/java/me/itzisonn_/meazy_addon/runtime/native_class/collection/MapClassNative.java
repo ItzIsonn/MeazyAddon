@@ -78,7 +78,7 @@ public class MapClassNative {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new RuntimeException("Can't remove pair from non-map value");
 
-        return new BooleanValue(mapValue.getValue().remove(key.getFinalRuntimeValue(), value.getFinalRuntimeValue()));
+        return BooleanValue.of(mapValue.getValue().remove(key.getFinalRuntimeValue(), value.getFinalRuntimeValue()));
     }
 
     @Function
@@ -104,7 +104,7 @@ public class MapClassNative {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new RuntimeException("Can't use non-map value");
 
-        return new BooleanValue(mapValue.getValue().isEmpty());
+        return BooleanValue.of(mapValue.getValue().isEmpty());
     }
 
     @Function
@@ -112,7 +112,7 @@ public class MapClassNative {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new RuntimeException("Can't use non-map value");
 
-        return new BooleanValue(mapValue.getValue().containsKey(key.getFinalRuntimeValue()));
+        return BooleanValue.of(mapValue.getValue().containsKey(key.getFinalRuntimeValue()));
     }
 
     @Function
@@ -120,7 +120,7 @@ public class MapClassNative {
         RuntimeValue<?> map = functionEnvironment.getVariableDeclarationEnvironment("map").getVariable("map").getValue();
         if (!(map instanceof InnerMapValue mapValue)) throw new RuntimeException("Can't use non-map value");
 
-        return new BooleanValue(mapValue.getValue().containsValue(value.getFinalRuntimeValue()));
+        return BooleanValue.of(mapValue.getValue().containsValue(value.getFinalRuntimeValue()));
     }
 
 

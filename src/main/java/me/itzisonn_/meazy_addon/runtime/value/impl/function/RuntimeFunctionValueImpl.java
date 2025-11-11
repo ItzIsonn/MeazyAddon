@@ -2,6 +2,7 @@ package me.itzisonn_.meazy_addon.runtime.value.impl.function;
 
 import lombok.EqualsAndHashCode;
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
@@ -9,13 +10,13 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
-import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 
@@ -135,26 +136,18 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
         }
 
         RuntimeValue<?> result = null;
-        boolean hasReturnStatement = false;
         for (int i = 0; i < body.size(); i++) {
             Statement statement = body.get(i);
             if (statement instanceof ReturnStatement) {
-                hasReturnStatement = true;
                 result = interpreter.evaluate(statement, functionEnvironment);
-                if (i + 1 < body.size()) throw new RuntimeException("Return statement must be last in body");
+                if (i + 1 < body.size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "return"));
                 break;
             }
             RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
             if (value instanceof ReturnInfoValue returnInfoValue) {
-                hasReturnStatement = true;
                 result = returnInfoValue.getFinalRuntimeValue();
                 break;
             }
-        }
-
-        if ((result == null || result instanceof NullValue) && getReturnDataType() != null) {
-            throw new RuntimeException(hasReturnStatement ?
-                    "Function specified return value's data type but return statement is empty" : "Missing return statement");
         }
 
         return result;

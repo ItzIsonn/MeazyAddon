@@ -1,8 +1,10 @@
 package me.itzisonn_.meazy_addon.runtime.environment;
 
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 
 import java.util.HashSet;
@@ -31,7 +33,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
                     if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
-                throw new RuntimeException("Function with id " + value.getId() + " already exists");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.function.already_exists", value.getId()));
             }
         }
 

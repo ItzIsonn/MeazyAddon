@@ -14,6 +14,6 @@ public class BooleanLiteralEvaluationFunction extends AbstractEvaluationFunction
 
     @Override
     public RuntimeValue<?> evaluate(BooleanLiteral booleanLiteral, RuntimeContext context, Environment environment, Object... extra) {
-        return new BooleanValue(booleanLiteral.isValue());
+        return BooleanValue.of(booleanLiteral.isValue());
     }
 }

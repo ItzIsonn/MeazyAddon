@@ -2,9 +2,11 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -31,19 +33,19 @@ public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<F
         LoopEnvironment forEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
         Interpreter interpreter = context.getInterpreter();
 
-        forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
-                forEnvironment.declareVariable(new VariableValueImpl(
-                        variableDeclarationInfo.getId(),
-                        variableDeclarationInfo.getDataType(),
-                        variableDeclarationInfo.getValue() == null ?
-                                null :
-                                interpreter.evaluate(variableDeclarationInfo.getValue(), environment),
-                        forStatement.getVariableDeclarationStatement().isConstant(),
-                        Set.of(),
-                        false,
-                        forEnvironment
-                ))
-        );
+        for (var variableDeclarationInfo : forStatement.getVariableDeclarationStatement().getDeclarationInfos()) {
+            forEnvironment.declareVariable(new VariableValueImpl(
+                    variableDeclarationInfo.getId(),
+                    variableDeclarationInfo.getDataType(),
+                    variableDeclarationInfo.getValue() == null ?
+                            null :
+                            interpreter.evaluate(variableDeclarationInfo.getValue(), environment),
+                    forStatement.getVariableDeclarationStatement().isConstant(),
+                    Set.of(),
+                    false,
+                    forEnvironment
+            ));
+        }
 
         main:
         while (EvaluationHelper.parseCondition(context, forStatement.getCondition(), forEnvironment)) {
@@ -52,7 +54,7 @@ public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<F
                 RuntimeValue<?> result = interpreter.evaluate(statement, forEnvironment);
 
                 if (statement instanceof ReturnStatement) {
-                    if (i + 1 < forStatement.getBody().size()) throw new RuntimeException("Return statement must be last in body");
+                    if (i + 1 < forStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "return"));
                     return new ReturnInfoValue(result);
                 }
                 if (result instanceof ReturnInfoValue returnInfoValue) {
@@ -60,7 +62,7 @@ public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<F
                 }
 
                 if (statement instanceof ContinueStatement) {
-                    if (i + 1 < forStatement.getBody().size()) throw new RuntimeException("Continue statement must be last in body");
+                    if (i + 1 < forStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "continue"));
                     break;
                 }
                 if (result instanceof ContinueInfoValue) {
@@ -68,7 +70,7 @@ public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<F
                 }
 
                 if (statement instanceof BreakStatement) {
-                    if (i + 1 < forStatement.getBody().size()) throw new RuntimeException("Break statement must be last in body");
+                    if (i + 1 < forStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "break"));
                     break main;
                 }
                 if (result instanceof BreakInfoValue) {

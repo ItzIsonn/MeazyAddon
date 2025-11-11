@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.runtime.evaluation_function.expression;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
@@ -26,20 +27,20 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
 
     @Override
     public RuntimeValue<?> evaluate(Identifier identifier, RuntimeContext context, Environment environment, Object... extra) {
-        Environment requestEnvironment;
-        if (extra.length == 0) requestEnvironment = environment;
-        else if (extra[0] instanceof Environment env) requestEnvironment = env;
-        else requestEnvironment = environment;
+        Environment callEnvironment;
+        if (extra.length == 0) callEnvironment = environment;
+        else if (extra[0] instanceof Environment env) callEnvironment = env;
+        else callEnvironment = environment;
 
         if (identifier instanceof VariableIdentifier) {
             VariableDeclarationEnvironment variableDeclarationEnvironment = environment.getVariableDeclarationEnvironment(identifier.getId());
-            if (variableDeclarationEnvironment == null) throw new InvalidIdentifierException("Variable with id " + identifier.getId() + " doesn't exist");
+            if (variableDeclarationEnvironment == null) throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.variable.doesnt_exist", identifier.getId()));
 
             VariableValue variableValue = variableDeclarationEnvironment.getVariable(identifier.getId());
-            if (variableValue == null) throw new InvalidIdentifierException("Variable with id " + identifier.getId() + " doesn't exist");
+            if (variableValue == null) throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.variable.doesnt_exist", identifier.getId()));
 
-            if (!variableValue.isAccessible(requestEnvironment)) {
-                throw new InvalidAccessException("Can't access variable with id " + identifier.getId() + " because of its modifiers");
+            if (!variableValue.isAccessible(callEnvironment)) {
+                throw new InvalidAccessException(Text.translatable("meazy_addon:runtime.variable.cant_access", identifier.getId()));
             }
 
             return variableValue;
@@ -54,13 +55,13 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
             }).collect(Collectors.toList());
 
             FunctionDeclarationEnvironment functionDeclarationEnvironment = environment.getFunctionDeclarationEnvironment(identifier.getId(), args);
-            if (functionDeclarationEnvironment == null) throw new InvalidIdentifierException("Function with id " + identifier.getId() + " doesn't exist");
+            if (functionDeclarationEnvironment == null) throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.function.doesnt_exist", identifier.getId()));
 
             FunctionValue functionValue = functionDeclarationEnvironment.getFunction(identifier.getId(), args);
-            if (functionValue == null) throw new InvalidIdentifierException("Function with id " + identifier.getId() + " doesn't exist");
+            if (functionValue == null) throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.function.doesnt_exist", identifier.getId()));
 
-            if (!functionValue.isAccessible(requestEnvironment)) {
-                throw new InvalidAccessException("Can't access function with id " + identifier.getId() + " because of its modifiers");
+            if (!functionValue.isAccessible(callEnvironment)) {
+                throw new InvalidAccessException(Text.translatable("meazy_addon:runtime.function.cant_access", identifier.getId()));
             }
 
             return functionValue;
@@ -70,13 +71,13 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
             ClassValue classValue = environment.getFileEnvironment().getClass(identifier.getId());
             if (classValue == null) return evaluate(new VariableIdentifier(identifier.getId()), context, environment, extra);
 
-            if (!classValue.isAccessible(requestEnvironment)) {
-                throw new InvalidAccessException("Can't access class with id " + identifier.getId() + " because of its modifiers");
+            if (!classValue.isAccessible(callEnvironment)) {
+                throw new InvalidAccessException(Text.translatable("meazy_addon:runtime.class.cant_access", identifier.getId()));
             }
 
             return classValue;
         }
 
-        throw new InvalidIdentifierException("Invalid identifier " + identifier.getClass().getName());
+        throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.invalid_identifier", identifier.getClass().getName()));
     }
 }

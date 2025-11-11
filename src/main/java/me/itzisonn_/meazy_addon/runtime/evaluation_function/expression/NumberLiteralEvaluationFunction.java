@@ -1,7 +1,9 @@
 package me.itzisonn_.meazy_addon.runtime.evaluation_function.expression;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
@@ -27,7 +29,7 @@ public class NumberLiteralEvaluationFunction extends AbstractEvaluationFunction<
                     return new LongValue(Long.parseLong(value));
                 }
                 catch (NumberFormatException ignore2) {
-                    throw new RuntimeException("Number " + value + " is too big");
+                    throw new EvaluationException(Text.translatable("meazy_addon:runtime.number_too_big", value));
                 }
             }
         }
@@ -40,7 +42,7 @@ public class NumberLiteralEvaluationFunction extends AbstractEvaluationFunction<
                 return new DoubleValue(Double.parseDouble(value));
             }
             catch (NumberFormatException ignore2) {
-                throw new RuntimeException("Number " + value + " is too big");
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.number_too_big", value));
             }
         }
     }

@@ -1,8 +1,10 @@
 package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -23,12 +25,13 @@ public class VariableDeclarationStatementEvaluationFunction extends AbstractEval
     @Override
     public RuntimeValue<?> evaluate(VariableDeclarationStatement variableDeclarationStatement, RuntimeContext context, Environment environment, Object... extra) {
         if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
-            throw new RuntimeException("Can't declare function in this environment");
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_statement", "variable_declaration"));
         }
 
         for (Modifier modifier : variableDeclarationStatement.getModifiers()) {
-            if (!modifier.canUse(variableDeclarationStatement, context, environment))
-                throw new RuntimeException("Can't use '" + modifier.getId() + "' Modifier");
+            if (!modifier.canUse(variableDeclarationStatement, context, environment)) {
+                throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_modifier", modifier.getId()));
+            }
         }
 
         Set<Modifier> modifiers = new HashSet<>(variableDeclarationStatement.getModifiers());

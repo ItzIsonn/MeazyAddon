@@ -7,10 +7,10 @@ import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.Program;
-import me.itzisonn_.meazy.runtime.InvalidFileException;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
@@ -27,13 +27,13 @@ public class ImportStatementEvaluationFunction extends AbstractEvaluationFunctio
     @Override
     public RuntimeValue<?> evaluate(ImportStatement importStatement, RuntimeContext context, Environment environment, Object... extra) {
         if (!(environment instanceof FileEnvironment fileEnvironment)) {
-            throw new RuntimeException("Can't use imports in non-global environment");
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_use_statement", "import"));
         }
 
         String folderPath = fileEnvironment.getParentFile().getParentFile().getAbsolutePath() + "\\";
         File file = new File(folderPath + importStatement.getFile());
         if (file.isDirectory() || !file.exists()) {
-            throw new InvalidFileException("File '" + file.getAbsolutePath() + "' doesn't exist");
+            throw new EvaluationException(Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
         }
 
         String extension = FileUtils.getExtension(file);
@@ -45,14 +45,18 @@ public class ImportStatementEvaluationFunction extends AbstractEvaluationFunctio
             }
             case "meac" -> {
                 program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
-                if (program == null) throw new InvalidFileException("Failed to read file '" + file.getAbsolutePath() + "'");
-                if (MeazyMain.VERSION.isBefore(program.getVersion())) throw new InvalidFileException("Can't run file that has been compiled by a more recent version of the Meazy (" + program.getVersion() + "), in a more older version (" + MeazyMain.VERSION + ")");
+                if (program == null) {
+                    throw new EvaluationException(Text.translatable("meazy:file.failed_read", file.getAbsolutePath()));
+                }
+                if (MeazyMain.VERSION.isBefore(program.getVersion())) {
+                    throw new EvaluationException(Text.translatable("meazy:commands.run.incompatible_version", program.getVersion(), MeazyMain.VERSION));
+                }
                 if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                    MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy_addon:runtime.unsafe", program.getVersion(), MeazyMain.VERSION));
+                    MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy:commands.run.unsafe", program.getVersion(), MeazyMain.VERSION));
                 }
                 program.setFile(file);
             }
-            default -> throw new InvalidFileException("Can't run file with extension " + extension);
+            default -> throw new EvaluationException(Text.translatable("meazy:commands.run.invalid_extension", extension));
         }
 
         GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();

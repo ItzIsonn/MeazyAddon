@@ -17,7 +17,7 @@ public class LongClassNative {
             return new LongValue(Long.parseLong(value.getFinalValue().toString().replaceAll("\\.0$", "")));
         }
         catch (NumberFormatException ignore) {
-            return new NullValue();
+            return NullValue.INSTANCE;
         }
     }
 

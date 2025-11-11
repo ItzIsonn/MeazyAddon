@@ -2,6 +2,7 @@ package me.itzisonn_.meazy_addon.parser.data_type;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
@@ -40,7 +41,7 @@ public class DataTypeImpl implements DataType {
         if (value instanceof NullValue) return isNullable;
 
         ClassValue classValue = fileEnvironment.getClass(id);
-        if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + id);
+        if (classValue == null) throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.class.doesnt_exist", id));
 
         return classValue.isLikeMatches(fileEnvironment, value);
     }

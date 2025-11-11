@@ -2,8 +2,10 @@ package me.itzisonn_.meazy_addon.runtime.evaluation_function.statement;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
@@ -37,7 +39,7 @@ public class IfStatementEvaluationFunction extends AbstractEvaluationFunction<If
                 RuntimeValue<?> result = interpreter.evaluate(statement, ifEnvironment);
 
                 if (statement instanceof ReturnStatement) {
-                    if (i + 1 < ifStatement.getBody().size()) throw new RuntimeException("Return statement must be last in body");
+                    if (i + 1 < ifStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "return"));
                     return new ReturnInfoValue(result);
                 }
                 if (result instanceof ReturnInfoValue returnInfoValue) {
@@ -45,7 +47,7 @@ public class IfStatementEvaluationFunction extends AbstractEvaluationFunction<If
                 }
 
                 if (statement instanceof ContinueStatement) {
-                    if (i + 1 < ifStatement.getBody().size()) throw new RuntimeException("Continue statement must be last in body");
+                    if (i + 1 < ifStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "continue"));
                     return new ContinueInfoValue();
                 }
                 if (result instanceof ContinueInfoValue continueInfoValue) {
@@ -53,7 +55,7 @@ public class IfStatementEvaluationFunction extends AbstractEvaluationFunction<If
                 }
 
                 if (statement instanceof BreakStatement) {
-                    if (i + 1 < ifStatement.getBody().size()) throw new RuntimeException("Break statement must be last in body");
+                    if (i + 1 < ifStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "break"));
                     return new BreakInfoValue();
                 }
                 if (result instanceof BreakInfoValue breakInfoValue) {

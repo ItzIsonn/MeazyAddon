@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.UnsupportedOperatorException;
 import me.itzisonn_.meazy_addon.AddonMain;
-import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
@@ -87,7 +86,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() + numberValue2.getValue().doubleValue());
+                    return NumberValue.getOptimal(numberValue1.getValue().doubleValue() + numberValue2.getValue().doubleValue());
                 }
                 return StringClassNative.newString(environment, String.valueOf(value1.getValue()) + value2.getValue());
             }
@@ -96,7 +95,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() - numberValue2.getValue().doubleValue());
+                    return NumberValue.getOptimal(numberValue1.getValue().doubleValue() - numberValue2.getValue().doubleValue());
                 }
                 return null;
             }
@@ -105,7 +104,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() * numberValue2.getValue().doubleValue());
+                    return NumberValue.getOptimal(numberValue1.getValue().doubleValue() * numberValue2.getValue().doubleValue());
                 }
 
                 String string;
@@ -130,7 +129,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() / numberValue2.getValue().doubleValue());
+                    return NumberValue.getOptimal(numberValue1.getValue().doubleValue() / numberValue2.getValue().doubleValue());
                 }
                 return null;
             }
@@ -139,7 +138,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return AddonUtils.optimalNumberValue(numberValue1.getValue().doubleValue() % numberValue2.getValue().doubleValue());
+                    return NumberValue.getOptimal(numberValue1.getValue().doubleValue() % numberValue2.getValue().doubleValue());
                 }
                 return null;
             }
@@ -148,7 +147,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return AddonUtils.optimalNumberValue(Math.pow(numberValue1.getValue().doubleValue(), numberValue2.getValue().doubleValue()));
+                    return NumberValue.getOptimal(Math.pow(numberValue1.getValue().doubleValue(), numberValue2.getValue().doubleValue()));
                 }
                 return null;
             }
@@ -157,7 +156,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue) {
-                    return AddonUtils.optimalNumberValue(-numberValue.getValue().doubleValue());
+                    return NumberValue.getOptimal(-numberValue.getValue().doubleValue());
                 }
                 return null;
             }
@@ -167,7 +166,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof BooleanValue booleanValue1 && value2 instanceof BooleanValue booleanValue2) {
-                    return new BooleanValue(booleanValue1.getValue() && booleanValue2.getValue());
+                    return BooleanValue.of(booleanValue1.getValue() && booleanValue2.getValue());
                 }
                 return null;
             }
@@ -176,7 +175,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof BooleanValue booleanValue1 && value2 instanceof BooleanValue booleanValue2) {
-                    return new BooleanValue(booleanValue1.getValue() || booleanValue2.getValue());
+                    return BooleanValue.of(booleanValue1.getValue() || booleanValue2.getValue());
                 }
                 return null;
             }
@@ -185,7 +184,7 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof BooleanValue booleanValue) {
-                    return new BooleanValue(!booleanValue.getValue());
+                    return BooleanValue.of(!booleanValue.getValue());
                 }
                 return null;
             }
@@ -193,26 +192,26 @@ public final class AddonOperators {
         register("equals", new Operator("==", OperatorType.INFIX) {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
-                if (value1 instanceof NullValue) return new BooleanValue(value2 instanceof NullValue);
-                if (value1.getValue() == null) return new BooleanValue(value1.equals(value2));
-                return new BooleanValue(value1.getValue().equals(value2.getValue()));
+                if (value1 instanceof NullValue) return BooleanValue.of(value2 instanceof NullValue);
+                if (value1.getValue() == null) return BooleanValue.of(value1.equals(value2));
+                return BooleanValue.of(value1.getValue().equals(value2.getValue()));
             }
         });
         register("not_equals", new Operator("!=", OperatorType.INFIX) {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
-                if (value1 instanceof NullValue) return new BooleanValue(!(value2 instanceof NullValue));
-                return new BooleanValue(!value1.getValue().equals(value2.getValue()));
+                if (value1 instanceof NullValue) return BooleanValue.of(!(value2 instanceof NullValue));
+                return BooleanValue.of(!value1.getValue().equals(value2.getValue()));
             }
         });
         register("greater", new Operator(">", OperatorType.INFIX) {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return new BooleanValue(numberValue1.getValue().doubleValue() > numberValue2.getValue().doubleValue());
+                    return BooleanValue.of(numberValue1.getValue().doubleValue() > numberValue2.getValue().doubleValue());
                 }
                 if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
-                    return new BooleanValue(stringValue1.getValue().length() > stringValue2.getValue().length());
+                    return BooleanValue.of(stringValue1.getValue().length() > stringValue2.getValue().length());
                 }
                 return null;
             }
@@ -221,10 +220,10 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return new BooleanValue(numberValue1.getValue().doubleValue() >= numberValue2.getValue().doubleValue());
+                    return BooleanValue.of(numberValue1.getValue().doubleValue() >= numberValue2.getValue().doubleValue());
                 }
                 if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
-                    return new BooleanValue(stringValue1.getValue().length() >= stringValue2.getValue().length());
+                    return BooleanValue.of(stringValue1.getValue().length() >= stringValue2.getValue().length());
                 }
                 return null;
             }
@@ -233,10 +232,10 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return new BooleanValue(numberValue1.getValue().doubleValue() < numberValue2.getValue().doubleValue());
+                    return BooleanValue.of(numberValue1.getValue().doubleValue() < numberValue2.getValue().doubleValue());
                 }
                 if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
-                    return new BooleanValue(stringValue1.getValue().length() < stringValue2.getValue().length());
+                    return BooleanValue.of(stringValue1.getValue().length() < stringValue2.getValue().length());
                 }
                 return null;
             }
@@ -245,10 +244,10 @@ public final class AddonOperators {
             @Override
             public RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
-                    return new BooleanValue(numberValue1.getValue().doubleValue() <= numberValue2.getValue().doubleValue());
+                    return BooleanValue.of(numberValue1.getValue().doubleValue() <= numberValue2.getValue().doubleValue());
                 }
                 if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
-                    return new BooleanValue(stringValue1.getValue().length() <= stringValue2.getValue().length());
+                    return BooleanValue.of(stringValue1.getValue().length() <= stringValue2.getValue().length());
                 }
                 return null;
             }

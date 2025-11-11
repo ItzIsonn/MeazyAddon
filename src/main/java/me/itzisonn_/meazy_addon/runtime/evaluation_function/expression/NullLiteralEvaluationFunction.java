@@ -14,6 +14,6 @@ public class NullLiteralEvaluationFunction extends AbstractEvaluationFunction<Nu
 
     @Override
     public RuntimeValue<?> evaluate(NullLiteral nullLiteral, RuntimeContext context, Environment environment, Object... extra) {
-        return new NullValue();
+        return NullValue.INSTANCE;
     }
 }

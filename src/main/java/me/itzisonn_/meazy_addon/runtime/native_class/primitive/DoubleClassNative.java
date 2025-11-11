@@ -17,7 +17,7 @@ public class DoubleClassNative {
             return new DoubleValue(Double.parseDouble(value.getFinalValue().toString()));
         }
         catch (NumberFormatException ignore) {
-            return new NullValue();
+            return NullValue.INSTANCE;
         }
     }
 

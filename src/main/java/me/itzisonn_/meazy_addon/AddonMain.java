@@ -8,12 +8,13 @@ import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -60,12 +61,13 @@ public class AddonMain extends Addon {
             while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
                 if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) requiredAddons = ParsingHelper.parseRequiredAddons(parsingContext);
                 else {
+                    int line = parser.getCurrent().getLine();
                     Statement statement = parser.parse(getIdentifier("global_statement"), Statement.class);
                     if (statement instanceof ImportStatement) {
-                        if (!isProgramHead) throw new RuntimeException("Imports must be at file's beginning");
+                        if (!isProgramHead) throw new InvalidSyntaxException(line, Text.translatable("meazy_addon:parser.exception.not_at_beginning", "import"));
                     }
                     else if (statement instanceof UsingStatement) {
-                        if (!isProgramHead) throw new RuntimeException("Using statements must be at file's beginning");
+                        if (!isProgramHead) throw new InvalidSyntaxException(line, Text.translatable("meazy_addon:parser.exception.not_at_beginning", "using"));
                     }
                     else isProgramHead = false;
                     body.add(statement);
@@ -88,12 +90,11 @@ public class AddonMain extends Addon {
         Registries.EVALUATE_PROGRAM_FUNCTION.register(getIdentifier("evaluate_program"), (program, globalEnvironment) -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
-                if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
+                if (addon == null) throw new EvaluationException(Text.translatable("meazy_addon:addons.cant_find", addonId));
 
                 Version addonVersion = program.getRequiredAddons().get(addonId);
                 if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonVersion)) {
-                    throw new RuntimeException("Can't find required addon with id " + addonId + " of version " + addonVersion +
-                            " (found version " + addon.getAddonInfo().getVersion() + ")");
+                    throw new EvaluationException(Text.translatable("meazy_addon:addons.cant_find_version", addonId, addonVersion, addon.getAddonInfo().getVersion()));
                 }
             }
 
@@ -115,13 +116,13 @@ public class AddonMain extends Addon {
 
             for (ClassValue classValue : fileEnvironment.getClasses()) {
                 if (EvaluationHelper.hasRepeatedBaseClasses(classValue.getBaseClasses(), new ArrayList<>(), fileEnvironment)) {
-                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated base classes");
+                    throw new EvaluationException(Text.translatable("meazy_addon:runtime.class.repeated.base_classes", classValue.getId()));
                 }
                 if (EvaluationHelper.hasRepeatedVariables(
                         classValue.getBaseClasses(),
                         new ArrayList<>(classValue.getEnvironment().getVariables().stream().map(VariableValue::getId).toList()),
                         fileEnvironment)) {
-                    throw new InvalidIdentifierException("Class with id " + classValue.getId() + " has repeated variables");
+                    throw new EvaluationException(Text.translatable("meazy_addon:runtime.class.repeated.variables", classValue.getId()));
                 }
             }
 
