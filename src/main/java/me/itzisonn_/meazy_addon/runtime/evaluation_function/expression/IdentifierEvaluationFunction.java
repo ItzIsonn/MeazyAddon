@@ -69,7 +69,7 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
 
         if (identifier instanceof ClassIdentifier) {
             ClassValue classValue = environment.getFileEnvironment().getClass(identifier.getId());
-            if (classValue == null) return evaluate(new VariableIdentifier(identifier.getId()), context, environment, extra);
+            if (classValue == null) throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.class.doesnt_exist", identifier.getId()));
 
             if (!classValue.isAccessible(callEnvironment)) {
                 throw new InvalidAccessException(Text.translatable("meazy_addon:runtime.class.cant_access", identifier.getId()));
@@ -78,6 +78,6 @@ public class IdentifierEvaluationFunction extends AbstractEvaluationFunction<Ide
             return classValue;
         }
 
-        throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.invalid_identifier", identifier.getClass().getName()));
+        throw new InvalidIdentifierException(Text.translatable("meazy_addon:invalid_identifier", identifier.getClass().getName()));
     }
 }

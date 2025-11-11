@@ -62,8 +62,7 @@ public final class AddonParsingFunctions {
         register(new NegationExpressionParsingFunction());
         register(new PostfixExpressionParsingFunction());
         register(new MemberExpressionParsingFunction());
-        register(new ClassCallExpressionParsingFunction());
-        register(new FunctionCallExpressionParsingFunction());
+        register(new CallExpressionParsingFunction());
         register(new PrimaryExpressionParsingFunction());
     }
 

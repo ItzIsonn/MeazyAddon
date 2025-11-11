@@ -113,7 +113,7 @@ public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue
         }
 
         if (value != null && !dataType.isMatches(value, parentEnvironment.getFileEnvironment())) {
-            throw new InvalidActionException(Text.translatable("meazy_addon:runtime.variable.invalid_data_type", id, dataType.toString()));
+            throw new InvalidValueException(Text.translatable("meazy_addon:runtime.variable.invalid_data_type", id, dataType.toString()));
         }
         this.value = value;
     }

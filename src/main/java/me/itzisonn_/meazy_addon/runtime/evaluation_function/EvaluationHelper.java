@@ -51,7 +51,7 @@ public final class EvaluationHelper {
         RuntimeValue<?> condition = context.getInterpreter().evaluate(rawCondition, environment).getFinalRuntimeValue();
 
         if (!(condition instanceof BooleanValue booleanValue)) {
-            throw new InvalidArgumentException(Text.translatable("meazy_addon:runtime.condition_must_be_boolean"));
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.condition_must_be_boolean"));
         }
 
         return booleanValue.getValue();

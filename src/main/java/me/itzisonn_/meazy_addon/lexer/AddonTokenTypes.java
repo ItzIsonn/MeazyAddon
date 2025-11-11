@@ -47,10 +47,6 @@ public final class AddonTokenTypes {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("base")).getValue();
     }
 
-    public static TokenType NEW() {
-        return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("new")).getValue();
-    }
-
     public static TokenType IF() {
         return Registries.TOKEN_TYPES.getEntry(AddonMain.getIdentifier("if")).getValue();
     }

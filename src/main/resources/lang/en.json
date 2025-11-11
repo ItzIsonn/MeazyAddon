@@ -1,4 +1,5 @@
 {
+  "invalid_identifier": "Invalid identifier '{0}'",
   "addons.cant_find": "Can't find required addon with id '{0}'",
   "addons.cant_find_version": "Can't find required addon with id '{0}' of version {1} (found version {2})",
 
@@ -23,8 +24,7 @@
   "parser.modifier.doesnt_exist": "Modifier with id '{0}' doesn't exist",
   "parser.modifier.unexpected": "Found unexpected modifier",
 
-  "parser.exception.class_creation": "Class creation must be call expression",
-  "parser.exception.call_not_identifier": "Can't call non-identifier as function",
+  "parser.exception.call_not_identifier": "Can't use non-identifier in 'call' expression",
   "parser.exception.member_expression": "Right side of 'member' expression must be either ID or 'call' expression",
   "parser.exception.cant_parse": "Can't parse token with type '{0}'",
   "parser.exception.enums.base_classes": "Enum class can't have base classes",
@@ -38,7 +38,6 @@
 
 
   "runtime.file_doesnt_contain_main_function": "File doesn't contain main function",
-  "runtime.invalid_identifier": "Invalid identifier '{0}'",
   "runtime.number_too_big": "Number {0} is too big",
   "runtime.cant_use_statement": "Can't use '{0}' statement in this environment",
   "runtime.cant_use_modifier": "Can't use '{0}' modifier",

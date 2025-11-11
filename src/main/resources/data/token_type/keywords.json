@@ -7,7 +7,6 @@
   { "id": "class", "regex": "class" },
   { "id": "constructor", "regex": "constructor" },
   { "id": "base", "regex": "base" },
-  { "id": "new", "regex": "new" },
   { "id": "if", "regex": "if" },
   { "id": "else", "regex": "else" },
   { "id": "for", "regex": "for" },

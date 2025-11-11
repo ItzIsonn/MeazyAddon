@@ -27,13 +27,19 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
         TokenType tokenType = token.getType();
 
         if (tokenType.equals(AddonTokenTypes.ID())) {
-            if ((parser.getPos() != 0 && parser.getTokens().get(parser.getPos() - 1).getType().equals(AddonTokenTypes.NEW())) ||
-                    (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(AddonTokenTypes.DOT()) && parser.getPos() != 0 && !parser.getTokens().get(parser.getPos() - 1).getType().equals(AddonTokenTypes.DOT())))
-                return new ClassIdentifier(parser.getCurrentAndNext().getValue());
-            else if (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(AddonTokenTypes.LEFT_PARENTHESIS())) {
-                return new FunctionIdentifier(parser.getCurrentAndNext().getValue());
+            if (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(AddonTokenTypes.LEFT_PARENTHESIS())) {
+                String id = parser.getCurrentAndNext().getValue();
+                if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
+                else return new FunctionIdentifier(id);
             }
-            else return new VariableIdentifier(parser.getCurrentAndNext().getValue());
+
+            if (parser.getPos() > 0 && parser.getTokens().get(parser.getPos() - 1).getType().equals(AddonTokenTypes.DOT())) {
+                return new VariableIdentifier(parser.getCurrentAndNext().getValue());
+            }
+
+            String id = parser.getCurrentAndNext().getValue();
+            if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
+            else return new VariableIdentifier(id);
         }
         if (tokenType.equals(AddonTokenTypes.NULL())) {
             parser.getCurrentAndNext();

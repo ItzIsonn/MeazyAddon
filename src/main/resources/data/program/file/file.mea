@@ -14,7 +14,7 @@ class File {
 
     native function getParent():String
     function getParentFile():File {
-        return new File(getParent())
+        return File(getParent())
     }
 
     native function exists():Boolean
@@ -27,10 +27,10 @@ class File {
     native function setReadable(val value:Boolean):Boolean
     native function setWritable(val value:Boolean):Boolean
     function getReader():FileReader {
-        return new FileReader(this)
+        return FileReader(this)
     }
     function getWriter():FileWriter {
-        return new FileWriter(this)
+        return FileWriter(this)
     }
 
     native function create():Boolean
