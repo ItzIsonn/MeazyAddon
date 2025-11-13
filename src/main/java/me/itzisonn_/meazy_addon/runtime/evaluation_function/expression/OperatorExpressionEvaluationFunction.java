@@ -42,6 +42,7 @@ public class OperatorExpressionEvaluationFunction extends AbstractEvaluationFunc
 
         ClassValue classValue;
         List<RuntimeValue<?>> args;
+
         if (left instanceof ClassValue leftClassValue) {
             classValue = leftClassValue;
             args = right == null ? List.of() : List.of(right);

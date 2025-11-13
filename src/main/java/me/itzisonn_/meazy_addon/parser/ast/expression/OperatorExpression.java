@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.ParenthesisExpression;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy_addon.parser.AddonOperators;
+import me.itzisonn_.meazy_addon.parser.operator.AddonOperators;
 
 @Getter
 public class OperatorExpression implements Expression, ParenthesisExpression {

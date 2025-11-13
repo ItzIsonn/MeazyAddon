@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
-import me.itzisonn_.meazy_addon.parser.AddonOperators;
+import me.itzisonn_.meazy_addon.parser.operator.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.ast.expression.OperatorExpression;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 
