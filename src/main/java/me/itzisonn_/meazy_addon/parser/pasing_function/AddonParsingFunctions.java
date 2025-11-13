@@ -29,6 +29,8 @@ public final class AddonParsingFunctions {
         if (hasRegistered) throw new IllegalStateException("ParsingFunctions have already been initialized");
         hasRegistered = true;
 
+        register(new ProgramParsingFunction());
+        register(new HeaderStatementParsingFunction());
         register(new GlobalStatementParsingFunction());
         register(new ImportStatementParsingFunction());
         register(new UsingStatementParsingFunction());

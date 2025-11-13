@@ -3,16 +3,12 @@ package me.itzisonn_.meazy_addon;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.logging.LogLevel;
-import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
@@ -20,15 +16,11 @@ import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.version.Version;
-import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.parser.operator.AddonOperators;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AddonParsingFunctions;
-import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
-import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.data_type.DataTypeFactoryImpl;
 import me.itzisonn_.meazy_addon.parser.json_converter.AddonConverters;
-import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AddonEvaluationFunctions;
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
@@ -52,39 +44,7 @@ public class AddonMain extends Addon {
             ParsingContext parsingContext = new ParsingContext(tokens);
 
             Parser parser = parsingContext.getParser();
-            parser.moveOverOptionalNewLines();
-
-            Map<String, Version> requiredAddons = null;
-            List<Statement> body = new ArrayList<>();
-            boolean isProgramHead = true;
-
-            while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) requiredAddons = ParsingHelper.parseRequiredAddons(parsingContext);
-                else {
-                    int line = parser.getCurrent().getLine();
-                    Statement statement = parser.parse(getIdentifier("global_statement"), Statement.class);
-                    if (statement instanceof ImportStatement) {
-                        if (!isProgramHead) throw new InvalidSyntaxException(line, Text.translatable("meazy_addon:parser.exception.not_at_beginning", "import"));
-                    }
-                    else if (statement instanceof UsingStatement) {
-                        if (!isProgramHead) throw new InvalidSyntaxException(line, Text.translatable("meazy_addon:parser.exception.not_at_beginning", "using"));
-                    }
-                    else isProgramHead = false;
-                    body.add(statement);
-                }
-
-                parser.moveOverOptionalNewLines();
-            }
-
-            if (requiredAddons == null) {
-                requiredAddons = new HashMap<>();
-                for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
-                    AddonInfo addonInfo = addon.getAddonInfo();
-                    requiredAddons.put(addonInfo.getId(), addonInfo.getVersion());
-                }
-            }
-
-            return new Program(file, MeazyMain.VERSION, requiredAddons, body);
+            return parser.parse(getIdentifier("program"), Program.class, file);
         });
 
         Registries.EVALUATE_PROGRAM_FUNCTION.register(getIdentifier("evaluate_program"), (program, globalEnvironment) -> {

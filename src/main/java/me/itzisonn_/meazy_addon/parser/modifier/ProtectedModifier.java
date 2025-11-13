@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy_addon.parser.modifier;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.expression.Identifier;
@@ -44,7 +45,7 @@ public class ProtectedModifier extends Modifier {
 
                         ClassValue parentClassValue = environment.getFileEnvironment().getClass(classEnvironment.getId());
                         if (parentClassValue == null) {
-                            throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
+                            throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.class.doesnt_exist", classEnvironment.getId()));
                         }
                         return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
                     }
@@ -63,7 +64,7 @@ public class ProtectedModifier extends Modifier {
 
                         ClassValue parentClassValue = environment.getFileEnvironment().getClass(classEnvironment.getId());
                         if (parentClassValue == null) {
-                            throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " doesn't exist");
+                            throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.class.doesnt_exist", classEnvironment.getId()));
                         }
                         return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
                     }
@@ -71,12 +72,12 @@ public class ProtectedModifier extends Modifier {
                 });
 
         if (identifier instanceof ConstructorClassIdentifier) return requestEnvironment.hasParent(env -> {
-            if (env instanceof ClassEnvironment classEnv) {
-                if (classEnv.getId().equals(identifier.getId())) return true;
+            if (env instanceof ClassEnvironment classEnvironment) {
+                if (classEnvironment.getId().equals(identifier.getId())) return true;
 
-                ClassValue parentClassValue = requestEnvironment.getFileEnvironment().getClass(classEnv.getId());
+                ClassValue parentClassValue = requestEnvironment.getFileEnvironment().getClass(classEnvironment.getId());
                 if (parentClassValue == null) {
-                    throw new InvalidIdentifierException("Class with id " + classEnv.getId() + " doesn't exist");
+                    throw new InvalidIdentifierException(Text.translatable("meazy_addon:runtime.class.doesnt_exist", classEnvironment.getId()));
                 }
                 return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(identifier.getId()));
             }

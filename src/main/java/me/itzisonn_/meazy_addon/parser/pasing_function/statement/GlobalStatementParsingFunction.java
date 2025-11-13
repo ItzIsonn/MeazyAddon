@@ -24,13 +24,6 @@ public class GlobalStatementParsingFunction extends AbstractParsingFunction<Stat
     public Statement parse(ParsingContext context, Object... extra) {
         Parser parser = context.getParser();
 
-        if (parser.getCurrent().getType().equals(AddonTokenTypes.IMPORT())) {
-            return parser.parse(AddonMain.getIdentifier("import_statement"), ImportStatement.class);
-        }
-        if (parser.getCurrent().getType().equals(AddonTokenTypes.USING())) {
-            return parser.parse(AddonMain.getIdentifier("using_statement"), UsingStatement.class);
-        }
-
         Set<Modifier> modifiers = ParsingHelper.parseModifiers(context);
         if (parser.getCurrent().getType().equals(AddonTokenTypes.CLASS())) {
             return parser.parse(AddonMain.getIdentifier("class_declaration_statement"), ClassDeclarationStatement.class, modifiers);
@@ -39,8 +32,7 @@ public class GlobalStatementParsingFunction extends AbstractParsingFunction<Stat
             return parser.parse(AddonMain.getIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
         }
         if (parser.getCurrent().getType().equals(AddonTokenTypes.VARIABLE())) {
-            VariableDeclarationStatement variableDeclarationStatement =
-                    parser.parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
+            VariableDeclarationStatement variableDeclarationStatement = parser.parse(AddonMain.getIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
             parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "variable_declaration"));
             parser.moveOverOptionalNewLines();
             return variableDeclarationStatement;

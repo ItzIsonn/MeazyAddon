@@ -15,4 +15,15 @@ public abstract class CallExpression implements Expression {
         this.caller = caller;
         this.args = args;
     }
+
+    @Override
+    public String toCodeString() {
+        StringBuilder argsBuilder = new StringBuilder();
+        for (int i = 0; i < args.size(); i++) {
+            argsBuilder.append(args.get(i).toCodeString());
+            if (i != args.size() - 1) argsBuilder.append(", ");
+        }
+
+        return caller.toCodeString() + "(" + argsBuilder + ")";
+    }
 }

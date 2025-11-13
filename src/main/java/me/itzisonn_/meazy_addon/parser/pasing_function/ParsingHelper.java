@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
@@ -39,32 +38,6 @@ public final class ParsingHelper {
         }
 
         return modifiers;
-    }
-
-    public static Map<String, Version> parseRequiredAddons(ParsingContext context) {
-        Parser parser = context.getParser();
-        Map<String, Version> requiredAddons = new HashMap<>();
-
-        parser.moveOverOptionalNewLines();
-
-        while (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
-            parser.getCurrentAndNext();
-
-            String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected.after_keyword", "id", "require")).getValue();
-            Version version;
-
-            if (parser.getCurrent().getType().equals(AddonTokenTypes.STRING())) {
-                String value = parser.getCurrentAndNext().getValue();
-                version = Version.of(value.substring(1, value.length() - 1));
-            }
-            else version = null;
-            requiredAddons.put(id, version);
-
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "require"));
-            parser.moveOverOptionalNewLines();
-        }
-
-        return requiredAddons;
     }
 
     @SuppressWarnings("unchecked")
