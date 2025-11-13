@@ -4,8 +4,8 @@ import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
+import me.itzisonn_.meazy_addon.runtime.EvaluationException;
 
 import java.util.HashSet;
 import java.util.List;

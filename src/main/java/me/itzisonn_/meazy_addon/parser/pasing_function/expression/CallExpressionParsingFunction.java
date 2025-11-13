@@ -2,12 +2,12 @@ package me.itzisonn_.meazy_addon.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
+import me.itzisonn_.meazy_addon.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;

@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidAccessException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -15,6 +14,7 @@ import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
+import me.itzisonn_.meazy_addon.runtime.InvalidAccessException;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
 
 import java.util.List;

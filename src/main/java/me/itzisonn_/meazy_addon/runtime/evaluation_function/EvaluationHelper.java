@@ -16,6 +16,9 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
+import me.itzisonn_.meazy_addon.runtime.EvaluationException;
+import me.itzisonn_.meazy_addon.runtime.InvalidAccessException;
+import me.itzisonn_.meazy_addon.runtime.InvalidCallException;
 import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 
 import java.util.*;

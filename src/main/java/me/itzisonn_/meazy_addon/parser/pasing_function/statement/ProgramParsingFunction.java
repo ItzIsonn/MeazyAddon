@@ -6,15 +6,12 @@ import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
-import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
-import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 
 import java.io.File;
@@ -41,7 +38,6 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
 
         Map<String, Version> requiredAddons = new HashMap<>();
         List<Statement> body = new ArrayList<>();
-        boolean isProgramHead = true;
 
         Statement headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
         while (headerStatement != null || parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
@@ -58,29 +54,16 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
                 else version = null;
 
                 parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "require"));
-                parser.moveOverOptionalNewLines();
-
                 requiredAddons.put(id, version);
             }
-            else {
-                body.add(headerStatement);
-                headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
-            }
+            else body.add(headerStatement);
+
+            headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
+            parser.moveOverOptionalNewLines();
         }
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-            int line = parser.getCurrent().getLine();
-            Statement statement = parser.parse(AddonMain.getIdentifier("global_statement"));
-
-            if (statement instanceof ImportStatement) {
-                if (!isProgramHead) throw new InvalidSyntaxException(line, Text.translatable("meazy_addon:parser.exception.not_at_beginning", "import"));
-            }
-            else if (statement instanceof UsingStatement) {
-                if (!isProgramHead) throw new InvalidSyntaxException(line, Text.translatable("meazy_addon:parser.exception.not_at_beginning", "using"));
-            }
-            else isProgramHead = false;
-
-            body.add(statement);
+            body.add(parser.parse(AddonMain.getIdentifier("global_statement")));
             parser.moveOverOptionalNewLines();
         }
 

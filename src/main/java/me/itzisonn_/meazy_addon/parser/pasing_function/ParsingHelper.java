@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -13,6 +12,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
+import me.itzisonn_.meazy_addon.parser.InvalidStatementException;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 
 import java.util.*;

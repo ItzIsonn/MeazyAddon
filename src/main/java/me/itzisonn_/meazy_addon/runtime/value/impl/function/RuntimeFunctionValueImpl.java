@@ -10,13 +10,13 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.native_annotation.Argument;
 import me.itzisonn_.meazy.runtime.native_annotation.Function;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
+import me.itzisonn_.meazy_addon.runtime.EvaluationException;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 

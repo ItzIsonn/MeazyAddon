@@ -4,9 +4,9 @@ import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.ThisLiteral;
+import me.itzisonn_.meazy_addon.runtime.EvaluationException;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
 import me.itzisonn_.meazy_addon.runtime.value.impl.classes.EmptyClassValueImpl;
 
