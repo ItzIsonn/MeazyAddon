@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.logging.LogLevel;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
@@ -14,7 +15,6 @@ import me.itzisonn_.meazy.runtime.interpreter.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.util.List;
@@ -52,7 +52,7 @@ public class ImportStatementEvaluationFunction extends AbstractEvaluationFunctio
                     throw new EvaluationException(Text.translatable("meazy:commands.run.incompatible_version", program.getVersion(), MeazyMain.VERSION));
                 }
                 if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                    MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy:commands.run.unsafe", program.getVersion(), MeazyMain.VERSION));
+                    MeazyMain.LOGGER.log(LogLevel.WARNING, Text.translatable("meazy:commands.run.unsafe", program.getVersion(), MeazyMain.VERSION));
                 }
                 program.setFile(file);
             }

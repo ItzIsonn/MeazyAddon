@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.logging.LogLevel;
 import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
@@ -32,7 +33,6 @@ import me.itzisonn_.meazy_addon.runtime.evaluation_function.AddonEvaluationFunct
 import me.itzisonn_.meazy_addon.runtime.environment.factory.*;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.registry.RegistryIdentifier;
-import org.apache.logging.log4j.Level;
 
 import java.util.*;
 
@@ -128,7 +128,7 @@ public class AddonMain extends Addon {
 
             FunctionValue function = fileEnvironment.getFunction("main", List.of());
             if (function == null) {
-                MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy_addon:runtime.file_doesnt_contain_main_function"));
+                MeazyMain.LOGGER.log(LogLevel.WARNING, Text.translatable("meazy_addon:runtime.file_doesnt_contain_main_function"));
                 return fileEnvironment;
             }
 
