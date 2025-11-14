@@ -3,4 +3,10 @@ using "me.itzisonn_.meazy_addon.runtime.native_class.primitive.IntClassNative"
 final native class Int : Number {
     private constructor()
     native shared function valueOf(val value:Any):Int?
+
+    native shared function fromBase(val value:String, val from:Int):Int?
+    native shared function toBase(val value:Int, val to:Int):String?
+    shared function fromBaseToBase(val value:String, val from:Int, val to:Int):String? {
+        return toBase(fromBase(value, from), to)
+    }
 }
