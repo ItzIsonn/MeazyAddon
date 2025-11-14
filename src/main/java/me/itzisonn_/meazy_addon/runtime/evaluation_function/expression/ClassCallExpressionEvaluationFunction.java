@@ -31,7 +31,7 @@ public class ClassCallExpressionEvaluationFunction extends AbstractEvaluationFun
         List<RuntimeValue<?>> args = classCallExpression.getArgs().stream().map(expression -> interpreter.evaluate(expression, callEnvironment)).collect(Collectors.toList());
         RuntimeValue<?> rawClass = interpreter.evaluate(classCallExpression.getCaller(), environment);
 
-        if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.cant_call", rawClass.getClass().getName()));
+        if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.instance.not_class", rawClass.getClass().getName()));
         if (classValue.getModifiers().contains(AddonModifiers.ABSTRACT())) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.instance.abstract", classValue.getId()));
         if (classValue.getModifiers().contains(AddonModifiers.ENUM())) throw new InvalidCallException(Text.translatable("meazy_addon:runtime.class.instance.enum", classValue.getId()));
 

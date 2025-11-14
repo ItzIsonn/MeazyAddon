@@ -25,7 +25,7 @@
   "parser.modifier.unexpected": "Found unexpected modifier",
 
   "parser.exception.call_not_identifier": "Can't use non-identifier in 'call' expression",
-  "parser.exception.member_expression": "Right side of 'member' expression must be either ID or 'call' expression",
+  "parser.exception.member_expression": "Right side of 'member' expression must be either id or 'call' expression",
   "parser.exception.cant_parse": "Can't parse token with type '{0}'",
   "parser.exception.enums.base_classes": "Enum class can't have base classes",
   "parser.exception.enums.duplicated_entries": "Enum class can't have duplicated entries",
@@ -34,6 +34,8 @@
   "parser.exception.statement": "Expected 'function_call', 'class_call', 'assignment' or 'member' expression",
   "parser.exception.constant_without_value": "Can't declare a constant variable without a value",
   "parser.exception.not_at_beginning": "'{0}' statement must be at the beginning of the file",
+  "parser.exception.invalid_statement": "Invalid statement at line {0}: {1}",
+  "parser.exception.invalid_syntax": "Invalid syntax at line {0}: {1}",
 
 
 
@@ -47,17 +49,18 @@
   "runtime.cant_assign_value": "Can't assign value to {0}",
   "runtime.condition_must_be_boolean": "Condition must be boolean value",
   "runtime.value_out_of_bounds": "Resulted value {0} is out of bounds",
+  "runtime.cant_evaluate_with_operator": "Can't evaluate expression with operator '{0}'",
 
   "runtime.class.doesnt_exist": "Class with id '{0}' doesn't exist",
   "runtime.class.already_exists": "Class with id '{0}' already exists",
   "runtime.class.cant_access": "Can't access class with id '{0}'",
-  "runtime.class.cant_call": "Can't create new instance of '{0}' because it's not a class",
   "runtime.class.cant_call_base": "Can't call base class with id '{0}' because it's not the base class of class with id '{1}'",
   "runtime.class.cant_inherit": "Can't inherit final class with id '{0}'",
   "runtime.class.cant_extend": "Can't extend final class with id '{0}'",
   "runtime.class.repeated.base_classes": "Class with id '{0}' has repeated base classes",
   "runtime.class.repeated.functions": "Class with id '{0}' has repeated functions",
   "runtime.class.repeated.variables": "Class with id '{0}' has repeated variables",
+  "runtime.class.instance.not_class": "Can't create new instance of '{0}' because it's not a class",
   "runtime.class.instance.abstract": "Can't create instance of an abstract class with id '{0}'",
   "runtime.class.instance.enum": "Can't create instance of an enum class with id '{0}'",
 

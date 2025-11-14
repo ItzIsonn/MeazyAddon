@@ -5,6 +5,6 @@ import me.itzisonn_.meazy.lang.text.Text;
 
 public class InvalidStatementException extends TextException {
     public InvalidStatementException(int lineNumber, Text text) {
-        super(Text.translatable("meazy:parser.invalid_statement", lineNumber, text));
+        super(Text.translatable("meazy_addon:parser.exception.invalid_statement", lineNumber, text));
     }
 }

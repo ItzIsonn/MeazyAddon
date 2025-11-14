@@ -44,9 +44,10 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
                 parser.getCurrentAndNext();
 
-                String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected.after_keyword", "id", "require")).getValue();
-                Version version;
+                String id = parser.getCurrentAndNext(AddonTokenTypes.STRING(), Text.translatable("meazy_addon:parser.expected.after_keyword", "string", "require")).getValue();
+                id = id.substring(1, id.length() - 1);
 
+                Version version;
                 if (parser.getCurrent().getType().equals(AddonTokenTypes.STRING())) {
                     String value = parser.getCurrentAndNext().getValue();
                     version = Version.of(value.substring(1, value.length() - 1));

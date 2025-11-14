@@ -56,7 +56,7 @@ public class ImportStatementEvaluationFunction extends AbstractEvaluationFunctio
                 }
                 program.setFile(file);
             }
-            default -> throw new EvaluationException(Text.translatable("meazy:commands.run.invalid_extension", extension));
+            default -> throw new EvaluationException(Text.translatable("meazy:file.unsupported_extension", extension));
         }
 
         GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
