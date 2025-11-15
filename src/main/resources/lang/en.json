@@ -36,6 +36,7 @@
   "parser.exception.not_at_beginning": "'{0}' statement must be at the beginning of the file",
   "parser.exception.invalid_statement": "Invalid statement at line {0}: {1}",
   "parser.exception.invalid_syntax": "Invalid syntax at line {0}: {1}",
+  "parser.exception.string_quote_not_closed": "String '{0}' has unclosed quote",
 
 
 

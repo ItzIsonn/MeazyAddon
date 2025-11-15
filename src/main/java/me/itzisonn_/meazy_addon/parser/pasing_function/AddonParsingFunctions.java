@@ -30,10 +30,13 @@ public final class AddonParsingFunctions {
         hasRegistered = true;
 
         register(new ProgramParsingFunction());
+
         register(new HeaderStatementParsingFunction());
-        register(new GlobalStatementParsingFunction());
         register(new ImportStatementParsingFunction());
         register(new UsingStatementParsingFunction());
+        register(new RequireStatementParsingFunction());
+
+        register(new GlobalStatementParsingFunction());
         register(new ClassDeclarationStatementParsingFunction());
         register(new ClassBodyStatementParsingFunction());
         register(new FunctionDeclarationStatementParsingFunction());

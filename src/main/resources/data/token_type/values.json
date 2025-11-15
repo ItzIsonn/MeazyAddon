@@ -1,7 +1,7 @@
 [
   { "id": "null", "regex": "null" },
   { "id": "number", "regex": "(0|([1-9][0-9]*))(\\.[0-9]+)?" },
-  { "id": "string", "regex": "\"[^\"\n]*\"" },
+  { "id": "string", "regex":"\"[^\"\n]*(\")?" },
   { "id": "boolean", "regex": "true|false" },
   { "id": "this", "regex": "this" },
   { "id": "id", "regex": "[a-zA-Z_][a-zA-Z0-9_]*", "can_match": "me.itzisonn_.meazy_addon.lexer.AddonTokenTypes#canMatchId" }

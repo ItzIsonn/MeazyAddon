@@ -36,6 +36,7 @@
   "parser.exception.not_at_beginning": "Инструкция '{0}' должна быть в начале файла",
   "parser.exception.invalid_statement": "Неверная инструкция на строке {0}: {1}",
   "parser.exception.invalid_syntax": "Неверный синтаксис на строке {0}: {1}",
+  "parser.exception.string_quote_not_closed": "У строки '{0}' есть незакрытая кавычка",
 
 
 

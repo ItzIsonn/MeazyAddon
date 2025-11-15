@@ -23,6 +23,9 @@ public class HeaderStatementParsingFunction extends AbstractParsingFunction<Stat
         if (parser.getCurrent().getType().equals(AddonTokenTypes.USING())) {
             return parser.parse(AddonMain.getIdentifier("using_statement"), UsingStatement.class);
         }
+        if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
+            return parser.parse(AddonMain.getIdentifier("require_statement"), RequireStatement.class);
+        }
 
         return null;
     }

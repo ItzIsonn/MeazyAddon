@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
+import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 
 public class ImportStatementParsingFunction extends AbstractParsingFunction<ImportStatement> {
     public ImportStatementParsingFunction() {
@@ -17,8 +18,8 @@ public class ImportStatementParsingFunction extends AbstractParsingFunction<Impo
         Parser parser = context.getParser();
 
         parser.next(AddonTokenTypes.IMPORT(), Text.translatable("meazy_addon:parser.expected.keyword", "import"));
-        String file = parser.getCurrentAndNext(AddonTokenTypes.STRING(), Text.translatable("meazy_addon:parser.expected.after_keyword", "string", "import")).getValue();
+        String file = ParsingHelper.parseString(context);
 
-        return new ImportStatement(file.substring(1, file.length() - 1));
+        return new ImportStatement(file);
     }
 }

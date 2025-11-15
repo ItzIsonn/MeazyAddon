@@ -4,14 +4,13 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy_addon.AddonMain;
-import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
+import me.itzisonn_.meazy_addon.parser.ast.statement.RequireStatement;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 
 import java.io.File;
@@ -40,24 +39,15 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
         List<Statement> body = new ArrayList<>();
 
         Statement headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
-        while (headerStatement != null || parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
-            if (parser.getCurrent().getType().equals(AddonTokenTypes.REQUIRE())) {
-                parser.getCurrentAndNext();
+        parser.moveOverOptionalNewLines();
 
-                String id = parser.getCurrentAndNext(AddonTokenTypes.STRING(), Text.translatable("meazy_addon:parser.expected.after_keyword", "string", "require")).getValue();
-                id = id.substring(1, id.length() - 1);
-
-                Version version;
-                if (parser.getCurrent().getType().equals(AddonTokenTypes.STRING())) {
-                    String value = parser.getCurrentAndNext().getValue();
-                    version = Version.of(value.substring(1, value.length() - 1));
-                }
-                else version = null;
-
-                parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "require"));
-                requiredAddons.put(id, version);
+        while (headerStatement != null) {
+            if (headerStatement instanceof RequireStatement requireStatement) {
+                requiredAddons.put(requireStatement.getId(), requireStatement.getVersion());
             }
-            else body.add(headerStatement);
+            else {
+                body.add(headerStatement);
+            }
 
             headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
             parser.moveOverOptionalNewLines();

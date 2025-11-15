@@ -3,6 +3,7 @@ package me.itzisonn_.meazy_addon.parser.pasing_function;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
@@ -120,5 +121,14 @@ public final class ParsingHelper {
 
         parser.moveOverOptionalNewLines();
         return body;
+    }
+
+    public static String parseString(ParsingContext context) {
+        Parser parser = context.getParser();
+        Token token = parser.getCurrent();
+
+        String value = parser.getCurrentAndNext(AddonTokenTypes.STRING(), Text.translatable("meazy_addon:parser.expected", "string")).getValue();
+        if (!value.endsWith("\"")) throw new InvalidStatementException(token.getLine(), Text.translatable("meazy_addon:parser.exception.string_quote_not_closed", value.substring(1)));
+        return value.substring(1, value.length() - 1);
     }
 }

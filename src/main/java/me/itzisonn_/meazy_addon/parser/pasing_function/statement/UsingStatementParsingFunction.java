@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.ast.statement.UsingStatement;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
+import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 
 public class UsingStatementParsingFunction extends AbstractParsingFunction<UsingStatement> {
     public UsingStatementParsingFunction() {
@@ -17,8 +18,8 @@ public class UsingStatementParsingFunction extends AbstractParsingFunction<Using
         Parser parser = context.getParser();
 
         parser.next(AddonTokenTypes.USING(), Text.translatable("meazy_addon:parser.expected.keyword", "using"));
-        String nativeClass = parser.getCurrentAndNext(AddonTokenTypes.STRING(), Text.translatable("meazy_addon:parser.expected.after_keyword", "string", "using")).getValue();
+        String nativeClass = ParsingHelper.parseString(context);
 
-        return new UsingStatement(nativeClass.substring(1, nativeClass.length() - 1));
+        return new UsingStatement(nativeClass);
     }
 }

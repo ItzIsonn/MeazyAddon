@@ -14,6 +14,7 @@ import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentif
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
+import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 
 public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Expression> {
     public PrimaryExpressionParsingFunction() {
@@ -46,10 +47,7 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
             return new NullLiteral();
         }
         if (tokenType.equals(AddonTokenTypes.NUMBER())) return new NumberLiteral(parser.getCurrentAndNext().getValue());
-        if (tokenType.equals(AddonTokenTypes.STRING())) {
-            String value = parser.getCurrentAndNext().getValue();
-            return new StringLiteral(value.substring(1, value.length() - 1));
-        }
+        if (tokenType.equals(AddonTokenTypes.STRING())) return new StringLiteral(ParsingHelper.parseString(context));
         if (tokenType.equals(AddonTokenTypes.BOOLEAN())) return new BooleanLiteral(Boolean.parseBoolean(parser.getCurrentAndNext().getValue()));
         if (tokenType.equals(AddonTokenTypes.THIS())) {
             parser.getCurrentAndNext();
