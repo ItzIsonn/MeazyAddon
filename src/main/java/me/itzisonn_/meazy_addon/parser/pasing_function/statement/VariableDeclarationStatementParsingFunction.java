@@ -15,8 +15,6 @@ import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatemen
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class VariableDeclarationStatementParsingFunction extends AbstractParsingFunction<VariableDeclarationStatement> {
@@ -34,21 +32,6 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
 
         boolean isConstant = parser.getCurrentAndNext(AddonTokenTypes.VARIABLE(), Text.translatable("meazy_addon:parser.expected.keyword", "variable")).getValue().equals("val");
 
-        List<VariableDeclarationStatement.VariableDeclarationInfo> declarations = new ArrayList<>();
-        declarations.add(parseVariableDeclarationInfo(context, isConstant, canWithoutValue));
-
-        while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA())) {
-            parser.next();
-            declarations.add(parseVariableDeclarationInfo(context, isConstant, canWithoutValue));
-        }
-
-        return new VariableDeclarationStatement(modifiers, isConstant, declarations);
-    }
-
-
-
-    private static VariableDeclarationStatement.VariableDeclarationInfo parseVariableDeclarationInfo(ParsingContext context, boolean isConstant, boolean canWithoutValue) {
-        Parser parser = context.getParser();
         String id = parser.getCurrentAndNext(AddonTokenTypes.ID(), Text.translatable("meazy_addon:parser.expected", "id")).getValue();
 
         DataType dataType = ParsingHelper.parseDataType(context);
@@ -56,14 +39,14 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
 
         if (!parser.getCurrent().getType().equals(AddonTokenTypes.ASSIGN())) {
             if (canWithoutValue) {
-                return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, null);
+                return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, null);
             }
             if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:parser.exception.constant_without_value"));
-            return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, new NullLiteral());
+            return new VariableDeclarationStatement(modifiers, false, id, dataType, new NullLiteral());
         }
 
         parser.next(AddonTokenTypes.ASSIGN(), Text.translatable("meazy_addon:parser.expected.after", "assign", "id"));
 
-        return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, parser.parse(AddonMain.getIdentifier("expression"), Expression.class));
+        return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, parser.parse(AddonMain.getIdentifier("expression"), Expression.class));
     }
 }

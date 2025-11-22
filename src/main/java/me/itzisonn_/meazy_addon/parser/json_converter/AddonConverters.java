@@ -43,12 +43,12 @@ public final class AddonConverters {
         register(new UsingStatementConverter());
         register(new ClassDeclarationStatementConverter());
         register(new FunctionDeclarationStatementConverter());
-        register(new VariableDeclarationConverter());
+        register(new VariableDeclarationStatementConverter());
         register(new ConstructorDeclarationStatementConverter());
         register(new BaseCallStatementConverter());
         register(new IfStatementConverter());
         register(new ForStatementConverter());
-        register(new ForeachStatementConverter());
+        register(new ForStatementConverter());
         register(new WhileStatementConverter());
         register(new ReturnStatementConverter());
         register(new ContinueStatementConverter());

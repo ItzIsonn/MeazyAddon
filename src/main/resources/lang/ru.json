@@ -29,7 +29,7 @@
   "parser.exception.cant_parse": "Не удалось проанализировать токен с типом '{0}'",
   "parser.exception.enums.base_classes": "Класс-перечисление не должен иметь базовых классов",
   "parser.exception.enums.duplicated_entries": "Класс-перечисление не должен иметь повторяющиеся элементы",
-  "parser.exception.foreach_one_variable": "Нельзя определить несколько переменных в инструкции 'foreach'",
+  "parser.exception.foreach_variable_wth_value": "Нельзя определить переменную с присвоенным значением в инструкции 'foreach'",
   "parser.exception.global_statement": "Ожидались инструкции 'variable_declaration', 'function_declaration' или 'class_declaration'",
   "parser.exception.statement": "Ожидались выражения 'function_call', 'class_call', 'assignment' или 'member'",
   "parser.exception.constant_without_value": "Нельзя определить константную переменную без значения",

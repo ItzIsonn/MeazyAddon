@@ -116,15 +116,11 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
             if (statement instanceof VariableDeclarationStatement variableDeclarationStatement) {
                 if (variableDeclarationStatement.getModifiers().contains(AddonModifiers.GET())) {
-                    for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
-                        body.add(getGetFunction(variableDeclarationInfo.getId(), variableDeclarationInfo.getDataType()));
-                    }
+                    body.add(getGetFunction(variableDeclarationStatement.getId(), variableDeclarationStatement.getDataType()));
                     variableDeclarationStatement.getModifiers().remove(AddonModifiers.GET());
                 }
                 if (variableDeclarationStatement.getModifiers().contains(AddonModifiers.SET()) && !variableDeclarationStatement.isConstant()) {
-                    for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
-                        body.add(getSetFunction(variableDeclarationInfo.getId(), variableDeclarationInfo.getDataType()));
-                    }
+                    body.add(getSetFunction(variableDeclarationStatement.getId(), variableDeclarationStatement.getDataType()));
                     variableDeclarationStatement.getModifiers().remove(AddonModifiers.SET());
                 }
             }
@@ -145,7 +141,10 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             body.add(new VariableDeclarationStatement(
                     Set.of(AddonModifiers.PRIVATE()),
                     dataVariable.isConstant(),
-                    List.of(new VariableDeclarationStatement.VariableDeclarationInfo(dataVariable.getId(), dataVariable.getDataType(), null))));
+                    dataVariable.getId(),
+                    dataVariable.getDataType(),
+                    null
+            ));
         }
 
         List<Statement> constructorBody = new ArrayList<>();

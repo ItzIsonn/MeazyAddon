@@ -40,7 +40,6 @@ public final class AddonEvaluationFunctions {
         register(new BaseCallStatementEvaluationFunction());
         register(new IfStatementEvaluationFunction());
         register(new ForStatementEvaluationFunction());
-        register(new ForeachStatementEvaluationFunction());
         register(new WhileStatementEvaluationFunction());
         register(new ReturnStatementEvaluationFunction());
         register(new ContinueStatementEvaluationFunction());

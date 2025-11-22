@@ -39,47 +39,44 @@ public class VariableDeclarationStatementEvaluationFunction extends AbstractEval
                 !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED())) modifiers.add(AddonModifiers.SHARED());
 
         Interpreter interpreter = context.getInterpreter();
-        for (VariableDeclarationStatement.VariableDeclarationInfo variableDeclarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
-            RuntimeValue<?> value = null;
-            VariableValue variableValue = null;
+        RuntimeValue<?> value = null;
+        VariableValue variableValue = null;
 
-            if (variableDeclarationInfo.getValue() != null && !(environment instanceof ClassEnvironment && environment.isShared() &&
-                    !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED()))) {
-                boolean placed = false;
+        if (variableDeclarationStatement.getValue() != null && !(environment instanceof ClassEnvironment && environment.isShared() &&
+                !variableDeclarationStatement.getModifiers().contains(AddonModifiers.SHARED()))) {
+            boolean placed = false;
 
-                if ((environment instanceof FileEnvironment || environment instanceof ClassEnvironment) && environment.isShared()) {
-                    if (environment.getFileEnvironment() instanceof FileEnvironmentImpl) {
-                        variableValue = new VariableValueImpl(
-                                variableDeclarationInfo.getId(),
-                                variableDeclarationInfo.getDataType(),
-                                variableDeclarationInfo.getValue(),
-                                variableDeclarationStatement.isConstant(),
-                                modifiers,
-                                false,
-                                variableDeclarationEnvironment
-                        );
-                        placed = true;
-                    }
+            if ((environment instanceof FileEnvironment || environment instanceof ClassEnvironment) && environment.isShared()) {
+                if (environment.getFileEnvironment() instanceof FileEnvironmentImpl) {
+                    variableValue = new VariableValueImpl(
+                            variableDeclarationStatement.getId(),
+                            variableDeclarationStatement.getDataType(),
+                            variableDeclarationStatement.getValue(),
+                            variableDeclarationStatement.isConstant(),
+                            modifiers,
+                            false,
+                            variableDeclarationEnvironment
+                    );
+                    placed = true;
                 }
-
-                if (!placed) value = interpreter.evaluate(variableDeclarationInfo.getValue(), environment);
             }
 
-            if (variableValue == null) {
-                variableValue = new VariableValueImpl(
-                        variableDeclarationInfo.getId(),
-                        variableDeclarationInfo.getDataType(),
-                        value,
-                        variableDeclarationStatement.isConstant(),
-                        modifiers,
-                        false,
-                        variableDeclarationEnvironment
-                );
-            }
-
-            variableDeclarationEnvironment.declareVariable(variableValue);
+            if (!placed) value = interpreter.evaluate(variableDeclarationStatement.getValue(), environment);
         }
 
+        if (variableValue == null) {
+            variableValue = new VariableValueImpl(
+                    variableDeclarationStatement.getId(),
+                    variableDeclarationStatement.getDataType(),
+                    value,
+                    variableDeclarationStatement.isConstant(),
+                    modifiers,
+                    false,
+                    variableDeclarationEnvironment
+            );
+        }
+
+        variableDeclarationEnvironment.declareVariable(variableValue);
         return null;
     }
 }

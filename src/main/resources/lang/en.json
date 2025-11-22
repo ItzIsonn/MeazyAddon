@@ -29,7 +29,7 @@
   "parser.exception.cant_parse": "Can't parse token with type '{0}'",
   "parser.exception.enums.base_classes": "Enum class can't have base classes",
   "parser.exception.enums.duplicated_entries": "Enum class can't have duplicated entries",
-  "parser.exception.foreach_one_variable": "Can't declare multiple variables in 'foreach' statement",
+  "parser.exception.foreach_variable_wth_value": "Can't declare variable with assigned value in 'foreach' statement",
   "parser.exception.global_statement": "Expected 'variable_declaration', 'function_declaration' or 'class_declaration' statement",
   "parser.exception.statement": "Expected 'function_call', 'class_call', 'assignment' or 'member' expression",
   "parser.exception.constant_without_value": "Can't declare a constant variable without a value",

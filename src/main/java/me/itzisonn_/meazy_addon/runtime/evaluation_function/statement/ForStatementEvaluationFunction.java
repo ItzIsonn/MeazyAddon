@@ -9,19 +9,17 @@ import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy_addon.parser.ast.statement.*;
 import me.itzisonn_.meazy_addon.runtime.EvaluationException;
 import me.itzisonn_.meazy_addon.runtime.evaluation_function.AbstractEvaluationFunction;
-import me.itzisonn_.meazy_addon.runtime.evaluation_function.EvaluationHelper;
 import me.itzisonn_.meazy_addon.runtime.value.impl.VariableValueImpl;
+import me.itzisonn_.meazy_addon.runtime.native_class.collection.InnerCollectionValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ContinueInfoValue;
 import me.itzisonn_.meazy_addon.runtime.value.statement_info.ReturnInfoValue;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<ForStatement> {
     public ForStatementEvaluationFunction() {
@@ -30,28 +28,35 @@ public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<F
 
     @Override
     public RuntimeValue<?> evaluate(ForStatement forStatement, RuntimeContext context, Environment environment, Object... extra) {
-        LoopEnvironment forEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
+        LoopEnvironment foreachEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment);
         Interpreter interpreter = context.getInterpreter();
 
-        for (var variableDeclarationInfo : forStatement.getVariableDeclarationStatement().getDeclarationInfos()) {
-            forEnvironment.declareVariable(new VariableValueImpl(
-                    variableDeclarationInfo.getId(),
-                    variableDeclarationInfo.getDataType(),
-                    variableDeclarationInfo.getValue() == null ?
-                            null :
-                            interpreter.evaluate(variableDeclarationInfo.getValue(), environment),
-                    forStatement.getVariableDeclarationStatement().isConstant(),
-                    Set.of(),
-                    false,
-                    forEnvironment
-            ));
+        RuntimeValue<?> rawCollectionValue = interpreter.evaluate(forStatement.getCollection(), foreachEnvironment).getFinalRuntimeValue();
+        if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getBaseClasses().contains("Collection"))) {
+            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_apply_foreach"));
         }
 
+        VariableValue variable = classValue.getEnvironment().getVariable("collection");
+        if (variable == null) throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_apply_foreach"));
+        if (!(variable.getValue() instanceof InnerCollectionValue<?> collectionValue)) throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_apply_foreach"));
+
         main:
-        while (EvaluationHelper.parseCondition(context, forStatement.getCondition(), forEnvironment)) {
+        for (RuntimeValue<?> runtimeValue : collectionValue.getValue()) {
+            foreachEnvironment.clearVariables();
+
+            foreachEnvironment.declareVariable(new VariableValueImpl(
+                    forStatement.getVariableDeclarationStatement().getId(),
+                    forStatement.getVariableDeclarationStatement().getDataType(),
+                    runtimeValue,
+                    forStatement.getVariableDeclarationStatement().isConstant(),
+                    new HashSet<>(),
+                    false,
+                    foreachEnvironment
+            ));
+
             for (int i = 0; i < forStatement.getBody().size(); i++) {
                 Statement statement = forStatement.getBody().get(i);
-                RuntimeValue<?> result = interpreter.evaluate(statement, forEnvironment);
+                RuntimeValue<?> result = interpreter.evaluate(statement, foreachEnvironment);
 
                 if (statement instanceof ReturnStatement) {
                     if (i + 1 < forStatement.getBody().size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "return"));
@@ -77,24 +82,6 @@ public class ForStatementEvaluationFunction extends AbstractEvaluationFunction<F
                     break main;
                 }
             }
-
-            List<VariableValue> variableValues = new ArrayList<>();
-            forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
-                    variableValues.add(forEnvironment.getVariable(variableDeclarationInfo.getId())));
-
-            forEnvironment.clearVariables();
-            for (VariableValue variableValue : variableValues) {
-                forEnvironment.declareVariable(new VariableValueImpl(
-                        variableValue.getId(),
-                        variableValue.getDataType(),
-                        variableValue.getValue(),
-                        variableValue.isConstant(),
-                        new HashSet<>(),
-                        false,
-                        forEnvironment
-                ));
-            }
-            EvaluationHelper.evaluateAssignmentExpression(context, forStatement.getAssignmentExpression(), forEnvironment);
         }
 
         return null;
