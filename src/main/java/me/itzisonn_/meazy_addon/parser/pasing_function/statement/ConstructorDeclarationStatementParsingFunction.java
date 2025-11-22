@@ -33,7 +33,6 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
 
         if (modifiers.contains(AddonModifiers.NATIVE())) {
-            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "constructor_declaration"));
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
@@ -52,12 +51,11 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
             if (parser.getCurrent().getType().equals(AddonTokenTypes.BASE())) body.add(parser.parse(AddonMain.getIdentifier("base_call_statement")));
             else body.add(parser.parse(AddonMain.getIdentifier("statement")));
+            parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy_addon:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
         }
 
         parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "constructor_body"));
-        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "constructor_declaration"));
-
         return new ConstructorDeclarationStatement(modifiers, parameters, body);
     }
 }

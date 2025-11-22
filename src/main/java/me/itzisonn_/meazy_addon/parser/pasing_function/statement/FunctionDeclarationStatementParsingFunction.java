@@ -2,7 +2,6 @@ package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -43,7 +42,6 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (modifiers.contains(AddonModifiers.ABSTRACT()) || modifiers.contains(AddonModifiers.NATIVE())) {
-            parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "function_declaration"));
             return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
         }
 
@@ -57,7 +55,6 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "function_body"));
             body = ParsingHelper.parseBody(context);
             parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "function_body"));
-            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "function_declaration"));
         }
 
         return new FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType);

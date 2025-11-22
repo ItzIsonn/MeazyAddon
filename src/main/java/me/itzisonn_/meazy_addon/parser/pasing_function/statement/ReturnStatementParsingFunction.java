@@ -24,7 +24,6 @@ public class ReturnStatementParsingFunction extends AbstractParsingFunction<Retu
         if (!parser.getCurrent().getType().equals(TokenTypes.NEW_LINE())) {
             expression = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
         }
-        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "return"));
 
         return new ReturnStatement(expression);
     }

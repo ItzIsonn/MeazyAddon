@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
@@ -39,9 +40,11 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
         List<Statement> body = new ArrayList<>();
 
         Statement headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
-        parser.moveOverOptionalNewLines();
 
         while (headerStatement != null) {
+            parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy_addon:parser.expected", "new_line"));
+            parser.moveOverOptionalNewLines();
+
             if (headerStatement instanceof RequireStatement requireStatement) {
                 requiredAddons.put(requireStatement.getId(), requireStatement.getVersion());
             }
@@ -50,12 +53,17 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             }
 
             headerStatement = parser.parse(AddonMain.getIdentifier("header_statement"));
-            parser.moveOverOptionalNewLines();
         }
+
+        parser.moveOverOptionalNewLines();
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
             body.add(parser.parse(AddonMain.getIdentifier("global_statement")));
-            parser.moveOverOptionalNewLines();
+
+            if (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
+                parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected", "new_line"));
+                parser.moveOverOptionalNewLines();
+            }
         }
 
         if (requiredAddons.isEmpty()) {

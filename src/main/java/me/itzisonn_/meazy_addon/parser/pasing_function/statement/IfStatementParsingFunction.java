@@ -36,9 +36,14 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
             parser.next();
             body = ParsingHelper.parseBody(context);
             parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "if_body"));
-            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "if"));
+
         }
         else body.add(parser.parse(AddonMain.getIdentifier("statement")));
+
+        int elsePos = parser.getPos() + 1;
+        if (elsePos < parser.getTokens().size() && parser.getTokens().get(elsePos).getType().equals(AddonTokenTypes.ELSE())) {
+            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line"));
+        }
 
         IfStatement elseStatement = null;
         if (parser.getCurrent().getType().equals(AddonTokenTypes.ELSE())) {
@@ -53,11 +58,8 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
                     parser.next();
                     elseBody = ParsingHelper.parseBody(context);
                     parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "if_body"));
-                    parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "if"));
                 }
-                else {
-                    elseBody.add(parser.parse(AddonMain.getIdentifier("statement")));
-                }
+                else elseBody.add(parser.parse(AddonMain.getIdentifier("statement")));
 
                 elseStatement = new IfStatement(null, elseBody, null);
             }

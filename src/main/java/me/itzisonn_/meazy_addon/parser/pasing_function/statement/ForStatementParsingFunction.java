@@ -2,7 +2,6 @@ package me.itzisonn_.meazy_addon.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -49,8 +48,6 @@ public class ForStatementParsingFunction extends AbstractParsingFunction<Stateme
             List<Statement> body = ParsingHelper.parseBody(context);
             parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "for_body"));
 
-            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "for"));
-
             return new ForeachStatement(variableDeclarationStatement, collection, body);
         }
 
@@ -81,8 +78,6 @@ public class ForStatementParsingFunction extends AbstractParsingFunction<Stateme
         parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "for_body"));
         List<Statement> body = ParsingHelper.parseBody(context);
         parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "for_body"));
-
-        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "for"));
 
         return new ForStatement(variableDeclarationStatement, condition, assignmentExpression, body);
     }

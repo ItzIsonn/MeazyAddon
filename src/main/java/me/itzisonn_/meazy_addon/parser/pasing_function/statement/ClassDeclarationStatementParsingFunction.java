@@ -77,8 +77,6 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
         if (parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
             parser.next();
-            parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected", "new_line"));
-            parser.moveOverOptionalNewLines();
             return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 
@@ -135,8 +133,6 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         }
 
         parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "class_body"));
-        parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected.end_statement", "new_line", "class_declaration"));
-
         return new ClassDeclarationStatement(modifiers, id, baseClasses, body, enumIds);
     }
 

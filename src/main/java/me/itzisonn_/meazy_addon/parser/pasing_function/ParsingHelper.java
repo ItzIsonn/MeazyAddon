@@ -116,10 +116,10 @@ public final class ParsingHelper {
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(AddonTokenTypes.RIGHT_BRACE())) {
             body.add(parser.parse(AddonMain.getIdentifier("statement")));
+            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy_addon:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
         }
 
-        parser.moveOverOptionalNewLines();
         return body;
     }
 
