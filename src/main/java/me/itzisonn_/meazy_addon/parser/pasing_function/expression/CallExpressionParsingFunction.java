@@ -8,10 +8,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy_addon.parser.ast.expression.CallExpression;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
 
@@ -34,12 +31,7 @@ public class CallExpressionParsingFunction extends AbstractParsingFunction<Expre
             }
 
             List<Expression> args = ParsingHelper.parseArgs(context);
-
-            return switch (identifier) {
-                case ClassIdentifier classIdentifier -> new ClassCallExpression(classIdentifier, args);
-                case FunctionIdentifier functionIdentifier -> new FunctionCallExpression(functionIdentifier, args);
-                default -> throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy_addon:invalid_identifier", identifier.getClass().getSimpleName()));
-            };
+            return new CallExpression(identifier, args);
         }
 
         return expression;

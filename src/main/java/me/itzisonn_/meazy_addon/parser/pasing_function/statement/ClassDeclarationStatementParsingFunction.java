@@ -15,12 +15,11 @@ import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.InvalidSyntaxException;
+import me.itzisonn_.meazy_addon.parser.ast.expression.CallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.AssignmentStatement;
 import me.itzisonn_.meazy_addon.parser.ast.expression.IsExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
@@ -197,7 +196,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 Set.of(),
                 "copy",
                 List.of(),
-                List.of(new ReturnStatement(new ClassCallExpression(new ClassIdentifier(id), copyArgs))),
+                List.of(new ReturnStatement(new CallExpression(new ClassIdentifier(id), copyArgs))),
                 Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(id, false)));
 
         Expression equalsExpression;
@@ -206,7 +205,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                     new VariableIdentifier(dataVariables.getFirst().getId()),
                     new MemberExpression(
                             new VariableIdentifier("value"),
-                            new FunctionCallExpression(
+                            new CallExpression(
                                     new FunctionIdentifier(AddonUtils.generatePrefixedName("get", dataVariables.getFirst().getId())),
                                     List.of()),
                             false),
@@ -219,7 +218,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                                 new VariableIdentifier(dataVariable.getId()),
                                 new MemberExpression(
                                         new VariableIdentifier("value"),
-                                        new FunctionCallExpression(
+                                        new CallExpression(
                                                 new FunctionIdentifier(AddonUtils.generatePrefixedName("get", dataVariable.getId())),
                                                 List.of()),
                                         false),

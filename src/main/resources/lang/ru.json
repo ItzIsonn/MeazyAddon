@@ -31,7 +31,7 @@
   "parser.exception.enums.duplicated_entries": "Класс-перечисление не должен иметь повторяющиеся элементы",
   "parser.exception.foreach_variable_wth_value": "Нельзя определить переменную с присвоенным значением в инструкции 'foreach'",
   "parser.exception.global_statement": "Ожидались инструкции 'variable_declaration', 'function_declaration' или 'class_declaration'",
-  "parser.exception.statement": "Ожидались выражения 'function_call', 'class_call', 'postfix' или 'member'",
+  "parser.exception.statement": "Ожидались выражения 'call', 'postfix' или 'member'",
   "parser.exception.constant_without_value": "Нельзя определить константную переменную без значения",
   "parser.exception.not_at_beginning": "Инструкция '{0}' должна быть в начале файла",
   "parser.exception.invalid_statement": "Неверная инструкция на строке {0}: {1}",
@@ -54,6 +54,7 @@
   "runtime.cant_multiply.values": "Нельзя перемножить значения '{0}' и '{1}'",
   "runtime.cant_multiply.string_by_negative": "Нельзя умножить строку на отрицательное число",
   "runtime.unknown_postfix_operator": "Неизвестный постфикс оператор '{0}'",
+  "runtime.unknown_call_identifier": "Неизвестный 'call' айди '{0}'",
 
   "runtime.class.doesnt_exist": "Класса с айди '{0}' не существует",
   "runtime.class.already_exists": "Класс с айди '{0}' уже существует",

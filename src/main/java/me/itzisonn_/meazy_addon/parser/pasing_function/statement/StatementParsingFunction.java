@@ -13,8 +13,7 @@ import me.itzisonn_.meazy_addon.parser.InvalidStatementException;
 import me.itzisonn_.meazy_addon.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.PostfixExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
+import me.itzisonn_.meazy_addon.parser.ast.expression.CallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy_addon.parser.pasing_function.ParsingHelper;
@@ -49,7 +48,7 @@ public class StatementParsingFunction extends AbstractParsingFunction<Statement>
         }
 
         Expression expression = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
-        if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression || expression instanceof MemberExpression || expression instanceof PostfixExpression) {
+        if (expression instanceof CallExpression || expression instanceof MemberExpression || expression instanceof PostfixExpression) {
             return expression;
         }
 

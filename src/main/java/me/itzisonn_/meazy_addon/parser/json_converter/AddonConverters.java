@@ -3,8 +3,6 @@ package me.itzisonn_.meazy_addon.parser.json_converter;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy_addon.parser.json_converter.expression.*;
-import me.itzisonn_.meazy_addon.parser.json_converter.expression.call_expression.ClassCallExpressionConverter;
-import me.itzisonn_.meazy_addon.parser.json_converter.expression.call_expression.FunctionCallExpressionConverter;
 import me.itzisonn_.meazy_addon.parser.json_converter.expression.collection_creation.ListCreationExpressionConverter;
 import me.itzisonn_.meazy_addon.parser.json_converter.expression.collection_creation.MapCreationExpressionConverter;
 import me.itzisonn_.meazy.Registries;
@@ -62,8 +60,7 @@ public final class AddonConverters {
         register(new OperatorExpressionConverter());
         register(new PostfixExpressionConverter());
         register(new MemberExpressionConverter());
-        register(new ClassCallExpressionConverter());
-        register(new FunctionCallExpressionConverter());
+        register(new CallExpressionConverter());
         register(new ClassIdentifierConverter());
         register(new FunctionIdentifierConverter());
         register(new VariableIdentifierConverter());

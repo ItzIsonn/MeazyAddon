@@ -51,10 +51,9 @@ public final class AddonEvaluationFunctions {
         register(new NullCheckExpressionEvaluationFunction());
         register(new IsExpressionEvaluationFunction());
         register(new OperatorExpressionEvaluationFunction());
-        register(new ClassCallExpressionEvaluationFunction());
         register(new PostfixExpressionEvaluationFunction());
         register(new MemberExpressionEvaluationFunction());
-        register(new FunctionCallExpressionEvaluationFunction());
+        register(new CallExpressionEvaluationFunction());
         register(new IdentifierEvaluationFunction());
         register(new NullLiteralEvaluationFunction());
         register(new NumberLiteralEvaluationFunction());

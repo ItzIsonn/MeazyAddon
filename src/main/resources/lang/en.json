@@ -31,7 +31,7 @@
   "parser.exception.enums.duplicated_entries": "Enum class can't have duplicated entries",
   "parser.exception.foreach_variable_wth_value": "Can't declare variable with assigned value in 'foreach' statement",
   "parser.exception.global_statement": "Expected 'variable_declaration', 'function_declaration' or 'class_declaration' statement",
-  "parser.exception.statement": "Expected 'function_call', 'class_call', 'postfix' or 'member' expression",
+  "parser.exception.statement": "Expected 'call', 'postfix' or 'member' expression",
   "parser.exception.constant_without_value": "Can't declare a constant variable without a value",
   "parser.exception.not_at_beginning": "'{0}' statement must be at the beginning of the file",
   "parser.exception.invalid_statement": "Invalid statement at line {0}: {1}",
@@ -54,6 +54,7 @@
   "runtime.cant_multiply.values": "Can't multiply values '{0}' and '{1}'",
   "runtime.cant_multiply.string_by_negative": "Can't multiply string by a negative int",
   "runtime.unknown_postfix_operator": "Unknown postfix operator '{0}'",
+  "runtime.unknown_call_identifier": "Unknown call identifier '{0}'",
 
   "runtime.class.doesnt_exist": "Class with id '{0}' doesn't exist",
   "runtime.class.already_exists": "Class with id '{0}' already exists",

@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy_addon.parser.ast.expression.call_expression;
+package me.itzisonn_.meazy_addon.parser.ast.expression;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import java.util.List;
 
 @Getter
-public abstract class CallExpression implements Expression {
+public class CallExpression implements Expression {
     protected final Identifier caller;
     protected final List<Expression> args;
 

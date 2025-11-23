@@ -10,7 +10,7 @@ import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.CallExpression;
+import me.itzisonn_.meazy_addon.parser.ast.expression.CallExpression;
 import me.itzisonn_.meazy_addon.parser.pasing_function.AbstractParsingFunction;
 
 public class MemberExpressionParsingFunction extends AbstractParsingFunction<Expression> {
