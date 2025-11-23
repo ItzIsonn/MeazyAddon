@@ -40,7 +40,6 @@ public class ForStatementParsingFunction extends AbstractParsingFunction<Stateme
         Expression collection = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
 
         parser.next(AddonTokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.end", "right_parenthesis", "for_condition"));
-        parser.moveOverOptionalNewLines();
 
         parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "for_body"));
         List<Statement> body = ParsingHelper.parseBody(context);

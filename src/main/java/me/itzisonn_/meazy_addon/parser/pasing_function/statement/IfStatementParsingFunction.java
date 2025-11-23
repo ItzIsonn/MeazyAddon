@@ -29,7 +29,6 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
 
         Expression condition = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
         parser.next(AddonTokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.end", "right_parenthesis", "if_condition"));
-        parser.moveOverOptionalNewLines();
 
         List<Statement> body = new ArrayList<>();
         if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
@@ -53,7 +52,6 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
             }
             else {
                 List<Statement> elseBody = new ArrayList<>();
-                parser.moveOverOptionalNewLines();
                 if (parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
                     parser.next();
                     elseBody = ParsingHelper.parseBody(context);

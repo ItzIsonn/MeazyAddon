@@ -36,10 +36,7 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
-        boolean hasNewLine = parser.getCurrent().getType().equals(TokenTypes.NEW_LINE());
-        parser.moveOverOptionalNewLines();
-
-        if (!parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE()) && hasNewLine) {
+        if (!parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 

@@ -65,10 +65,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             while (parser.getCurrent().getType().equals(AddonTokenTypes.COMMA()));
         }
 
-        boolean hasNewLine = parser.getCurrent().getType().equals(TokenTypes.NEW_LINE());
-        parser.moveOverOptionalNewLines();
-
-        if (!parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE()) && hasNewLine) {
+        if (!parser.getCurrent().getType().equals(AddonTokenTypes.LEFT_BRACE())) {
             return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 

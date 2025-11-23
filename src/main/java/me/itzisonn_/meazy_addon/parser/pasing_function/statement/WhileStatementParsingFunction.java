@@ -28,7 +28,6 @@ public class WhileStatementParsingFunction extends AbstractParsingFunction<While
         Expression condition = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
         parser.getCurrentAndNext(AddonTokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy_addon:parser.expected.end", "right_parenthesis", "while_condition"));
 
-        parser.moveOverOptionalNewLines();
         parser.getCurrentAndNext(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "while_body"));
         List<Statement> body = ParsingHelper.parseBody(context);
         parser.getCurrentAndNext(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "while_body"));

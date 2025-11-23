@@ -51,7 +51,6 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             body = new ArrayList<>(List.of(parser.parse(AddonMain.getIdentifier("statement"))));
         }
         else {
-            parser.moveOverOptionalNewLines();
             parser.next(AddonTokenTypes.LEFT_BRACE(), Text.translatable("meazy_addon:parser.expected.start", "left_brace", "function_body"));
             body = ParsingHelper.parseBody(context);
             parser.next(AddonTokenTypes.RIGHT_BRACE(), Text.translatable("meazy_addon:parser.expected.end", "right_brace", "function_body"));
