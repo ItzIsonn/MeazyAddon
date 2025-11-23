@@ -331,13 +331,13 @@ public class StringClassNative {
         return new StringClassValue(baseClasses, classEnvironment, body);
     }
 
-    public static class InnerStringValue extends RuntimeValueImpl<String> {
+    private static class InnerStringValue extends RuntimeValueImpl<String> {
         private InnerStringValue(String value) {
             super(value);
         }
     }
 
-    private static class StringClassValue extends RuntimeClassValueImpl {
+    public static class StringClassValue extends RuntimeClassValueImpl {
         private StringClassValue(Set<String> baseClasses, ClassEnvironment classEnvironment, List<Statement> body) {
             super(baseClasses, classEnvironment, body);
         }

@@ -13,6 +13,6 @@ public class UnsupportedOperatorException extends TextException {
      * @param operator Operator
      */
     public UnsupportedOperatorException(String operator) {
-        super(Text.translatable("meazy_addon:runtime.cant_evaluate_with_operator").append(Text.literal(operator)));
+        super(Text.translatable("meazy_addon:runtime.cant_evaluate_with_operator", operator));
     }
 }

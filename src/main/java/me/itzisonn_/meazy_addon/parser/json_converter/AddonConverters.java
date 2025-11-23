@@ -53,15 +53,16 @@ public final class AddonConverters {
         register(new ReturnStatementConverter());
         register(new ContinueStatementConverter());
         register(new BreakStatementConverter());
+        register(new AssignmentStatementConverter());
 
-        register(new AssignmentExpressionConverter());
         register(new ListCreationExpressionConverter());
         register(new MapCreationExpressionConverter());
         register(new NullCheckExpressionConverter());
         register(new IsExpressionConverter());
         register(new OperatorExpressionConverter());
-        register(new ClassCallExpressionConverter());
+        register(new PostfixExpressionConverter());
         register(new MemberExpressionConverter());
+        register(new ClassCallExpressionConverter());
         register(new FunctionCallExpressionConverter());
         register(new ClassIdentifierConverter());
         register(new FunctionIdentifierConverter());

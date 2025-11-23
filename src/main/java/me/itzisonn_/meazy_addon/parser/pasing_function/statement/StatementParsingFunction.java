@@ -7,11 +7,12 @@ import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy_addon.AddonMain;
+import me.itzisonn_.meazy_addon.lexer.AddonTokenTypeSets;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.InvalidStatementException;
 import me.itzisonn_.meazy_addon.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
+import me.itzisonn_.meazy_addon.parser.ast.expression.PostfixExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.call_expression.FunctionCallExpression;
 import me.itzisonn_.meazy_addon.parser.ast.statement.VariableDeclarationStatement;
@@ -43,8 +44,12 @@ public class StatementParsingFunction extends AbstractParsingFunction<Statement>
         if (parser.getCurrent().getType().equals(AddonTokenTypes.CONTINUE())) return parser.parse(AddonMain.getIdentifier("continue_statement"));
         if (parser.getCurrent().getType().equals(AddonTokenTypes.BREAK())) return parser.parse(AddonMain.getIdentifier("break_statement"));
 
+        if (parser.currentLineHasToken(AddonTokenTypes.ASSIGN()) || parser.currentLineHasToken(AddonTokenTypeSets.OPERATOR_ASSIGN())) {
+            return parser.parse(AddonMain.getIdentifier("assignment_statement"));
+        }
+
         Expression expression = parser.parse(AddonMain.getIdentifier("expression"), Expression.class);
-        if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression || expression instanceof AssignmentExpression || expression instanceof MemberExpression) {
+        if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression || expression instanceof MemberExpression || expression instanceof PostfixExpression) {
             return expression;
         }
 

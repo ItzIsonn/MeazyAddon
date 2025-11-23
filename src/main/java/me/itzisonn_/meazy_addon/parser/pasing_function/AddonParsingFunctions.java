@@ -51,9 +51,9 @@ public final class AddonParsingFunctions {
         register(new ReturnStatementParsingFunction());
         register(new ContinueStatementParsingFunction());
         register(new BreakStatementParsingFunction());
+        register(new AssignmentStatementParsingFunction());
 
         register(new ExpressionParsingFunction());
-        register(new AssignmentExpressionParsingFunction());
         register(new ListCreationExpressionParsingFunction());
         register(new MapCreationExpressionParsingFunction());
         register(new NullCheckExpressionParsingFunction());

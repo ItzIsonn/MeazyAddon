@@ -18,7 +18,7 @@ public class GreaterOperator extends Operator {
         if (value1 instanceof NumberValue<?> numberValue1 && value2 instanceof NumberValue<?> numberValue2) {
             return BooleanValue.of(numberValue1.getValue().doubleValue() > numberValue2.getValue().doubleValue());
         }
-        if (value1 instanceof StringClassNative.InnerStringValue stringValue1 && value2 instanceof StringClassNative.InnerStringValue stringValue2) {
+        if (value1 instanceof StringClassNative.StringClassValue stringValue1 && value2 instanceof StringClassNative.StringClassValue stringValue2) {
             return BooleanValue.of(stringValue1.getValue().length() > stringValue2.getValue().length());
         }
         return null;

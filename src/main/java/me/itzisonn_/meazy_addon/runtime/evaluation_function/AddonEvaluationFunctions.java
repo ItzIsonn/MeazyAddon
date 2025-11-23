@@ -44,14 +44,15 @@ public final class AddonEvaluationFunctions {
         register(new ReturnStatementEvaluationFunction());
         register(new ContinueStatementEvaluationFunction());
         register(new BreakStatementEvaluationFunction());
+        register(new AssignmentStatementEvaluationFunction());
 
-        register(new AssignmentExpressionEvaluationFunction());
         register(new ListCreationExpressionEvaluationFunction());
         register(new MapCreationExpressionEvaluationFunction());
         register(new NullCheckExpressionEvaluationFunction());
         register(new IsExpressionEvaluationFunction());
         register(new OperatorExpressionEvaluationFunction());
         register(new ClassCallExpressionEvaluationFunction());
+        register(new PostfixExpressionEvaluationFunction());
         register(new MemberExpressionEvaluationFunction());
         register(new FunctionCallExpressionEvaluationFunction());
         register(new IdentifierEvaluationFunction());

@@ -11,9 +11,6 @@ import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
-import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
-import me.itzisonn_.meazy_addon.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy_addon.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy_addon.parser.modifier.AddonModifiers;
 import me.itzisonn_.meazy_addon.runtime.EvaluationException;
@@ -28,27 +25,7 @@ public final class EvaluationHelper {
 
     private EvaluationHelper() {}
 
-    public static RuntimeValue<?> evaluateAssignmentExpression(RuntimeContext context, AssignmentExpression assignmentExpression, Environment environment) {
-        Interpreter interpreter = context.getInterpreter();
 
-        if (assignmentExpression.getId() instanceof VariableIdentifier variableIdentifier) {
-            RuntimeValue<?> value = interpreter.evaluate(assignmentExpression.getValue(), environment).getFinalRuntimeValue();
-            environment.getVariableDeclarationEnvironment(variableIdentifier.getId()).assignVariable(variableIdentifier.getId(), value);
-            return value;
-        }
-
-        if (assignmentExpression.getId() instanceof MemberExpression memberExpression) {
-            RuntimeValue<?> memberExpressionValue = interpreter.evaluate(memberExpression, environment);
-            if (memberExpressionValue instanceof VariableValue variableValue) {
-                RuntimeValue<?> value = interpreter.evaluate(assignmentExpression.getValue(), environment).getFinalRuntimeValue();
-                variableValue.setValue(value);
-                return value;
-            }
-            throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_assign_value", memberExpressionValue));
-        }
-
-        throw new EvaluationException(Text.translatable("meazy_addon:runtime.cant_assign_value", assignmentExpression.getId().getClass().getName()));
-    }
 
     public static boolean parseCondition(RuntimeContext context, Expression rawCondition, Environment environment) {
         RuntimeValue<?> condition = context.getInterpreter().evaluate(rawCondition, environment).getFinalRuntimeValue();

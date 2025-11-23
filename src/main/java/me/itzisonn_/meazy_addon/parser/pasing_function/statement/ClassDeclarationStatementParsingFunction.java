@@ -15,7 +15,7 @@ import me.itzisonn_.meazy_addon.AddonMain;
 import me.itzisonn_.meazy_addon.AddonUtils;
 import me.itzisonn_.meazy_addon.lexer.AddonTokenTypes;
 import me.itzisonn_.meazy_addon.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy_addon.parser.ast.expression.AssignmentExpression;
+import me.itzisonn_.meazy_addon.parser.ast.statement.AssignmentStatement;
 import me.itzisonn_.meazy_addon.parser.ast.expression.IsExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy_addon.parser.ast.expression.OperatorExpression;
@@ -149,7 +149,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
         List<Statement> constructorBody = new ArrayList<>();
         for (ParameterExpression callArgExpression : dataVariables) {
-            constructorBody.add(new AssignmentExpression(new MemberExpression(new ThisLiteral(), new VariableIdentifier(callArgExpression.getId()), false), new VariableIdentifier(callArgExpression.getId())));
+            constructorBody.add(new AssignmentStatement(new MemberExpression(new ThisLiteral(), new VariableIdentifier(callArgExpression.getId()), false), new VariableIdentifier(callArgExpression.getId())));
         }
         body.add(new ConstructorDeclarationStatement(Set.of(), dataVariables, constructorBody));
 
@@ -263,7 +263,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 Set.of(),
                 AddonUtils.generatePrefixedName("set", id),
                 List.of(new ParameterExpression(id, dataType, true)),
-                List.of(new AssignmentExpression(new MemberExpression(new ThisLiteral(), new VariableIdentifier(id), false), new VariableIdentifier(id))),
+                List.of(new AssignmentStatement(new MemberExpression(new ThisLiteral(), new VariableIdentifier(id), false), new VariableIdentifier(id))),
                 null);
     }
 }
