@@ -10,7 +10,9 @@ import me.itzisonn_.meazy_addon.runtime.value.number.FloatValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 @NativeContainer("data/program/primitive/float.mea")
-public class FloatClassNative {
+public final class FloatClassNative {
+    private FloatClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {

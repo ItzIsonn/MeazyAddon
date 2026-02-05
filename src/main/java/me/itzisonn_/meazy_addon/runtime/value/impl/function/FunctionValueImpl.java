@@ -53,21 +53,21 @@ public abstract class FunctionValueImpl extends ModifierableRuntimeValueImpl<Obj
         if (o == this) return true;
         if (!(o instanceof FunctionValue other)) return false;
 
-        Object this$id = this.getId();
+        Object this$id = getId();
         Object other$id = other.getId();
         if (this$id == null) {
             if (other$id != null) return false;
         }
         else if (!this$id.equals(other$id)) return false;
 
-        Object this$parameters = this.getParameters();
+        Object this$parameters = getParameters();
         Object other$parameters = other.getParameters();
         if (this$parameters == null) {
             if (other$parameters != null) return false;
         }
         else if (!this$parameters.equals(other$parameters)) return false;
 
-        Object this$returnDataType = this.getReturnDataType();
+        Object this$returnDataType = getReturnDataType();
         Object other$returnDataType = other.getReturnDataType();
         if (this$returnDataType == null) {
             return other$returnDataType == null;

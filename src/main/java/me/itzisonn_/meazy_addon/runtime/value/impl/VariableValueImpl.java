@@ -60,7 +60,7 @@ public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue
         this.dataType = dataType;
         this.parentEnvironment = parentEnvironment;
         setValue(value);
-        this.rawValue = null;
+        rawValue = null;
         this.isConstant = isConstant;
         this.isArgument = isArgument;
     }
@@ -86,10 +86,9 @@ public class VariableValueImpl extends ModifierableRuntimeValueImpl<RuntimeValue
         this.id = id;
         this.dataType = dataType;
         this.parentEnvironment = parentEnvironment;
-        this.value = null;
+        value = null;
         this.rawValue = rawValue;
         this.isConstant = isConstant;
-        this.modifiers = modifiers;
         this.isArgument = isArgument;
     }
 

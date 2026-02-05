@@ -15,7 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
 @NativeContainer("data/program/file/file_writer.mea")
-public class FileWriterClassNative {
+public final class FileWriterClassNative {
+    private FileWriterClassNative() {}
+
     @Function
     public static InnerFileValue getNativeFile(@Argument RuntimeValue<?> file) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {
@@ -83,7 +85,7 @@ public class FileWriterClassNative {
 
 
 
-    public static class InnerFileValue extends RuntimeValueImpl<File> {
+    public static final class InnerFileValue extends RuntimeValueImpl<File> {
         private InnerFileValue(File value) {
             super(value);
         }

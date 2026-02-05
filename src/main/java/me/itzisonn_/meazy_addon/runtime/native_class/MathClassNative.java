@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NativeContainer("data/program/math.mea")
-public class MathClassNative {
+public final class MathClassNative {
+    private MathClassNative() {}
+
     @Function
     public static LongValue round(@Argument RuntimeValue<?> value) {
         if (!(value.getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new RuntimeException("Can't round non-number value");

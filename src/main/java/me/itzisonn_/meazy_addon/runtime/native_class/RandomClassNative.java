@@ -13,7 +13,9 @@ import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 import java.util.Random;
 
 @NativeContainer("data/program/random.mea")
-public class RandomClassNative {
+public final class RandomClassNative {
+    private RandomClassNative() {}
+
     @Function
     public static InnerRandomValue getNativeRandom() {
         return new InnerRandomValue(new Random());
@@ -76,7 +78,7 @@ public class RandomClassNative {
         return new DoubleValue(randomValue.getValue().nextDouble(beginValue.getValue(), endValue.getValue()));
     }
 
-    public static class InnerRandomValue extends RuntimeValueImpl<Random> {
+    public static final class InnerRandomValue extends RuntimeValueImpl<Random> {
         private InnerRandomValue(Random value) {
             super(value);
         }

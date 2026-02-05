@@ -9,7 +9,9 @@ import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 @NativeContainer("data/program/primitive/number.mea")
-public class NumberClassNative {
+public final class NumberClassNative {
+    private NumberClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {

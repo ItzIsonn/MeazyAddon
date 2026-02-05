@@ -11,7 +11,9 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 @NativeContainer("data/program/primitive/int.mea")
-public class IntClassNative {
+public final class IntClassNative {
+    private IntClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {

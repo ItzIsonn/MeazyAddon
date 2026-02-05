@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Set;
 
 @NativeContainer("data/program/collection/set.mea")
-public class SetClassNative {
+public final class SetClassNative {
+    private SetClassNative() {}
+
     public static ClassValue newSet(Environment callEnvironment, RuntimeContext context, Set<RuntimeValue<?>> set) {
         ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Set"), callEnvironment, new ArrayList<>());
 
@@ -113,7 +115,7 @@ public class SetClassNative {
 
 
 
-    public static class InnerSetValue extends InnerCollectionValue<Set<RuntimeValue<?>>> {
+    public static final class InnerSetValue extends InnerCollectionValue<Set<RuntimeValue<?>>> {
         private InnerSetValue(Set<RuntimeValue<?>> value) {
             super(value);
         }

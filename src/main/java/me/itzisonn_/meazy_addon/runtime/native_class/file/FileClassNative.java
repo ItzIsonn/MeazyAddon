@@ -14,7 +14,9 @@ import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative
 import java.io.*;
 
 @NativeContainer("data/program/file/file.mea")
-public class FileClassNative {
+public final class FileClassNative {
+    private FileClassNative() {}
+
     @Function
     public static InnerFileValue getNativeFile(@Argument RuntimeValue<?> path) {
         return new InnerFileValue(new File(String.valueOf(path.getFinalValue())));

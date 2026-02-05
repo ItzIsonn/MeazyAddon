@@ -7,7 +7,9 @@ import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 @NativeContainer("data/program/global.mea")
-public class GlobalEnvironmentNative {
+public final class GlobalEnvironmentNative {
+    private GlobalEnvironmentNative() {}
+
     @Function
     public static void print(@Argument RuntimeValue<?> value, RuntimeContext context) {
         value = value.getFinalRuntimeValue();

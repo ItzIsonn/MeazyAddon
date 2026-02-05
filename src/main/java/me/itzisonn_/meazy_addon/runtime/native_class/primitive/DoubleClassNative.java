@@ -10,7 +10,9 @@ import me.itzisonn_.meazy_addon.runtime.value.number.DoubleValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 @NativeContainer("data/program/primitive/double.mea")
-public class DoubleClassNative {
+public final class DoubleClassNative {
+    private DoubleClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {

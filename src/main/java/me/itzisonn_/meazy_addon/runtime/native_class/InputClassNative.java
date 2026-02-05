@@ -11,8 +11,10 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import java.util.Scanner;
 
 @NativeContainer("data/program/input.mea")
-public class InputClassNative {
+public final class InputClassNative {
     private static final Scanner SCANNER = new Scanner(System.in);
+
+    private InputClassNative() {}
 
     @Function
     public static ClassValue read(FunctionEnvironment functionEnvironment) {

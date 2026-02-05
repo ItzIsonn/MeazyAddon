@@ -20,7 +20,9 @@ import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import java.util.*;
 
 @NativeContainer("data/program/collection/list.mea")
-public class MapClassNative {
+public final class MapClassNative {
+    private MapClassNative() {}
+
     public static ClassValue newMap(Environment callEnvironment, RuntimeContext context, Map<RuntimeValue<?>, RuntimeValue<?>> map) {
         ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("Map"), callEnvironment, new ArrayList<>());
 
@@ -165,7 +167,7 @@ public class MapClassNative {
         return unpackedMap;
     }
 
-    public static class InnerMapValue extends RuntimeValueImpl<Map<RuntimeValue<?>, RuntimeValue<?>>> {
+    public static final class InnerMapValue extends RuntimeValueImpl<Map<RuntimeValue<?>, RuntimeValue<?>>> {
         private InnerMapValue(Map<RuntimeValue<?>, RuntimeValue<?>> value) {
             super(value);
         }

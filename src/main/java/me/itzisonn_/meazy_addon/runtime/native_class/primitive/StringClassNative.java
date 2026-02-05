@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Set;
 
 @NativeContainer("data/program/primitive/string.mea")
-public class StringClassNative {
+public final class StringClassNative {
+    private StringClassNative() {}
+
     public static ClassValue newString(Environment callEnvironment, String string) {
         FileEnvironment fileEnvironment = callEnvironment.getFileEnvironment();
         ClassValue classValue = EvaluationHelper.callUninitializedClassValue(fileEnvironment.getParent().getContext(), fileEnvironment.getClass("String"), callEnvironment);
@@ -39,7 +41,7 @@ public class StringClassNative {
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         try {
-            return StringClassNative.newString(functionEnvironment, value.getFinalRuntimeValue().toString());
+            return newString(functionEnvironment, value.getFinalRuntimeValue().toString());
         }
         catch (NumberFormatException ignore) {
             return NullValue.INSTANCE;
@@ -69,7 +71,7 @@ public class StringClassNative {
         if (!(pos.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't get char at non-int pos");
 
         try {
-            return StringClassNative.newString(functionEnvironment, String.valueOf(stringValue.getValue().charAt(intValue.getValue())));
+            return newString(functionEnvironment, String.valueOf(stringValue.getValue().charAt(intValue.getValue())));
         }
         catch (IndexOutOfBoundsException ignore) {
             throw new RuntimeException("Index " + intValue.getValue() + " is out of bounds " + (stringValue.getValue().length() - 1));
@@ -90,7 +92,7 @@ public class StringClassNative {
 
         StringBuilder stringBuilder = new StringBuilder(stringValue.getValue());
         stringBuilder.setCharAt(intValue.getValue(), character.getFinalValue().toString().charAt(0));
-        return StringClassNative.newString(functionEnvironment, stringBuilder.toString());
+        return newString(functionEnvironment, stringBuilder.toString());
     }
 
 
@@ -105,7 +107,7 @@ public class StringClassNative {
         }
         if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return StringClassNative.newString(classEnvironment, stringValue.getValue().replace(begin.getFinalValue().toString(), end.getFinalValue().toString()));
+        return newString(classEnvironment, stringValue.getValue().replace(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
 
     @Function
@@ -118,7 +120,7 @@ public class StringClassNative {
         }
         if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().replaceAll(begin.getFinalValue().toString(), end.getFinalValue().toString()));
+        return newString(functionEnvironment, stringValue.getValue().replaceAll(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
 
     @Function
@@ -131,7 +133,7 @@ public class StringClassNative {
         }
         if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().replaceFirst(begin.getFinalValue().toString(), end.getFinalValue().toString()));
+        return newString(functionEnvironment, stringValue.getValue().replaceFirst(begin.getFinalValue().toString(), end.getFinalValue().toString()));
     }
 
 
@@ -149,7 +151,7 @@ public class StringClassNative {
         if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new RuntimeException("Can't get substring with non-int begin value");
         if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new RuntimeException("Can't get substring with non-int end value");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue(), endValue.getValue()));
+        return newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue(), endValue.getValue()));
     }
 
     @Function
@@ -164,7 +166,7 @@ public class StringClassNative {
 
         if (!(begin.getFinalRuntimeValue() instanceof IntValue beginValue)) throw new RuntimeException("Can't get substring with non-int begin value");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue()));
+        return newString(functionEnvironment, stringValue.getValue().substring(beginValue.getValue()));
     }
 
     @Function
@@ -179,7 +181,7 @@ public class StringClassNative {
 
         if (!(end.getFinalRuntimeValue() instanceof IntValue endValue)) throw new RuntimeException("Can't get substring with non-int begin value");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().substring(0, endValue.getValue()));
+        return newString(functionEnvironment, stringValue.getValue().substring(0, endValue.getValue()));
     }
 
 
@@ -197,7 +199,7 @@ public class StringClassNative {
         String[] splitString = stringValue.getValue().split(regex.getFinalValue().toString());
         List<RuntimeValue<?>> list = new ArrayList<>();
         for (String str : splitString) {
-            list.add(StringClassNative.newString(functionEnvironment, str));
+            list.add(newString(functionEnvironment, str));
         }
 
         return ListClassNative.newList(functionEnvironment, context, list);
@@ -215,7 +217,7 @@ public class StringClassNative {
 
         if (!(times.getFinalRuntimeValue() instanceof IntValue intValue)) throw new RuntimeException("Can't repeat string non-int times");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().repeat(intValue.getValue()));
+        return newString(functionEnvironment, stringValue.getValue().repeat(intValue.getValue()));
     }
 
     @Function
@@ -228,7 +230,7 @@ public class StringClassNative {
         }
         if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().trim());
+        return newString(functionEnvironment, stringValue.getValue().trim());
     }
 
     @Function
@@ -241,7 +243,7 @@ public class StringClassNative {
         }
         if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().toUpperCase());
+        return newString(functionEnvironment, stringValue.getValue().toUpperCase());
     }
 
     @Function
@@ -254,7 +256,7 @@ public class StringClassNative {
         }
         if (!classEnvironment.getId().equals("String")) throw new RuntimeException("Invalid function call");
 
-        return StringClassNative.newString(functionEnvironment, stringValue.getValue().toLowerCase());
+        return newString(functionEnvironment, stringValue.getValue().toLowerCase());
     }
 
 
@@ -331,13 +333,13 @@ public class StringClassNative {
         return new StringClassValue(baseClasses, classEnvironment, body);
     }
 
-    private static class InnerStringValue extends RuntimeValueImpl<String> {
+    private static final class InnerStringValue extends RuntimeValueImpl<String> {
         private InnerStringValue(String value) {
             super(value);
         }
     }
 
-    public static class StringClassValue extends RuntimeClassValueImpl {
+    public static final class StringClassValue extends RuntimeClassValueImpl {
         private StringClassValue(Set<String> baseClasses, ClassEnvironment classEnvironment, List<Statement> body) {
             super(baseClasses, classEnvironment, body);
         }
@@ -360,9 +362,7 @@ public class StringClassNative {
 
         @Override
         public boolean equals(Object o) {
-            if (o == this) return true;
-            else if (!(o instanceof StringClassValue other)) return false;
-            else return other.getValue().equals(getValue());
+            return o == this || (o instanceof StringClassValue other && other.getValue().equals(getValue()));
         }
     }
 }

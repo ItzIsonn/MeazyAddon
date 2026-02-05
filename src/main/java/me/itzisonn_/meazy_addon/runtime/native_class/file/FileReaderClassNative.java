@@ -11,20 +11,23 @@ import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 import me.itzisonn_.meazy_addon.runtime.value.impl.RuntimeValueImpl;
 import me.itzisonn_.meazy_addon.runtime.native_class.collection.ListClassNative;
 import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.file.FileClassNative.InnerFileValue;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @NativeContainer("data/program/file/file_reader.mea")
-public class FileReaderClassNative {
+public final class FileReaderClassNative {
+    private FileReaderClassNative() {}
+
     @Function
     public static InnerFileReaderValue getNativeFileReader(@Argument RuntimeValue<?> file) {
         if (!(file.getFinalRuntimeValue() instanceof ClassValue classValue)) {
             throw new RuntimeException("Can't create file reader from non-file value");
         }
         if (!classValue.getId().equals("File")) throw new RuntimeException("Can't create file reader from non-file value");
-        if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("file").getVariable("file").getValue() instanceof FileClassNative.InnerFileValue fileValue)) {
+        if (!(classValue.getEnvironment().getVariableDeclarationEnvironment("file").getVariable("file").getValue() instanceof InnerFileValue fileValue)) {
             throw new RuntimeException("Can't create file reader from non-file value");
         }
 

@@ -135,21 +135,19 @@ public class RuntimeFunctionValueImpl extends FunctionValueImpl {
             ));
         }
 
-        RuntimeValue<?> result = null;
         for (int i = 0; i < body.size(); i++) {
             Statement statement = body.get(i);
             if (statement instanceof ReturnStatement) {
-                result = interpreter.evaluate(statement, functionEnvironment);
+                RuntimeValue<?> result = interpreter.evaluate(statement, functionEnvironment);
                 if (i + 1 < body.size()) throw new EvaluationException(Text.translatable("meazy_addon:runtime.statement_must_be_last", "return"));
-                break;
+                return result;
             }
             RuntimeValue<?> value = interpreter.evaluate(statement, functionEnvironment);
             if (value instanceof ReturnInfoValue returnInfoValue) {
-                result = returnInfoValue.getFinalRuntimeValue();
-                break;
+                return returnInfoValue.getFinalRuntimeValue();
             }
         }
 
-        return result;
+        return null;
     }
 }

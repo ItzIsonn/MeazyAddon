@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy_addon.runtime.EvaluationException;
 import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative;
+import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.IntValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
@@ -24,11 +25,11 @@ public class MultiplyOperator extends Operator {
         String string;
         int amount;
 
-        if (value1 instanceof StringClassNative.StringClassValue stringValue && value2 instanceof IntValue numberValue) {
+        if (value1 instanceof StringClassValue stringValue && value2 instanceof IntValue numberValue) {
             string = stringValue.getValue();
             amount = numberValue.getValue();
         }
-        else if (value2 instanceof StringClassNative.StringClassValue stringValue && value1 instanceof IntValue numberValue) {
+        else if (value2 instanceof StringClassValue stringValue && value1 instanceof IntValue numberValue) {
             string = stringValue.getValue();
             amount = numberValue.getValue();
         }

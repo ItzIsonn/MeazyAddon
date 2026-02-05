@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NativeContainer("data/program/meazy/meazy.mea")
-public class MeazyClassNative {
+public final class MeazyClassNative {
+    private MeazyClassNative() {}
+
     @Function
     public static ClassValue getVersion(FunctionEnvironment functionEnvironment) {
         return StringClassNative.newString(functionEnvironment.getFileEnvironment(), MeazyMain.VERSION.toString());

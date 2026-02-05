@@ -9,7 +9,9 @@ import me.itzisonn_.meazy_addon.runtime.value.BooleanValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 
 @NativeContainer("data/program/primitive/boolean.mea")
-public class BooleanClassNative {
+public final class BooleanClassNative {
+    private BooleanClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         return switch (value.getFinalValue().toString()) {
@@ -24,9 +26,6 @@ public class BooleanClassNative {
         if (value == null) return false;
         if (value instanceof Boolean || value instanceof BooleanValue) return true;
 
-        if (value instanceof RuntimeValue<?> runtimeValue) {
-            return runtimeValue.getFinalRuntimeValue() instanceof BooleanValue;
-        }
-        return false;
+        return value instanceof RuntimeValue<?> runtimeValue && runtimeValue.getFinalRuntimeValue() instanceof BooleanValue;
     }
 }

@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Set;
 
 @NativeContainer("data/program/collection/list.mea")
-public class ListClassNative {
+public final class ListClassNative {
+    private ListClassNative() {}
+
     public static ClassValue newList(Environment callEnvironment, RuntimeContext context, List<RuntimeValue<?>> list) {
         ClassValue classValue = EvaluationHelper.callClassValue(context, callEnvironment.getFileEnvironment().getClass("List"), callEnvironment, new ArrayList<>());
 
@@ -128,7 +130,7 @@ public class ListClassNative {
 
 
 
-    public static class InnerListValue extends InnerCollectionValue<List<RuntimeValue<?>>> {
+    public static final class InnerListValue extends InnerCollectionValue<List<RuntimeValue<?>>> {
         private InnerListValue(List<RuntimeValue<?>> value) {
             super(value);
         }

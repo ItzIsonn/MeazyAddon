@@ -10,7 +10,9 @@ import me.itzisonn_.meazy_addon.runtime.value.number.LongValue;
 import me.itzisonn_.meazy_addon.runtime.value.number.NumberValue;
 
 @NativeContainer("data/program/primitive/long.mea")
-public class LongClassNative {
+public final class LongClassNative {
+    private LongClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value) {
         try {

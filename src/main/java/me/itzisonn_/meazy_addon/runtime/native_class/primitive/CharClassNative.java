@@ -6,10 +6,13 @@ import me.itzisonn_.meazy.runtime.native_annotation.IsMatches;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy_addon.runtime.native_class.primitive.StringClassNative.StringClassValue;
 import me.itzisonn_.meazy_addon.runtime.value.NullValue;
 
 @NativeContainer("data/program/primitive/char.mea")
-public class CharClassNative {
+public final class CharClassNative {
+    private CharClassNative() {}
+
     @Function
     public static RuntimeValue<?> valueOf(@Argument RuntimeValue<?> value, FunctionEnvironment functionEnvironment) {
         String stringValue = value.getFinalValue().toString();
@@ -21,7 +24,7 @@ public class CharClassNative {
     public static boolean isMatches(Object value) {
         return switch (value) {
             case Character _ -> true;
-            case StringClassNative.StringClassValue classValue -> classValue.getValue().length() == 1;
+            case StringClassValue classValue -> classValue.getValue().length() == 1;
             default -> false;
         };
     }
